@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "143527122254",
+    "project_id": "carive-8d3bf",
+    "storage_bucket": "carive-8d3bf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:143527122254:android:a16032a0f5d4bcf2e97a1f",
+        "android_client_info": {
+          "package_name": "com.example.carive"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "143527122254-9jhk6vknpsjgsuvdjrgtipb6hoodot2r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBs0fpL95lJRKDLwsyHRYtihOjC4RHdI8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "143527122254-9jhk6vknpsjgsuvdjrgtipb6hoodot2r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
