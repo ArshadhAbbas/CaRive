@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:carive/screens/home/car_details/car_details.dart';
 import 'package:carive/shared/constants.dart';
-import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:flutter/material.dart';
 
 class TransluscentCard extends StatelessWidget {

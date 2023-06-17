@@ -8,6 +8,7 @@ import 'package:carive/shared/logo.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 
+import '../../screens/profile/create_profile/create_profile.dart';
 import '../../screens/profile/profile_screen.dart';
 
 class BottomNavBar extends StatefulWidget {
@@ -26,8 +27,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
     const ChatScreen(),
     const SettingsScreen(),
     const Home(),
-    const NotificationScreen(),
-     ProfileScreen()
+     NotificationScreen(),
+    ProfileScreen()
   ];
 
   @override

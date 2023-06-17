@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
         print("StreamProvider Error: $error");
         return null;
       },
-      child: GetMaterialApp(
+      child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',
           theme: ThemeData(
