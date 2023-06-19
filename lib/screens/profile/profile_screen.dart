@@ -102,7 +102,7 @@ class ProfileScreen extends StatelessWidget {
                     Image.network(
                       myUser.image,
                       width: double.infinity,
-                      height: MediaQuery.of(context).size.height / 2,
+                      height: MediaQuery.of(context).size.height / 1.9,
                       fit: BoxFit.cover,
                     ),
                     Align(

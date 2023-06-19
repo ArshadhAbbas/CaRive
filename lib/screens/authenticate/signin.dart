@@ -67,6 +67,11 @@ class _SignInState extends State<SignIn> {
                           hintText: 'Email',
                           labelText: 'Email',
                           controller: emailController,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return "Please Enter valid Mail";
+                            }
+                          },
                         ),
                         hSizedBox10,
                         CustomTextFormField(
@@ -75,6 +80,11 @@ class _SignInState extends State<SignIn> {
                           controller: passwordController,
                           obscureText: true,
                           isEye: true,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return "Please Enter Password containing atleast 6 characters";
+                            }
+                          },
                         ),
                         hSizedBox20,
                         isLoading

@@ -51,6 +51,11 @@ class _RegisterState extends State<Register> {
                 hintText: 'Email',
                 labelText: 'Email',
                 controller: emailController,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Please Enter Email";
+                  }
+                },
               ),
               hSizedBox30,
               CustomTextFormField(
@@ -59,9 +64,15 @@ class _RegisterState extends State<Register> {
                 controller: passwordController,
                 obscureText: true,
                 isEye: true,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Please Enter Password";
+                  }
+                },
               ),
               hSizedBox30,
-              CustomElevatedButton(text: "Register Now",onPressed: _registerButtonPressed),
+              CustomElevatedButton(
+                  text: "Register Now", onPressed: _registerButtonPressed),
               hSizedBox20,
               Text(
                 error,

@@ -1,11 +1,32 @@
 import 'dart:ui';
 
 import 'package:carive/screens/home/car_details/car_details.dart';
+import 'package:carive/shared/cars_list.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:flutter/material.dart';
 
 class TransluscentCard extends StatelessWidget {
-  const TransluscentCard({super.key});
+  TransluscentCard({
+    super.key,
+    required this.brand,
+    required this.model,
+    required this.price,
+    required this.location,
+    required this.image,
+    required this.modelYear,
+    required this.seatCapacity,
+    required this.fuelType,
+    required this.ownerId
+  });
+  String brand;
+  String model;
+  String price;
+  String location;
+  String image;
+  String fuelType;
+  String modelYear;
+  String seatCapacity;
+  String ownerId;
 
   @override
   Widget build(BuildContext context) {
@@ -25,17 +46,23 @@ class TransluscentCard extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                ClipRRect(
+                Container(
+                  height: 130,
+                  width: 170,
+                  child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-                    child: Image.asset(
-                      'assets/Thar.jpg',
-                      fit: BoxFit.fitWidth,
-                    )),
+                    child: Image.network(
+                      image,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      "Mahindra Thar",
+                    Text(
+                      model,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -64,7 +91,7 @@ class TransluscentCard extends StatelessWidget {
                       width: 15,
                     ),
                     wSizedBox10,
-                    const Text("Location",
+                    Text(location,
                         style: TextStyle(color: Colors.white, fontSize: 15))
                   ],
                 ),
@@ -76,7 +103,7 @@ class TransluscentCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Text(
-                            "₹Price",
+                            "₹${price}",
                             style: TextStyle(color: themeColorGreen),
                           ),
                           const Text(
@@ -98,7 +125,19 @@ class TransluscentCard extends StatelessWidget {
                         ),
                         child: Text("Explore"),
                         onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => CarDetails(),));
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => CarDetails(
+                              brand: brand,
+                              image: image,
+                              location: location,
+                              model: model,
+                              price: price,
+                              modelYear: modelYear,
+                              seatCapacity: seatCapacity,
+                              fuelType: fuelType,
+                              ownerId: ownerId,
+                            ),
+                          ));
                         },
                       )
                     ],

@@ -33,6 +33,11 @@ class ForgotPassword extends StatelessWidget {
                   hintText: "Email",
                   labelText: "User Email",
                   controller: emailController,
+                   validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Please Enter valid Mail";
+                  }
+                },
                 ),
                 hSizedBox30,
                 CustomElevatedButton(

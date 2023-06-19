@@ -176,6 +176,7 @@ class _CreateProfileState extends State<CreateProfile> {
                       ),
                       hSizedBox10,
                       CustomTextFormField(
+                        maxLines: 3,
                         controller: addressController,
                         validator: (value) {
                           if (value!.isEmpty) {
@@ -195,6 +196,13 @@ class _CreateProfileState extends State<CreateProfile> {
                             : CustomElevatedButton(
                                 text: "Save",
                                 onPressed: () async {
+                                  FocusScopeNode currentfocus = FocusScope.of(
+                                      context); //get the currnet focus node
+                                  if (!currentfocus.hasPrimaryFocus) {
+                                    //prevent Flutter from throwing an exception
+                                    currentfocus
+                                        .unfocus(); //unfocust from current focust, so that keyboard will dismiss
+                                  }
                                   if (_formKey.currentState!.validate()) {
                                     setState(() {
                                       isLoading = true;
