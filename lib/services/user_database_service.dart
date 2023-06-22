@@ -7,13 +7,61 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as Path;
 
 class UserDatabaseService {
+  UserDatabaseService({this.uid});
+  final String? uid;
+
   final StreamController<File?> _selectedImageController =
       StreamController<File?>.broadcast();
 
   Stream<File?> get selectedImageStream => _selectedImageController.stream;
 
-  final String? uid;
-  UserDatabaseService({this.uid});
+  final CollectionReference userCollectionReference =
+      FirebaseFirestore.instance.collection("users");
+
+// Create user profile
+
+  Future<void> addUser(String uid, String name, String address,
+      String phoneNumber, String mailId) async {
+    try {
+      String url = await uploadImage(selectedImage!);
+      await userCollectionReference.doc(uid).set({
+        "id": uid,
+        "image": url,
+        "name": name,
+        "phone_number": phoneNumber,
+        "email": mailId,
+        "address": address
+      });
+    } catch (e) {
+      print("An error occurred while adding the user: $e");
+      throw e;
+    }
+  }
+
+  // Edit user profile
+
+  Future<void> updateUserData(
+    String uid,
+    String name,
+    String address,
+    String phoneNumber,
+    String mailId,
+  ) async {
+    if (selectedImage != null) {
+      String url = await uploadImage(selectedImage!);
+      await userCollectionReference.doc(uid).update({
+        "image": url,
+      });
+    }
+     await userCollectionReference.doc(uid).update({
+      "name": name,
+      "phone_number": phoneNumber,
+      "email": mailId,
+      "address": address
+    });
+  }
+
+  // Image picker from gallery
 
   final ImagePicker _picker = ImagePicker();
   File? selectedImage;
@@ -25,6 +73,8 @@ class UserDatabaseService {
     }
     return null;
   }
+
+  // Upload image to firestore
 
   uploadImage(File image) async {
     String imageUrl = '';
@@ -39,38 +89,7 @@ class UserDatabaseService {
     return imageUrl;
   }
 
-  final CollectionReference userCollectionReference =
-      FirebaseFirestore.instance.collection("users");
-
-  Future addUser(String uid, String name, String address, String phoneNumber,
-      String mailId) async {
-    String url = await uploadImage(selectedImage!);
-    return await userCollectionReference.doc(uid).set({
-      "id": uid,
-      "image": url,
-      "name": name,
-      "phone_number": phoneNumber,
-      "email": mailId,
-      "address": address
-    });
-  }
-
-  Future updateUserData(String uid, String name, String address,
-      String phoneNumber, String mailId) async {
-    if (selectedImage != null) {
-      String url = await uploadImage(selectedImage!);
-      await userCollectionReference.doc(uid).update({
-        "image": url,
-      });
-    }
-    return await userCollectionReference.doc(uid).update({
-      "name": name,
-      "phone_number": phoneNumber,
-      "email": mailId,
-      "address": address
-    });
-  }
-
+//  Delete user profile
   Future deleteUser(String deleteUid) async {
     // Delete user document
     await userCollectionReference.doc(deleteUid).delete();
@@ -88,7 +107,7 @@ class UserDatabaseService {
     }
   }
 
-    Future<DocumentSnapshot> getUserData(String uid) async {
+  Future<DocumentSnapshot> getUserData(String uid) async {
     return await userCollectionReference.doc(uid).get();
   }
 

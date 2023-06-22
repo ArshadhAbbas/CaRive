@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 class TransluscentCard extends StatelessWidget {
   TransluscentCard({
     super.key,
+    required this.carId,
     required this.brand,
     required this.model,
     required this.price,
@@ -18,6 +19,7 @@ class TransluscentCard extends StatelessWidget {
     required this.fuelType,
     required this.ownerId
   });
+  String carId;
   String brand;
   String model;
   String price;

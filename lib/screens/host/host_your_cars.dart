@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:carive/screens/host/edit_cars/edit_cars.dart';
 import 'package:carive/services/auth.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:flutter/material.dart';
@@ -55,103 +56,132 @@ class _HostYourCarsState extends State<HostYourCars> {
               physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
                 final car = cars[index].data() as Map<String, dynamic>;
-                final carName = car['carModel'] as String;
+                final carId=car['carId'];
+                final carName = car['carModel'];
                 final carImage = car['imageUrl'];
                 final carLocation = car['location'];
                 final carPrice = car['amount'];
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(25),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                    child: Container(
-                      height: 400,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                            colors: [
-                              Colors.white60.withOpacity(0.13),
-                              Colors.white10
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomCenter),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Container(
-                              height: 130,
-                              width: 170,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Image.network(
-                                  carImage,
-                                  fit: BoxFit.cover,
+                final carMake = car['make'];
+                final fuelType = car['fuelType'];
+                final seatCapacity = car['seatCapacity'];
+                final modelYear = car['modelYear'];
+                final location = car['location'];
+                final amount = car['amount'];
+
+
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (context) {
+                      return EditCarScreen(
+                        carId: carId,
+                        selectedCarModel: carName,
+                        selectedMake: carMake,
+                        selectedFuel: fuelType,
+                        selectedSeatCapacity: seatCapacity,
+                        modelYear: modelYear,
+                        amount: amount,
+                        location: location,
+                        image: carImage,
+                      );
+                    }));
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                      child: Container(
+                        height: 400,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                              colors: [
+                                Colors.white60.withOpacity(0.13),
+                                Colors.white10
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomCenter),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Container(
+                                height: 130,
+                                width: 170,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Image.network(
+                                    carImage,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  carName,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Row(
-                                  children: [
-                                    Container(
-                                        width: 10,
-                                        child: const CircleAvatar(
-                                          backgroundColor: Colors.green,
-                                        )),
-                                    const Text(
-                                      "Available",
-                                      style: TextStyle(
-                                          fontSize: 12, color: Colors.white),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Image.asset(
-                                  'assets/map-marker.png',
-                                  width: 15,
-                                ),
-                                wSizedBox10,
-                                Text(carLocation,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 15))
-                              ],
-                            ),
-                            Expanded(
-                              child: Row(
+                              Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
+                                  Text(
+                                    carName,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        "₹${carPrice}",
-                                        style:
-                                            TextStyle(color: themeColorGreen),
-                                      ),
+                                      Container(
+                                          width: 10,
+                                          child: const CircleAvatar(
+                                            backgroundColor: Colors.green,
+                                          )),
                                       const Text(
-                                        "/day",
-                                        style: TextStyle(color: Colors.white),
+                                        "Available",
+                                        style: TextStyle(
+                                            fontSize: 12, color: Colors.white),
                                       ),
                                     ],
-                                  ),
+                                  )
                                 ],
                               ),
-                            )
-                          ],
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Image.asset(
+                                    'assets/map-marker.png',
+                                    width: 15,
+                                  ),
+                                  wSizedBox10,
+                                  Text(carLocation,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 15))
+                                ],
+                              ),
+                              Expanded(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "₹${carPrice}",
+                                          style:
+                                              TextStyle(color: themeColorGreen),
+                                        ),
+                                        const Text(
+                                          "/day",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ),

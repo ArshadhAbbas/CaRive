@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:carive/services/auth.dart';
 import 'package:carive/services/car_database_service.dart';
@@ -6,25 +7,39 @@ import 'package:carive/shared/cars_list.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:carive/shared/custom_scaffold.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../shared/custom_text_form_field.dart';
 
-class NewPostScreen extends StatefulWidget {
-  const NewPostScreen({Key? key}) : super(key: key);
+class EditCarScreen extends StatefulWidget {
+  String carId;
+  String? selectedCarModel;
+  String selectedMake;
+  String selectedFuel;
+  String selectedSeatCapacity;
+  final String modelYear;
+  final String amount;
+  final String location;
+  final String image;
+
+  EditCarScreen({
+    required this.carId,
+    required this.selectedCarModel,
+    required this.selectedMake,
+    required this.selectedFuel,
+    required this.selectedSeatCapacity,
+    required this.modelYear,
+    required this.amount,
+    required this.location,
+    required this.image,
+  });
 
   @override
-  State<NewPostScreen> createState() => _NewPostScreenState();
+  State<EditCarScreen> createState() => _EditCarScreenState();
 }
 
-class _NewPostScreenState extends State<NewPostScreen> {
-  String? selectedCarModel;
-  String? selectedMake;
-  String? selectedFuel;
-  String? selectedSeatCapacity;
-
+class _EditCarScreenState extends State<EditCarScreen> {
   bool isLoading = false;
   final _formKey = GlobalKey<FormState>();
 
@@ -32,9 +47,20 @@ class _NewPostScreenState extends State<NewPostScreen> {
   TextEditingController amountController = TextEditingController();
   TextEditingController locationController = TextEditingController();
   TextEditingController addInfoController = TextEditingController();
+  String? photo;
 
   AuthService auth = AuthService();
   final CarService carService = CarService();
+
+  @override
+  void initState() {
+    super.initState();
+    modelYearController.text = widget.modelYear;
+    amountController.text = widget.amount;
+    locationController.text = widget.location;
+    photo = null;
+  }
+
   @override
   void dispose() {
     carService.dispose();
@@ -45,12 +71,13 @@ class _NewPostScreenState extends State<NewPostScreen> {
     super.dispose();
   }
 
-  onCarModelChanged(String? value) {
-    // Don't change the second dropdown if the first item didn't change
-    if (value != selectedMake) selectedCarModel = null;
-    setState(() {
-      selectedMake = value;
-    });
+  void onCarModelChanged(String? value) {
+    if (value != widget.selectedMake) {
+      setState(() {
+        widget.selectedMake = value!;
+        widget.selectedCarModel = null; // Reset selected car model
+      });
+    }
   }
 
   @override
@@ -70,8 +97,16 @@ class _NewPostScreenState extends State<NewPostScreen> {
               ),
               onPressed: () => Navigator.of(context).pop(),
             ),
-            title: const Text("Add New Car"),
+            title: const Text("Update Car"),
             centerTitle: false,
+            actions: [
+              IconButton(
+                  onPressed: () {
+                    carService.deleteCar(widget.carId);
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(Icons.delete))
+            ],
           ),
           body: SingleChildScrollView(
             child: Center(
@@ -83,57 +118,60 @@ class _NewPostScreenState extends State<NewPostScreen> {
                       stream: carService.selectedImageStream,
                       builder: (context, snapshot) {
                         final File? selectedImage = snapshot.data;
-                        return selectedImage == null
-                            ? GestureDetector(
-                                onTap: () async {
-                                  await carService
-                                      .getImage(ImageSource.gallery);
-                                },
-                                child: Container(
-                                  height: 200,
-                                  width: 200,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Colors.white60.withOpacity(0.13),
-                                        Colors.white10,
-                                      ],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomCenter,
+                        return Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: selectedImage != null
+                                  ? Image.file(
+                                      selectedImage,
+                                      height: 180,
+                                      width: 180,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : BackdropFilter(
+                                      filter: ImageFilter.blur(
+                                        sigmaX: 15,
+                                        sigmaY: 15,
+                                      ),
+                                      child: Container(
+                                        height: 180,
+                                        width: 180,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Colors.white60.withOpacity(0.25),
+                                              Colors.white10,
+                                            ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomCenter,
+                                          ),
+                                        ),
+                                        child: Image(
+                                          image: NetworkImage(
+                                            widget.image,
+                                          ),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                  child: Icon(
-                                    Icons.add,
-                                    color: Colors.white,
-                                    size: 80,
-                                  ),
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: CircleAvatar(
+                                child: IconButton(
+                                  onPressed: () {
+                                    carService.getImage(
+                                      ImageSource.gallery,
+                                    );
+                                  },
+                                  icon: Icon(Icons.edit),
                                 ),
-                              )
-                            : GestureDetector(
-                                onTap: () async {
-                                  await carService
-                                      .getImage(ImageSource.gallery);
-                                },
-                                child: Container(
-                                  height: 200,
-                                  width: 200,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Colors.white60.withOpacity(0.13),
-                                        Colors.white10,
-                                      ],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomCenter,
-                                    ),
-                                  ),
-                                  child: Image(
-                                    image: FileImage(selectedImage),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ));
+                              ),
+                            ),
+                          ],
+                        );
                       },
                     ),
                     const SizedBox(height: 20),
@@ -162,7 +200,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                                 style: TextStyle(color: themeColorblueGrey),
                               ),
                             ),
-                            value: selectedMake,
+                            value: widget.selectedMake,
                             items: carDataset.keys.map((e) {
                               return DropdownMenuItem<String?>(
                                 value: e,
@@ -194,14 +232,17 @@ class _NewPostScreenState extends State<NewPostScreen> {
                             ),
                             dropdownColor: themeColorGrey,
                             style: TextStyle(color: Colors.white),
-                            value: selectedCarModel,
+                            value: widget.selectedCarModel != null
+                                ? widget.selectedCarModel
+                                : null,
                             hint: Center(
                               child: Text(
                                 'Select Car Model',
                                 style: TextStyle(color: themeColorblueGrey),
                               ),
                             ),
-                            items: (carDataset[selectedMake] ?? []).map((e) {
+                            items: (carDataset[widget.selectedMake] ?? [])
+                                .map((e) {
                               return DropdownMenuItem<String?>(
                                 value: e,
                                 child: Center(child: Text('$e')),
@@ -209,7 +250,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                             }).toList(),
                             onChanged: (val) {
                               setState(() {
-                                selectedCarModel = val!;
+                                widget.selectedCarModel = val!;
                               });
                             },
                           ),
@@ -236,7 +277,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                             ),
                             dropdownColor: themeColorGrey,
                             style: TextStyle(color: Colors.white),
-                            value: selectedFuel,
+                            value: widget.selectedFuel,
                             hint: Center(
                               child: Text(
                                 'Select Fuel type',
@@ -251,7 +292,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                             }).toList(),
                             onChanged: (val) {
                               setState(() {
-                                selectedFuel = val!;
+                                widget.selectedFuel = val!;
                               });
                             },
                           ),
@@ -278,7 +319,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                             ),
                             dropdownColor: themeColorGrey,
                             style: TextStyle(color: Colors.white),
-                            value: selectedSeatCapacity,
+                            value: widget.selectedSeatCapacity,
                             hint: Center(
                               child: Text(
                                 'Select Seat Capacity',
@@ -293,7 +334,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                             }).toList(),
                             onChanged: (val) {
                               setState(() {
-                                selectedSeatCapacity = val!;
+                                widget.selectedSeatCapacity = val!;
                               });
                             },
                           ),
@@ -345,7 +386,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                             color: themeColorGreen,
                           )
                         : CustomElevatedButton(
-                            text: "Post",
+                            text: "Update details",
                             onPressed: () async {
                               if (_formKey.currentState!.validate()) {
                                 FocusScopeNode currentfocus = FocusScope.of(
@@ -358,29 +399,19 @@ class _NewPostScreenState extends State<NewPostScreen> {
                                 setState(() {
                                   isLoading = true;
                                 });
-                                String newCarDocumentId = FirebaseFirestore
-                                    .instance
-                                    .collection('cars')
-                                    .doc()
-                                    .id;
-                                await carService.postNewCar(
-                                    uid: auth.auth.currentUser!.uid,
-                                    carModel: selectedCarModel!,
-                                    make: selectedMake!,
-                                    fuelType: selectedFuel!,
-                                    seatCapacity: selectedSeatCapacity!,
-                                    modelYear: modelYearController.text,
-                                    amount: amountController.text,
-                                    location: locationController.text,
-                                    additionalInfo: addInfoController.text,
-                                    isAvailable: true);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Center(
-                                        child: Text('New car has been posted')),
-                                    duration: Duration(seconds: 3),
-                                  ),
+
+                                await carService.updateCarDetails(
+                                  carId: widget
+                                      .carId, // Pass the car ID of the car being edited
+                                  carModel: widget.selectedCarModel!,
+                                  make: widget.selectedMake,
+                                  fuelType: widget.selectedFuel,
+                                  seatCapacity: widget.selectedSeatCapacity,
+                                  modelYear: modelYearController.text,
+                                  amount: amountController.text,
+                                  location: locationController.text,
                                 );
+
                                 Navigator.of(context).pop();
                                 setState(() {
                                   isLoading = false;

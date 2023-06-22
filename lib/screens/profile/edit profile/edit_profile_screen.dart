@@ -112,7 +112,8 @@ class _EditProfileState extends State<EditProfile> {
                                           decoration: BoxDecoration(
                                             gradient: LinearGradient(
                                               colors: [
-                                                Colors.white60.withOpacity(0.25),
+                                                Colors.white60
+                                                    .withOpacity(0.25),
                                                 Colors.white10,
                                               ],
                                               begin: Alignment.topLeft,

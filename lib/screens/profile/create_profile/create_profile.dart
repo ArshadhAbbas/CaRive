@@ -196,12 +196,10 @@ class _CreateProfileState extends State<CreateProfile> {
                             : CustomElevatedButton(
                                 text: "Save",
                                 onPressed: () async {
-                                  FocusScopeNode currentfocus = FocusScope.of(
-                                      context); //get the currnet focus node
+                                  FocusScopeNode currentfocus =
+                                      FocusScope.of(context);
                                   if (!currentfocus.hasPrimaryFocus) {
-                                    //prevent Flutter from throwing an exception
-                                    currentfocus
-                                        .unfocus(); //unfocust from current focust, so that keyboard will dismiss
+                                    currentfocus.unfocus();
                                   }
                                   if (_formKey.currentState!.validate()) {
                                     setState(() {
@@ -216,34 +214,39 @@ class _CreateProfileState extends State<CreateProfile> {
                                       final number = numberController.text;
                                       final email = mailController.text;
 
-                                      await userDatabaseService.addUser(
-                                        userUID,
-                                        name,
-                                        address,
-                                        number,
-                                        email,
-                                      );
+                                      try {
+                                        if (userDatabaseService.selectedImage ==
+                                            null) {
+                                          throw ('Image cannot be empty');
+                                        }
 
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Center(
-                                              child: Text('Profile created')),
-                                          duration: Duration(seconds: 3),
-                                        ),
-                                      );
-                                      Navigator.of(context).pop();
-                                    } else {
-                                      // Handle the case where the user is not authenticated
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Center(
-                                              child: Text(
-                                                  'User not authenticated')),
-                                          duration: Duration(seconds: 3),
-                                        ),
-                                      );
+                                        await userDatabaseService.addUser(
+                                          userUID,
+                                          name,
+                                          address,
+                                          number,
+                                          email,
+                                        );
+
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Center(
+                                                child: Text('Profile created')),
+                                            duration: Duration(seconds: 3),
+                                          ),
+                                        );
+                                        Navigator.of(context).pop();
+                                      } catch (e) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Center(
+                                                child: Text(e.toString())),
+                                            duration: Duration(seconds: 3),
+                                          ),
+                                        );
+                                      }
                                     }
 
                                     setState(() {

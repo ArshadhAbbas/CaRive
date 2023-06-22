@@ -2,10 +2,13 @@ import 'package:carive/services/user_database_service.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_scaffold.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class CarDetails extends StatelessWidget {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   CarDetails(
       {super.key,
       required this.brand,
@@ -52,6 +55,8 @@ class CarDetails extends StatelessWidget {
         }
 
         final userData = snapshot.data!.data() as Map<String, dynamic>;
+        final user = _auth.currentUser;
+        final isCurrentUserOwner = user != null && user.uid == ownerId;
         return CustomScaffold(
           child: Scaffold(
             extendBodyBehindAppBar: true,
@@ -103,7 +108,7 @@ class CarDetails extends StatelessWidget {
                                   children: [
                                     hSizedBox10,
                                     Text(
-                                      model,
+                                      "${brand} ${model}",
                                       style: const TextStyle(
                                           color: Colors.white, fontSize: 30),
                                     ),
@@ -228,7 +233,7 @@ class CarDetails extends StatelessWidget {
                             Container(
                               width: double.infinity,
                               child: ElevatedButton(
-                                onPressed: () {},
+                                onPressed: isCurrentUserOwner ? null : () {},
                                 style: ButtonStyle(
                                   shape: MaterialStateProperty.all<
                                       RoundedRectangleBorder>(

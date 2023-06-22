@@ -21,7 +21,7 @@ class UserModel {
   final data = snapshot.data() as Map<String, dynamic>?;
 
   return UserModel(
-    id: snapshot.id,
+    id: data?['id'] ?? '',
     name: data?['name'] ?? '',
     email: data?['email'] ?? '',
     phoneNumber: data?['phone_number'] ?? '',

@@ -7,7 +7,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as Path;
 
-
 class CarService {
   final StreamController<File?> _selectedImageController =
       StreamController<File?>.broadcast();
@@ -39,6 +38,8 @@ class CarService {
     return imageUrl;
   }
 
+// Inside the _NewPostScreenState class
+
   Future<void> postNewCar({
     required String uid,
     required String carModel,
@@ -49,7 +50,7 @@ class CarService {
     required String amount,
     required String location,
     required String additionalInfo,
-    required bool isAvailable
+    required bool isAvailable,
   }) async {
     if (selectedImage == null) {
       throw Exception('No image selected for the car');
@@ -58,7 +59,7 @@ class CarService {
     final imageUrl = await uploadImage(selectedImage!);
 
     final newCar = Car(
-      userId:uid ,
+      userId: uid,
       carModel: carModel,
       make: make,
       fuelType: fuelType,
@@ -67,13 +68,71 @@ class CarService {
       amount: amount,
       location: location,
       imageUrl: imageUrl,
-      isAvailable: isAvailable
+      isAvailable: isAvailable,
     );
 
-    await carCollectionReference.add(newCar.toMap());
+    final newCarDocRef = carCollectionReference
+        .doc(); // Create a new document with an auto-generated ID
+    final newCarId = newCarDocRef.id; // Get the auto-generated document ID
+
+    // Set the new car data to Firestore
+    await newCarDocRef.set(
+      newCar.toMap()
+        ..addAll(
+            {'carId': newCarId}), // Include the document ID in the car data
+    );
   }
 
-    Stream<QuerySnapshot> get car {
+  Future<void> updateCarDetails({
+    required String carId,
+    required String carModel,
+    required String make,
+    required String fuelType,
+    required String seatCapacity,
+    required String modelYear,
+    required String amount,
+    required String location,
+  }) async {
+    final carDocRef = carCollectionReference.doc(carId);
+    if (selectedImage != null) {
+      String url = await uploadImage(selectedImage!);
+      await carCollectionReference.doc(carId).update({
+        "imageUrl": url,
+      });
+    }
+
+    await carDocRef.update({
+      'carModel': carModel,
+      'make': make,
+      'fuelType': fuelType,
+      'seatCapacity': seatCapacity,
+      'modelYear': modelYear,
+      'amount': amount,
+      'location': location,
+    });
+  }
+
+  Future<void> deleteCar(String carId) async {
+    // Get the car document reference
+    final carDocRef = carCollectionReference.doc(carId);
+
+    // Delete the car document
+    await carDocRef.delete();
+
+    // Delete the car's image from Firebase Storage (if applicable)
+    var carDoc = await carCollectionReference.doc(carId).get();
+    var data = carDoc.data() as Map<String, dynamic>?;
+
+    if (data != null) {
+      var imageUrl = data['image'];
+      if (imageUrl != null && imageUrl.isNotEmpty) {
+        var imageRef = FirebaseStorage.instance.refFromURL(imageUrl);
+        await imageRef.delete();
+      }
+    }
+  }
+
+  Stream<QuerySnapshot> get car {
     return carCollectionReference.snapshots();
   }
 
