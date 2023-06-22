@@ -129,6 +129,7 @@ class TransluscentCard extends StatelessWidget {
                         onPressed: () {
                           Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => CarDetails(
+                              carId: carId,
                               brand: brand,
                               image: image,
                               location: location,

@@ -1,3 +1,4 @@
+import 'package:carive/screens/host/edit_cars/edit_cars.dart';
 import 'package:carive/services/user_database_service.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_scaffold.dart';
@@ -11,6 +12,7 @@ class CarDetails extends StatelessWidget {
 
   CarDetails(
       {super.key,
+      required this.carId,
       required this.brand,
       required this.model,
       required this.price,
@@ -20,6 +22,7 @@ class CarDetails extends StatelessWidget {
       required this.seatCapacity,
       required this.fuelType,
       required this.ownerId});
+  String carId;
   String brand;
   String model;
   String price;
@@ -108,7 +111,7 @@ class CarDetails extends StatelessWidget {
                                   children: [
                                     hSizedBox10,
                                     Text(
-                                      "${brand} ${model}",
+                                      "$brand $model",
                                       style: const TextStyle(
                                           color: Colors.white, fontSize: 30),
                                     ),
@@ -129,13 +132,6 @@ class CarDetails extends StatelessWidget {
                                       "Available",
                                       style: TextStyle(color: Colors.white),
                                     ),
-                                    hSizedBox20,
-                                    const Text(
-                                      "Owner Info",
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 22),
-                                    ),
-                                    hSizedBox10,
                                   ],
                                 ),
                                 Column(
@@ -162,91 +158,146 @@ class CarDetails extends StatelessWidget {
                                 )
                               ],
                             ),
-                            Container(
-                              height: 100,
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: themeColorGreen),
-                                  borderRadius: BorderRadius.circular(20)),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      width: 80,
-                                      height: 80,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: Image.network(
-                                          "${userData['image']}",
-                                          fit: BoxFit.cover,
-                                        ),
+                            hSizedBox20,
+                            if (!isCurrentUserOwner)
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "Owner Info",
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 22),
+                                  ),
+                                  hSizedBox10,
+                                  Container(
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                        border:
+                                            Border.all(color: themeColorGreen),
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                            width: 80,
+                                            height: 80,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: Image.network(
+                                                "${userData['image']}",
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                          wSizedBox10,
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "${userData['name']}",
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 22),
+                                              ),
+                                              Spacer(),
+                                              Text(
+                                                "${userData['address']}",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                              Spacer(),
+                                              Text(
+                                                "${userData['phone_number']}",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                            ],
+                                          ),
+                                          const Spacer(),
+                                          const Icon(
+                                            Icons.message_rounded,
+                                            color: Colors.white,
+                                            size: 60,
+                                          )
+                                        ],
                                       ),
                                     ),
-                                    wSizedBox10,
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "${userData['name']}",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 22),
-                                        ),
-                                        Spacer(),
-                                        Text(
-                                          "${userData['address']}",
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        Spacer(),
-                                        Text(
-                                          "${userData['phone_number']}",
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ],
-                                    ),
-                                    const Spacer(),
-                                    const Icon(
-                                      Icons.message_rounded,
-                                      color: Colors.white,
-                                      size: 60,
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                            hSizedBox20,
-                            Container(
-                              height: 300,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: themeColorGreen),
-                                  borderRadius: BorderRadius.circular(20)),
-                              child: const Center(
-                                  child: Text(
-                                "Location",
-                                style: TextStyle(color: Colors.white),
-                              )),
-                            ),
-                            hSizedBox10,
-                            Container(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: isCurrentUserOwner ? null : () {},
-                                style: ButtonStyle(
-                                  shape: MaterialStateProperty.all<
-                                      RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
                                   ),
-                                  backgroundColor: MaterialStateProperty.all(
-                                      const Color(0xFF198396)),
-                                ),
-                                child: const Text("Book Now"),
+                                  hSizedBox20,
+                                  Container(
+                                    height: 300,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                        border:
+                                            Border.all(color: themeColorGreen),
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    child: const Center(
+                                        child: Text(
+                                      "Location",
+                                      style: TextStyle(color: Colors.white),
+                                    )),
+                                  ),
+                                ],
                               ),
-                            )
+                            hSizedBox10,
+                            if (!isCurrentUserOwner)
+                              Container(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: () {},
+                                  style: ButtonStyle(
+                                    shape: MaterialStateProperty.all<
+                                        RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                    backgroundColor: MaterialStateProperty.all(
+                                        const Color(0xFF198396)),
+                                  ),
+                                  child: const Text("Book Now"),
+                                ),
+                              )
+                            else
+                              Container(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context) {
+                                      return EditCarScreen(
+                                        carId: carId,
+                                        selectedCarModel: model,
+                                        selectedMake: brand,
+                                        selectedFuel: fuelType,
+                                        selectedSeatCapacity: seatCapacity,
+                                        modelYear: modelYear,
+                                        amount: price,
+                                        location: location,
+                                        image: image,
+                                      );
+                                    }));
+                                  },
+                                  style: ButtonStyle(
+                                    shape: MaterialStateProperty.all<
+                                        RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                    backgroundColor: MaterialStateProperty.all(
+                                        const Color(0xFF198396)),
+                                  ),
+                                  child: const Text("Edit Details"),
+                                ),
+                              )
                           ],
                         ),
                       ),
