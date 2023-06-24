@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:carive/models/car_model.dart';
+import 'package:carive/services/user_database_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as Path;
 
 class CarService {
+  final UserDatabaseService userDatabaseService = UserDatabaseService();
   final StreamController<File?> _selectedImageController =
       StreamController<File?>.broadcast();
 
@@ -49,7 +51,6 @@ class CarService {
     required String modelYear,
     required String amount,
     required String location,
-    required String additionalInfo,
     required bool isAvailable,
   }) async {
     if (selectedImage == null) {
@@ -81,6 +82,8 @@ class CarService {
         ..addAll(
             {'carId': newCarId}), // Include the document ID in the car data
     );
+
+    await userDatabaseService.addPost(uid, newCarId);
   }
 
   Future<void> updateCarDetails({
@@ -112,21 +115,24 @@ class CarService {
     });
   }
 
-  Future<void> deleteCar(String carId) async {
+  Future<void> deleteCar(String carId, String uid) async {
     // Get the car document reference
     final carDocRef = carCollectionReference.doc(carId);
 
-    // Delete the car document
-    await carDocRef.delete();
+    // Get the car data from the document snapshot
+    final carDocSnapshot = await carDocRef.get();
+    final carData = carDocSnapshot.data() as Map<String, dynamic>?;
 
-    // Delete the car's image from Firebase Storage (if applicable)
-    var carDoc = await carCollectionReference.doc(carId).get();
-    var data = carDoc.data() as Map<String, dynamic>?;
+    if (carData != null) {
+      final imageUrl = carData['imageUrl'];
 
-    if (data != null) {
-      var imageUrl = data['image'];
+      // Delete the car document
+      await carDocRef.delete();
+      await userDatabaseService.removePost(uid, carId);
+
+      // Delete the car's image from Firebase Storage (if applicable)
       if (imageUrl != null && imageUrl.isNotEmpty) {
-        var imageRef = FirebaseStorage.instance.refFromURL(imageUrl);
+        final imageRef = FirebaseStorage.instance.refFromURL(imageUrl);
         await imageRef.delete();
       }
     }

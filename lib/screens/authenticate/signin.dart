@@ -187,6 +187,7 @@ class _SignInState extends State<SignIn> {
   }
 
   void _signInButtonPressed() async {
+    dismissKeyboard(context);
     if (formkey.currentState?.validate() ?? false) {
       setState(() {
         isLoading = true;

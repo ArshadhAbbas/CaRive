@@ -38,22 +38,19 @@ class ProfileScreen extends StatelessWidget {
             );
           }
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            // Display a text when there is no data for the current user
-            return Center(
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) {
-                      return const CreateProfile();
-                    },
-                  ));
-                },
-                child: const Text(
-                  'Create your profile',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                  ),
+             return Scaffold(
+              extendBodyBehindAppBar: true,
+              floatingActionButton: Center(
+                child: FloatingActionButton.extended(
+                  label: const Text("Create Profile"),
+                  backgroundColor: themeColorGreen,
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) {
+                        return const CreateProfile();
+                      },
+                    ));
+                  },
                 ),
               ),
             );
@@ -72,22 +69,19 @@ class ProfileScreen extends StatelessWidget {
             }
           }
           if (myUser == null) {
-            // Display a text when there is no user data available
-            return Center(
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) {
-                      return const CreateProfile();
-                    },
-                  ));
-                },
-                child: const Text(
-                  'Create your profile',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                  ),
+            return Scaffold(
+              extendBodyBehindAppBar: true,
+              floatingActionButton: Center(
+                child: FloatingActionButton.extended(
+                  label: const Text("Create Profile"),
+                  backgroundColor: themeColorGreen,
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) {
+                        return const CreateProfile();
+                      },
+                    ));
+                  },
                 ),
               ),
             );
@@ -198,9 +192,9 @@ class ProfileScreen extends StatelessWidget {
                                       contentTextStyle:
                                           const TextStyle(color: Colors.white),
                                       backgroundColor: const Color(0xFF1E1E1E),
-                                      title: const Text('Delete ?'),
+                                      title: const Text('Delete !?'),
                                       content: const Text(
-                                          'Are you sure you want to Delete yor Account?'),
+                                          'All your posts will be deleted.This action cannot be undone'),
                                       actions: [
                                         TextButton(
                                           child: const Text(
@@ -227,7 +221,7 @@ class ProfileScreen extends StatelessWidget {
                                   },
                                 );
                               },
-                              icon: Icon(
+                              icon: const Icon(
                                 Icons.delete,
                                 color: Colors.white,
                               ),

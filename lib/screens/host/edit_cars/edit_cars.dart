@@ -102,7 +102,8 @@ class _EditCarScreenState extends State<EditCarScreen> {
             actions: [
               IconButton(
                   onPressed: () {
-                    carService.deleteCar(widget.carId);
+                    carService.deleteCar(
+                        widget.carId, auth.auth.currentUser!.uid);
                     Navigator.of(context).pop();
                   },
                   icon: Icon(Icons.delete))

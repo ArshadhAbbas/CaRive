@@ -1,4 +1,5 @@
 import 'package:carive/models/car_model.dart';
+import 'package:carive/models/notification_model.dart';
 import 'package:carive/services/auth.dart';
 import 'package:carive/services/car_database_service.dart';
 import 'package:carive/shared/constants.dart';
@@ -6,6 +7,10 @@ import 'package:carive/shared/custom_scaffold.dart';
 import 'package:carive/shared/transluscent_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/notification_provider.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -17,6 +22,31 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   AuthService auth = AuthService();
   final CarService carService = CarService();
+
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    initializeFirebaseMessaging();
+  }
+
+  void initializeFirebaseMessaging() {
+    _firebaseMessaging.requestPermission();
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      Provider.of<NotificationProvider>(context, listen: false).addNotification(
+        NotificationModel(
+          title: message.notification?.title ?? '',
+          body: message.notification?.body ?? '',
+        ),
+      );
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print("Background Message: $message");
+      // Handle the message here, e.g., navigate to a specific screen
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

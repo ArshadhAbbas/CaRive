@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:carive/screens/host/new_post/location_screen.dart';
 import 'package:carive/services/auth.dart';
 import 'package:carive/services/car_database_service.dart';
 import 'package:carive/shared/cars_list.dart';
@@ -335,6 +336,13 @@ class _NewPostScreenState extends State<NewPostScreen> {
                       controller: amountController,
                     ),
                     hSizedBox20,
+                    // ElevatedButton(
+                    //     onPressed: () {
+                    //       Navigator.of(context).push(MaterialPageRoute(
+                    //         builder: (context) => LocationScreen(),
+                    //       ));
+                    //     },
+                    //     child: Text("Click")),
                     CustomTextFormField(
                       controller: locationController,
                       hintText: "Enter location details",
@@ -372,7 +380,6 @@ class _NewPostScreenState extends State<NewPostScreen> {
                                     modelYear: modelYearController.text,
                                     amount: amountController.text,
                                     location: locationController.text,
-                                    additionalInfo: addInfoController.text,
                                     isAvailable: true);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(

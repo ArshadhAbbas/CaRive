@@ -5,13 +5,13 @@ import 'package:carive/screens/host/host_screen.dart';
 import 'package:carive/screens/notification/screen/notification_screen.dart';
 import 'package:carive/screens/settings/screen/screen.dart';
 import 'package:carive/shared/constants.dart';
+import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:carive/shared/logo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../../screens/profile/create_profile/create_profile.dart';
 import '../../screens/profile/profile_screen.dart';
 import '../../services/auth.dart';
 import '../../services/user_database_service.dart';
@@ -27,11 +27,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
   bool isHost = false;
   String guestOrHost = "Guest";
   int selectedIndex = 2;
-  bool isProfileCreated = false;
   List<Widget> widgetOptions = [
     const ChatScreen(),
     const SettingsScreen(),
-     Home(),
+    const Home(),
     NotificationScreen(),
     ProfileScreen()
   ];
@@ -70,18 +69,18 @@ class _BottomNavBarState extends State<BottomNavBar> {
             }
           }
         }
-        
+
 
         return Scaffold(
           appBar: AppBar(
             centerTitle: false,
             title: Row(
               children: [
-                LogoWidget(30, 30),
+                const LogoWidget(30, 30),
                 wSizedBox10,
                 Text(
                   "${myUser?.name ?? "Carive"}",
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                 ),
               ],
             ),
@@ -92,7 +91,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 children: [
                   Text(
                     guestOrHost,
-                    style: TextStyle(color: Colors.white, fontSize: 18),
+                    style: const TextStyle(color: Colors.white, fontSize: 18),
                   ),
                   Switch(
                     activeTrackColor: themeColorGrey,
@@ -101,17 +100,48 @@ class _BottomNavBarState extends State<BottomNavBar> {
                     inactiveTrackColor: Colors.white,
                     value: isHost,
                     onChanged: (value) {
-                      setState(() {
-                        isHost = value;
-                        guestOrHost = value ? "Host" : "Guest";
-                      });
+                      if (myUser?.name !=null || !value) {
+                        // Allow switching to host mode if the profile is created
+                        setState(() {
+                          isHost = value;
+                          guestOrHost = value ? "Host" : "Guest";
+                        });
+                      } else {
+                        // Prompt the user to create a profile first
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              backgroundColor: themeColorGrey,
+                              title: const Text(
+                                'Create Profile',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              content: const Text(
+                                'Please create a profile before switching to host mode.',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              actions: [
+                                CustomElevatedButton(
+                                  text: "OK",
+                                  paddingHorizontal: 3,
+                                  paddingVertical: 3,
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
                     },
                   ),
                 ],
               )
             ],
           ),
-          body: isHost ? HostScreen() : widgetOptions.elementAt(selectedIndex),
+          body: isHost ? const HostScreen() : widgetOptions.elementAt(selectedIndex),
           bottomNavigationBar: Visibility(
             visible: !isHost,
             child: CurvedNavigationBar(

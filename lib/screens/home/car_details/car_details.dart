@@ -4,11 +4,14 @@ import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_scaffold.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
+import '../../../services/notification_service.dart';
 
 class CarDetails extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final notificationService = NotificationService();
 
   CarDetails(
       {super.key,
@@ -251,7 +254,27 @@ class CarDetails extends StatelessWidget {
                               Container(
                                 width: double.infinity,
                                 child: ElevatedButton(
-                                  onPressed: () {},
+                                  onPressed: () async {
+                                    try {
+                                      final ownerFCMToken =
+                                          await FirebaseFirestore.instance
+                                              .collection('FCMTokens')
+                                              .doc(ownerId)
+                                              .get()
+                                              .then((snapshot) =>
+                                                  snapshot.data()?['fcmToken']
+                                                      as String);
+                                      final currentUserName =
+                                          await userDatabaseService
+                                              .getCurrentUserName(
+                                                  _auth.currentUser!.uid);
+                                      await notificationService
+                                          .sendNotificationToOwner(
+                                              ownerFCMToken, currentUserName);
+                                    } catch (e) {
+                                      print(e.toString());
+                                    }
+                                  },
                                   style: ButtonStyle(
                                     shape: MaterialStateProperty.all<
                                         RoundedRectangleBorder>(

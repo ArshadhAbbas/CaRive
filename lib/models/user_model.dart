@@ -18,16 +18,15 @@ class UserModel {
   });
 
   factory UserModel.fromDocumentSnapshot(DocumentSnapshot snapshot) {
-  final data = snapshot.data() as Map<String, dynamic>?;
+    final data = snapshot.data() as Map<String, dynamic>?;
 
-  return UserModel(
-    id: data?['id'] ?? '',
-    name: data?['name'] ?? '',
-    email: data?['email'] ?? '',
-    phoneNumber: data?['phone_number'] ?? '',
-    image: data?['image'] ?? '',
-    address:data?['address']??''
-  );
-}
-
+    return UserModel(
+      id: data?['id'] ?? '',
+      name: data?['name'] ?? '',
+      email: data?['email'] ?? '',
+      phoneNumber: data?['phone_number'] ?? '',
+      image: data?['image'] ?? '',
+      address: data?['address'] ?? '',
+    );
+  }
 }

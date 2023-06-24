@@ -196,11 +196,7 @@ class _CreateProfileState extends State<CreateProfile> {
                             : CustomElevatedButton(
                                 text: "Save",
                                 onPressed: () async {
-                                  FocusScopeNode currentfocus =
-                                      FocusScope.of(context);
-                                  if (!currentfocus.hasPrimaryFocus) {
-                                    currentfocus.unfocus();
-                                  }
+                                  dismissKeyboard(context);
                                   if (_formKey.currentState!.validate()) {
                                     setState(() {
                                       isLoading = true;

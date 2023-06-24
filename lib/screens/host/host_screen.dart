@@ -1,5 +1,5 @@
 import 'package:carive/screens/host/host_history.dart';
-import 'package:carive/screens/host/host_notifictions.dart';
+import 'package:carive/screens/host/host_notifications.dart';
 import 'package:carive/screens/host/host_your_cars.dart';
 import 'package:carive/screens/host/new_post/new_post_screen.dart';
 import 'package:carive/shared/constants.dart';

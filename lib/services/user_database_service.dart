@@ -17,6 +17,8 @@ class UserDatabaseService {
 
   final CollectionReference userCollectionReference =
       FirebaseFirestore.instance.collection("users");
+  final CollectionReference carCollectionReference =
+      FirebaseFirestore.instance.collection("cars");
 
 // Create user profile
 
@@ -30,11 +32,11 @@ class UserDatabaseService {
         "name": name,
         "phone_number": phoneNumber,
         "email": mailId,
-        "address": address
+        "address": address,
       });
     } catch (e) {
       print("An error occurred while adding the user: $e");
-      throw e;
+      rethrow;
     }
   }
 
@@ -53,12 +55,27 @@ class UserDatabaseService {
         "image": url,
       });
     }
-     await userCollectionReference.doc(uid).update({
+    await userCollectionReference.doc(uid).update({
       "name": name,
       "phone_number": phoneNumber,
       "email": mailId,
       "address": address
     });
+  }
+
+
+
+   Future<String> getCurrentUserName(String uid) async {
+    try {
+      final userSnapshot = await userCollectionReference.doc(uid).get();
+      final userData = userSnapshot.data() as Map<String, dynamic>?;
+      if (userData != null) {
+        return userData['name'] ?? '';
+      }
+    } catch (e) {
+      print('An error occurred while getting the user name: $e');
+    }
+    return '';
   }
 
   // Image picker from gallery
@@ -90,20 +107,72 @@ class UserDatabaseService {
   }
 
 //  Delete user profile
-  Future deleteUser(String deleteUid) async {
-    // Delete user document
-    await userCollectionReference.doc(deleteUid).delete();
+  Future<void> deleteUser(String deleteUid) async {
+    // Get the user document reference
+    final userDocRef = userCollectionReference.doc(deleteUid);
 
-    // Delete user image from Firebase Storage
-    var userDoc = await userCollectionReference.doc(deleteUid).get();
-    var data = userDoc.data() as Map<String, dynamic>?;
+    // Get the user data from the document snapshot
+    final userDocSnapshot = await userDocRef.get();
+    final userData = userDocSnapshot.data() as Map<String, dynamic>?;
 
-    if (data != null) {
-      var imageUrl = data['image'];
+    if (userData != null) {
+      // Get the posts associated with the user
+      final posts = userData['posts'] as List<dynamic>?;
+
+      // Delete the user document
+      await userDocRef.delete();
+
+      // Delete the user image from Firebase Storage
+      final imageUrl = userData['image'];
       if (imageUrl != null && imageUrl.isNotEmpty) {
-        var imageRef = FirebaseStorage.instance.refFromURL(imageUrl);
+        final imageRef = FirebaseStorage.instance.refFromURL(imageUrl);
         await imageRef.delete();
       }
+
+      // Delete the user's posts
+      if (posts != null && posts.isNotEmpty) {
+        for (final postId in posts) {
+          final carDocRef = carCollectionReference.doc(postId);
+          final carDocSnapshot = await carDocRef.get();
+          final carData = carDocSnapshot.data() as Map<String, dynamic>?;
+
+          if (carData != null) {
+            final carImageUrl = carData['imageUrl'];
+
+            // Delete the car document
+            await carDocRef.delete();
+
+            // Delete the car's image from Firebase Storage (if applicable)
+            if (carImageUrl != null && carImageUrl.isNotEmpty) {
+              final carImageRef =
+                  FirebaseStorage.instance.refFromURL(carImageUrl);
+              await carImageRef.delete();
+            }
+          }
+        }
+      }
+    }
+  }
+
+  Future<void> addPost(String uid, String postId) async {
+    try {
+      await userCollectionReference.doc(uid).update({
+        "posts": FieldValue.arrayUnion([postId]),
+      });
+    } catch (e) {
+      print("An error occurred while adding the post: $e");
+      throw e;
+    }
+  }
+
+  Future<void> removePost(String uid, String postId) async {
+    try {
+      await userCollectionReference.doc(uid).update({
+        "posts": FieldValue.arrayRemove([postId]),
+      });
+    } catch (e) {
+      print("An error occurred while removing the post: $e");
+      throw e;
     }
   }
 

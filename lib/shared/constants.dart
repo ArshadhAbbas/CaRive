@@ -11,3 +11,10 @@ SizedBox wSizedBox10 = const SizedBox(width: 10);
 Color themeColorGreen = const Color(0xFF198396);
 Color themeColorGrey = const Color(0xFF1E1E1E);
 Color themeColorblueGrey = Colors.blueGrey;
+
+void dismissKeyboard(BuildContext context) {
+  FocusScopeNode currentfocus = FocusScope.of(context);
+  if (!currentfocus.hasPrimaryFocus) {
+    currentfocus.unfocus();
+  }
+}

@@ -2,6 +2,8 @@ import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:carive/shared/custom_text_form_field.dart';
 import 'package:carive/shared/logo.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import '../../services/auth.dart';
 
@@ -21,6 +23,7 @@ class _RegisterState extends State<Register> {
   TextEditingController passwordController = TextEditingController();
 
   AuthService auth = AuthService();
+  bool isLoading = false; // Add a isLoading state variable
 
   @override
   Widget build(BuildContext context) {
@@ -71,8 +74,12 @@ class _RegisterState extends State<Register> {
                 },
               ),
               hSizedBox30,
-              CustomElevatedButton(
-                  text: "Register Now", onPressed: _registerButtonPressed),
+              isLoading
+                  ? CircularProgressIndicator(
+                      color: themeColorGreen,
+                    )
+                  : CustomElevatedButton(
+                      text: "Register Now", onPressed: _registerButtonPressed),
               hSizedBox20,
               Text(
                 error,
@@ -87,6 +94,11 @@ class _RegisterState extends State<Register> {
 
   void _registerButtonPressed() async {
     if (formkey.currentState?.validate() ?? false) {
+      setState(() {
+        isLoading =
+            true; // Set isLoading to true when the registration process starts
+      });
+
       dynamic result = await auth.registerWithEmailAndPAssword(
         emailController.text.trim(),
         passwordController.text.trim(),
@@ -95,12 +107,26 @@ class _RegisterState extends State<Register> {
       if (result == null) {
         setState(() {
           error = 'Invalid email';
+          isLoading = false; // Set isLoading to false if registration fails
         });
       } else if (result == 'email-already-in-use') {
         setState(() {
           error = 'User already exists, Please sign In ';
+          isLoading = false; // Set isLoading to false if registration fails
         });
       } else {
+        try {
+          final fcmToken = await FirebaseMessaging.instance.getToken();
+          await FirebaseFirestore.instance
+              .collection('FCMTokens')
+              .doc(result
+                  .uid) // Assuming 'result.uid' is the user's unique ID after registration
+              .set({'fcmToken': fcmToken, 'UserId': result.uid});
+          print(fcmToken);
+        } catch (e) {
+          print(e.toString());
+        }
+
         print('Registered');
         Navigator.pop(context);
       }

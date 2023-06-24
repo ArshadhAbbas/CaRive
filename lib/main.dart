@@ -1,5 +1,6 @@
 import 'package:carive/firebase_options.dart';
 import 'package:carive/models/custom_user.dart';
+import 'package:carive/providers/notification_provider.dart';
 import 'package:carive/services/auth.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -13,7 +14,8 @@ import 'shared/constants.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (context) => NotificationProvider(), child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
