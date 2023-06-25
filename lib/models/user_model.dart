@@ -29,4 +29,16 @@ class UserModel {
       address: data?['address'] ?? '',
     );
   }
+
+   Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'phone_number': phoneNumber,
+      'image': image,
+      'address': address,
+
+    };
+  }
 }

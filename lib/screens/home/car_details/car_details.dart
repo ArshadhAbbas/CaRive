@@ -250,7 +250,7 @@ class CarDetails extends StatelessWidget {
                                 ],
                               ),
                             hSizedBox10,
-                            if (!isCurrentUserOwner)
+                            // if (!isCurrentUserOwner)
                               Container(
                                 width: double.infinity,
                                 child: ElevatedButton(
@@ -270,7 +270,7 @@ class CarDetails extends StatelessWidget {
                                                   _auth.currentUser!.uid);
                                       await notificationService
                                           .sendNotificationToOwner(
-                                              ownerFCMToken, currentUserName);
+                                              ownerFCMToken, currentUserName,ownerId,);
                                     } catch (e) {
                                       print(e.toString());
                                     }
@@ -287,8 +287,8 @@ class CarDetails extends StatelessWidget {
                                   ),
                                   child: const Text("Book Now"),
                                 ),
-                              )
-                            else
+                              ),
+                            // else
                               Container(
                                 width: double.infinity,
                                 child: ElevatedButton(

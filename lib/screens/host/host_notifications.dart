@@ -1,32 +1,71 @@
-import 'package:carive/providers/notification_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-class HostNotifications extends StatelessWidget {
+import '../../services/auth.dart';
+
+class HostNotifications extends StatefulWidget {
   const HostNotifications({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final notifications =
-        Provider.of<NotificationProvider>(context).notifications;
+  State<HostNotifications> createState() => _HostNotificationsState();
+}
 
+class _HostNotificationsState extends State<HostNotifications> {
+  AuthService auth = AuthService();
+
+  late String userId;
+  @override
+  void initState() {
+    super.initState();
+    userId = auth.auth.currentUser?.uid ?? '';
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView.builder(
-        itemCount: notifications.length,
-        itemBuilder: (context, index) {
-          final notification = notifications[index];
-          return ListTile(
-            title: Text(
-              notification.title,
-              style: TextStyle(color: Colors.white),
-            ),
-            subtitle: Text(
-              notification.body,
-              style: TextStyle(color: Colors.white),
-            ),
-          );
-        },
-      ),
+      body: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('notifications')
+              .where('ownerId', isEqualTo: userId)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final notifications = snapshot.data!.docs;
+              if (notifications.isEmpty) {
+                return const Center(
+                  child: Text(
+                    'No notifications available.',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                );
+              }
+              return ListView.builder(
+                itemCount: notifications.length,
+                itemBuilder: (context, index) {
+                  final notification =
+                      notifications[index].data() as Map<String, dynamic>;
+
+                  return ListTile(
+                    subtitle: Text(
+                      notification['message'],
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                },
+              );
+            } else if (snapshot.hasError) {
+              return const Center(
+                child: Text(
+                  'Error fetching car data.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              );
+            } else {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          }),
     );
   }
 }

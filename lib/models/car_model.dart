@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Car {
+class CarModel {
   String? carId;
   final String carModel;
   final String make;
@@ -13,7 +13,7 @@ class Car {
   final bool isAvailable;
   final String userId; // New field for user ID
 
-  Car(
+  CarModel(
       {this.carId,
       required this.carModel,
       required this.make,
@@ -27,10 +27,10 @@ class Car {
       required this.isAvailable // Added field for user ID
       });
 
-  factory Car.fromSnapshot(DocumentSnapshot snapshot) {
+  factory CarModel.fromSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
     final carId = snapshot.id; // Retrieve the document ID
-    return Car(
+    return CarModel(
       carId: carId,
       carModel: data['carModel'],
       make: data['make'],

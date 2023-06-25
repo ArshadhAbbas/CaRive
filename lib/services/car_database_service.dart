@@ -59,7 +59,7 @@ class CarService {
 
     final imageUrl = await uploadImage(selectedImage!);
 
-    final newCar = Car(
+    final newCar = CarModel(
       userId: uid,
       carModel: carModel,
       make: make,
@@ -84,7 +84,7 @@ class CarService {
     );
 
     await userDatabaseService.addPost(uid, newCarId);
-  }
+  } 
 
   Future<void> updateCarDetails({
     required String carId,

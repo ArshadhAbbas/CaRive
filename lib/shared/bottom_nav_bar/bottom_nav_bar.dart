@@ -147,7 +147,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
             child: CurvedNavigationBar(
               height: 60,
               color: themeColorGreen,
-              animationCurve: Curves.easeOutQuart,
+              animationCurve: Curves.bounceIn,
               buttonBackgroundColor: themeColorblueGrey,
               backgroundColor: Colors.transparent,
               items: const [

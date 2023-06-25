@@ -154,6 +154,18 @@ class UserDatabaseService {
     }
   }
 
+
+    Future<void> addNotification(String uid, String notificationId) async {
+    try {
+      await userCollectionReference.doc(uid).update({
+        "notifications": FieldValue.arrayUnion([notificationId]),
+      });
+    } catch (e) {
+      print("An error occurred while adding the post: $e");
+      throw e;
+    }
+  }
+
   Future<void> addPost(String uid, String postId) async {
     try {
       await userCollectionReference.doc(uid).update({

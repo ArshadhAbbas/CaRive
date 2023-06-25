@@ -36,7 +36,6 @@ class _HomeState extends State<Home> {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       Provider.of<NotificationProvider>(context, listen: false).addNotification(
         NotificationModel(
-          title: message.notification?.title ?? '',
           body: message.notification?.body ?? '',
         ),
       );
@@ -61,8 +60,9 @@ class _HomeState extends State<Home> {
           return CircularProgressIndicator(color: themeColorGreen);
         }
 
-        final List<Car> cars =
-            snapshot.data!.docs.map((doc) => Car.fromSnapshot(doc)).toList();
+        final List<CarModel> cars = snapshot.data!.docs
+            .map((doc) => CarModel.fromSnapshot(doc))
+            .toList();
 
         return CustomScaffold(
           child: SafeArea(
