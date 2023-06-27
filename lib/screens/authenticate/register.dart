@@ -94,6 +94,13 @@ class _RegisterState extends State<Register> {
 
   void _registerButtonPressed() async {
     if (formkey.currentState?.validate() ?? false) {
+      FocusScopeNode currentfocus =
+          FocusScope.of(context); //get the currnet focus node
+      if (!currentfocus.hasPrimaryFocus) {
+        //prevent Flutter from throwing an exception
+        currentfocus
+            .unfocus(); //unfocust from current focust, so that keyboard will dismiss
+      }
       setState(() {
         isLoading =
             true; // Set isLoading to true when the registration process starts
@@ -122,7 +129,7 @@ class _RegisterState extends State<Register> {
               .doc(result
                   .uid) // Assuming 'result.uid' is the user's unique ID after registration
               .set({'fcmToken': fcmToken, 'UserId': result.uid});
-          print(fcmToken);
+          print("fcm:$fcmToken");
         } catch (e) {
           print(e.toString());
         }

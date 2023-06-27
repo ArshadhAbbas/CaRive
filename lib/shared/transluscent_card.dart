@@ -17,7 +17,8 @@ class TransluscentCard extends StatelessWidget {
     required this.modelYear,
     required this.seatCapacity,
     required this.fuelType,
-    required this.ownerId
+    required this.ownerId,
+    required this.isAvailable
   });
   String carId;
   String brand;
@@ -29,6 +30,7 @@ class TransluscentCard extends StatelessWidget {
   String modelYear;
   String seatCapacity;
   String ownerId;
+  bool isAvailable;
 
   @override
   Widget build(BuildContext context) {
@@ -77,8 +79,8 @@ class TransluscentCard extends StatelessWidget {
                             child: const CircleAvatar(
                               backgroundColor: Colors.green,
                             )),
-                        const Text(
-                          "Available",
+                         Text(
+                          isAvailable?"Available":"Unavailable",
                           style: TextStyle(fontSize: 12, color: Colors.white),
                         ),
                       ],
@@ -139,6 +141,7 @@ class TransluscentCard extends StatelessWidget {
                               seatCapacity: seatCapacity,
                               fuelType: fuelType,
                               ownerId: ownerId,
+                              isAvailable:isAvailable
                             ),
                           ));
                         },

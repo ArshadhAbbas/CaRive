@@ -9,7 +9,7 @@ class CustomElevatedButton extends StatelessWidget {
       super.key});
 
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final double paddingHorizontal;
   final double paddingVertical;
 

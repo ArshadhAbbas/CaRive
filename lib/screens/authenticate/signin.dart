@@ -189,6 +189,13 @@ class _SignInState extends State<SignIn> {
   void _signInButtonPressed() async {
     dismissKeyboard(context);
     if (formkey.currentState?.validate() ?? false) {
+      FocusScopeNode currentfocus =
+          FocusScope.of(context); //get the currnet focus node
+      if (!currentfocus.hasPrimaryFocus) {
+        //prevent Flutter from throwing an exception
+        currentfocus
+            .unfocus(); //unfocust from current focust, so that keyboard will dismiss
+      }
       setState(() {
         isLoading = true;
       });

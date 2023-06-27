@@ -1,3 +1,4 @@
+
 import 'dart:io';
 import 'dart:ui';
 
@@ -23,7 +24,7 @@ class EditCarScreen extends StatefulWidget {
   final String location;
   final String image;
 
-  EditCarScreen({
+  EditCarScreen({super.key, 
     required this.carId,
     required this.selectedCarModel,
     required this.selectedMake,
