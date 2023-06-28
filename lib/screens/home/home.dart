@@ -7,6 +7,8 @@ import 'package:carive/shared/transluscent_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../host/new_post/location__selection_screen.dart';
+
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -18,7 +20,6 @@ class _HomeState extends State<Home> {
   AuthService auth = AuthService();
   final CarService carService = CarService();
 
-
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -29,7 +30,8 @@ class _HomeState extends State<Home> {
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(color: themeColorGreen);
+          return Center(
+              child: CircularProgressIndicator(color: themeColorGreen));
         }
 
         final List<CarModel> cars = snapshot.data!.docs
@@ -88,7 +90,11 @@ class _HomeState extends State<Home> {
                               Icons.filter_alt_outlined,
                               color: themeColorGreen,
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => LocationSelectionScreen(),
+                              ));
+                            },
                           ),
                         ],
                       ),
@@ -116,7 +122,8 @@ class _HomeState extends State<Home> {
                             modelYear: cars[index].modelYear,
                             seatCapacity: cars[index].seatCapacity,
                             ownerId: cars[index].userId,
-                            isAvailable:cars[index].isAvailable
+                            isAvailable: cars[index].isAvailable,
+                            ownerFcmToken: cars[index].ownerFcmToken,
                           );
                         },
                       ),

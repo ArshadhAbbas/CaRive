@@ -1,14 +1,15 @@
 import 'dart:io';
 
-import 'package:carive/screens/host/new_post/location_screen.dart';
+import 'package:carive/screens/host/new_post/location__selection_screen.dart';
 import 'package:carive/services/auth.dart';
 import 'package:carive/services/car_database_service.dart';
 import 'package:carive/shared/cars_list.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:carive/shared/custom_scaffold.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../shared/custom_text_form_field.dart';
@@ -33,6 +34,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
   TextEditingController amountController = TextEditingController();
   TextEditingController locationController = TextEditingController();
   TextEditingController addInfoController = TextEditingController();
+  LatLng? selectedLocation;
 
   AuthService auth = AuthService();
   final CarService carService = CarService();
@@ -42,7 +44,6 @@ class _NewPostScreenState extends State<NewPostScreen> {
     modelYearController.dispose();
     amountController.dispose();
     locationController.dispose();
-    addInfoController.dispose();
     super.dispose();
   }
 
@@ -336,16 +337,62 @@ class _NewPostScreenState extends State<NewPostScreen> {
                       controller: amountController,
                     ),
                     hSizedBox20,
-                    // ElevatedButton(
-                    //     onPressed: () {
-                    //       Navigator.of(context).push(MaterialPageRoute(
-                    //         builder: (context) => LocationScreen(),
-                    //       ));
-                    //     },
-                    //     child: Text("Click")),
                     CustomTextFormField(
                       controller: locationController,
                       hintText: "Enter location details",
+                    ),
+                    hSizedBox20,
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: themeColorGreen),
+                      ),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                        ),
+                        onPressed: () async {
+                          final selectedLatLng = await Navigator.push<LatLng>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LocationSelectionScreen(
+                                onLocationSelected: (LatLng selectedLatLng) {
+                                  Navigator.pop(context, selectedLatLng);
+                                },
+                              ),
+                            ),
+                          );
+
+                          if (selectedLatLng != null) {
+                            setState(() {
+                              selectedLocation = selectedLatLng;
+                            });
+                          }
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(18.0),
+                          child: FractionallySizedBox(
+                            widthFactor: 1.0,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  selectedLocation != null
+                                      ? 'Latitude: ${selectedLocation!.latitude}'
+                                      : 'Select Location',
+                                  textAlign: TextAlign.center,
+                                ),
+                                Text(
+                                  selectedLocation != null
+                                      ? 'Longitude: ${selectedLocation!.longitude}'
+                                      : '',
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                     hSizedBox20,
                     isLoading
@@ -366,12 +413,11 @@ class _NewPostScreenState extends State<NewPostScreen> {
                                 setState(() {
                                   isLoading = true;
                                 });
-                                String newCarDocumentId = FirebaseFirestore
-                                    .instance
-                                    .collection('cars')
-                                    .doc()
-                                    .id;
+                                final fcmToken =
+                                    await FirebaseMessaging.instance.getToken();
+                                print("FCM:$fcmToken");
                                 await carService.postNewCar(
+                                    ownerFcmToken: fcmToken!,
                                     uid: auth.auth.currentUser!.uid,
                                     carModel: selectedCarModel!,
                                     make: selectedMake!,

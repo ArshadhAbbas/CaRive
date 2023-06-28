@@ -3,6 +3,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-feature android:name="android.hardware.location.gps" />
+
    <application
         android:label="carive"
         android:name="${applicationName}"
@@ -33,6 +35,12 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <meta-data android:name="com.google.android.geo.API_KEY"
+           android:value="AIzaSyB5Na9mYeneCTz8gKvdrwxRgNNK2zUUNQY"/>
+         <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyB5Na9mYeneCTz8gKvdrwxRgNNK2zUUNQY" />
+
         <!-- <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="high_importance_channel_id" /> -->

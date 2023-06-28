@@ -11,6 +11,7 @@ class NotificationService {
       FirebaseFirestore.instance.collection('notifications');
 
   Future<void> sendNotificationToOwner(
+    String userId,
     String ownerFCMToken,
     String userName,
     String ownerId,
@@ -61,6 +62,7 @@ class NotificationService {
           'timestamp': timestamp.toIso8601String(),
           'startDate': startDate.toIso8601String(),
           'endDate': endDate.toIso8601String(),
+          'customerId': userId
         });
 
         // Add the notification ID to the owner's ID

@@ -79,9 +79,12 @@ class _HostNotificationsState extends State<HostNotifications> {
                       DateTime.parse(endDateTimestampString);
                   final endDateFormattedDate =
                       DateFormat('dd/MM/yy').format(endDateTimestamp);
+                      final customerAddress =
+                       getCustomerAddress(notification['customerId'] as String);
+                      
                   return ListTile(
                     title: Text(
-                      "${notification['message']} $startDateFormattedDate to $endDateFormattedDate.",
+                      "${notification['message']} $startDateFormattedDate to $endDateFormattedDate address $customerAddress.",
                       style: TextStyle(color: Colors.white),
                     ),
                     subtitle: Text(
@@ -140,3 +143,15 @@ class _HostNotificationsState extends State<HostNotifications> {
     );
   }
 }
+
+
+Future<String> getCustomerAddress(String customerId) async {
+    final DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(customerId)
+        .get();
+    final userData = snapshot.data() as Map<String, dynamic>?;
+    final address = userData?['address'] as String? ?? '';
+    return address;
+  }
+

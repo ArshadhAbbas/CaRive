@@ -24,6 +24,7 @@ class CarDetails extends StatefulWidget {
       required this.seatCapacity,
       required this.fuelType,
       required this.ownerId,
+      required this.ownerFcmToken,
       required this.isAvailable});
   String carId;
   String brand;
@@ -36,6 +37,7 @@ class CarDetails extends StatefulWidget {
   String seatCapacity;
   String ownerId;
   bool isAvailable;
+  String ownerFcmToken;
 
   DateTime? start;
   DateTime? end;
@@ -272,7 +274,7 @@ class _CarDetailsState extends State<CarDetails> {
                                 child: ElevatedButton(
                                   onPressed: () async {
                                     widget.isAvailable
-                                        ? bookingDialogueBox(context)
+                                        ? bookingDialogueBox()
                                         : null;
                                   },
                                   style: ButtonStyle(
@@ -344,13 +346,13 @@ class _CarDetailsState extends State<CarDetails> {
 //
 //
 
-  Future<dynamic> bookingDialogueBox(BuildContext context) {
+  Future<dynamic> bookingDialogueBox() {
     widget.start = null;
     widget.end = null;
     return showDialog(
       context: context,
-      builder: (context) {
-        return StatefulBuilder(builder: (context, setState) {
+      builder: (context1) {
+        return StatefulBuilder(builder: (context1, setState) {
           return AlertDialog(
             titleTextStyle: const TextStyle(
               color: Colors.white,
@@ -396,18 +398,11 @@ class _CarDetailsState extends State<CarDetails> {
                 onPressed: widget.start != null
                     ? () async {
                         try {
-                          final ownerFCMToken = await FirebaseFirestore.instance
-                              .collection('FCMTokens')
-                              .doc(widget.ownerId)
-                              .get()
-                              .then((snapshot) =>
-                                  snapshot.data()?['fcmToken'] as String);
-                          print("FCM:$ownerFCMToken");
-
                           final currentUserId = _auth.currentUser!.uid;
                           final currentUserName = await userDatabaseService
                               .getCurrentUserName(currentUserId);
                           Navigator.of(context).pop(); // Close the dialog
+                         
                           if (currentUserName == '') {
                             // ignore: use_build_context_synchronously
                             showDialog(
@@ -438,7 +433,8 @@ class _CarDetailsState extends State<CarDetails> {
                             );
                           } else {
                             await notificationService.sendNotificationToOwner(
-                                ownerFCMToken,
+                                currentUserId,
+                                widget.ownerFcmToken,
                                 currentUserName,
                                 widget.ownerId,
                                 widget.start!,

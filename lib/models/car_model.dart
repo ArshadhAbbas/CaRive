@@ -11,10 +11,12 @@ class CarModel {
   final String location;
   final String imageUrl;
   final bool isAvailable;
+  final String ownerFcmToken;
   final String userId; // New field for user ID
 
   CarModel(
       {this.carId,
+      required this.ownerFcmToken,
       required this.carModel,
       required this.make,
       required this.fuelType,
@@ -31,6 +33,7 @@ class CarModel {
     final data = snapshot.data() as Map<String, dynamic>;
     final carId = snapshot.id; // Retrieve the document ID
     return CarModel(
+      ownerFcmToken: data['ownerFcmToken'],
       carId: carId,
       carModel: data['carModel'],
       make: data['make'],
@@ -56,7 +59,8 @@ class CarModel {
       'location': location,
       'imageUrl': imageUrl,
       'userId': userId,
-      'isAvailable': isAvailable
+      'isAvailable': isAvailable,
+      'ownerFcmToken':ownerFcmToken
     };
   }
   // factory Car.fromMap(Map<String, dynamic> map) {

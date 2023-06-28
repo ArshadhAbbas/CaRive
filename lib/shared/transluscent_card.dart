@@ -18,7 +18,8 @@ class TransluscentCard extends StatelessWidget {
     required this.seatCapacity,
     required this.fuelType,
     required this.ownerId,
-    required this.isAvailable
+    required this.isAvailable,
+    required this.ownerFcmToken
   });
   String carId;
   String brand;
@@ -31,6 +32,7 @@ class TransluscentCard extends StatelessWidget {
   String seatCapacity;
   String ownerId;
   bool isAvailable;
+  String ownerFcmToken;
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +143,8 @@ class TransluscentCard extends StatelessWidget {
                               seatCapacity: seatCapacity,
                               fuelType: fuelType,
                               ownerId: ownerId,
-                              isAvailable:isAvailable
+                              isAvailable:isAvailable,
+                              ownerFcmToken:ownerFcmToken
                             ),
                           ));
                         },

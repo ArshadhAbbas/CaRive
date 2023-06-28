@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -215,6 +216,9 @@ class _CreateProfileState extends State<CreateProfile> {
                                             null) {
                                           throw ('Image cannot be empty');
                                         }
+                                        final fcmToken = await FirebaseMessaging
+                                            .instance
+                                            .getToken();
 
                                         await userDatabaseService.addUser(
                                           userUID,
@@ -222,7 +226,14 @@ class _CreateProfileState extends State<CreateProfile> {
                                           address,
                                           number,
                                           email,
+                                          fcmToken!
                                         );
+                                        // final fcmToken = await FirebaseMessaging
+                                        //     .instance
+                                        //     .getToken();
+
+                                        // userDatabaseService.addFcmToken(
+                                        //     userUID, fcmToken);
 
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(

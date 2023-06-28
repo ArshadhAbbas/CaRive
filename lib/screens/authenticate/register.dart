@@ -58,6 +58,7 @@ class _RegisterState extends State<Register> {
                   if (value!.isEmpty) {
                     return "Please Enter Email";
                   }
+                  return null;
                 },
               ),
               hSizedBox30,
@@ -71,6 +72,7 @@ class _RegisterState extends State<Register> {
                   if (value!.isEmpty) {
                     return "Please Enter Password";
                   }
+                  return null;
                 },
               ),
               hSizedBox30,
@@ -123,18 +125,18 @@ class _RegisterState extends State<Register> {
         });
       } else {
         try {
-          final fcmToken = await FirebaseMessaging.instance.getToken();
-          await FirebaseFirestore.instance
-              .collection('FCMTokens')
-              .doc(result
-                  .uid) // Assuming 'result.uid' is the user's unique ID after registration
-              .set({'fcmToken': fcmToken, 'UserId': result.uid});
-          print("fcm:$fcmToken");
+          // final fcmToken = await FirebaseMessaging.instance.getToken();
+          // await FirebaseFirestore.instance
+          //     .collection('FCMTokens')
+          //     .doc(result
+          //         .uid) // Assuming 'result.uid' is the user's unique ID after registration
+          //     .set({'fcmToken': fcmToken, 'UserId': result.uid});
+          // print("fcm:$fcmToken");
         } catch (e) {
           print(e.toString());
         }
 
-        print('Registered');
+        // print('Registered');
         Navigator.pop(context);
       }
     }

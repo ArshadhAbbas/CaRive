@@ -42,49 +42,48 @@ class CarService {
 
 // Inside the _NewPostScreenState class
 
-  Future<void> postNewCar({
-    required String uid,
-    required String carModel,
-    required String make,
-    required String fuelType,
-    required String seatCapacity,
-    required String modelYear,
-    required String amount,
-    required String location,
-    required bool isAvailable,
-  }) async {
-    if (selectedImage == null) {
-      throw Exception('No image selected for the car');
-    }
+ Future<void> postNewCar({
+  required String uid,
+  required String carModel,
+  required String make,
+  required String fuelType,
+  required String seatCapacity,
+  required String modelYear,
+  required String amount,
+  required String location,
+  required bool isAvailable,
+  required String ownerFcmToken,
+}) async {
+  if (selectedImage == null) {
+    throw Exception('No image selected for the car');
+  }
 
-    final imageUrl = await uploadImage(selectedImage!);
+  final imageUrl = await uploadImage(selectedImage!);
 
-    final newCar = CarModel(
-      userId: uid,
-      carModel: carModel,
-      make: make,
-      fuelType: fuelType,
-      seatCapacity: seatCapacity,
-      modelYear: modelYear,
-      amount: amount,
-      location: location,
-      imageUrl: imageUrl,
-      isAvailable: isAvailable,
-    );
+  final newCar = CarModel(
+    userId: uid,
+    carModel: carModel,
+    make: make,
+    fuelType: fuelType,
+    seatCapacity: seatCapacity,
+    modelYear: modelYear,
+    amount: amount,
+    location: location,
+    imageUrl: imageUrl,
+    isAvailable: isAvailable,
+    ownerFcmToken: ownerFcmToken,
+  );
 
-    final newCarDocRef = carCollectionReference
-        .doc(); // Create a new document with an auto-generated ID
-    final newCarId = newCarDocRef.id; // Get the auto-generated document ID
+  final newCarDocRef = carCollectionReference.doc();
+  final newCarId = newCarDocRef.id;
 
-    // Set the new car data to Firestore
-    await newCarDocRef.set(
-      newCar.toMap()
-        ..addAll(
-            {'carId': newCarId}), // Include the document ID in the car data
-    );
+  await newCarDocRef.set(
+    newCar.toMap()..addAll({'carId': newCarId}),
+  );
 
-    await userDatabaseService.addPost(uid, newCarId);
-  } 
+  await userDatabaseService.addPost(uid, newCarId);
+}
+
 
   Future<void> updateCarDetails({
     required String carId,

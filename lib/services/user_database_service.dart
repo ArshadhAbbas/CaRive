@@ -22,8 +22,14 @@ class UserDatabaseService {
 
 // Create user profile
 
-  Future<void> addUser(String uid, String name, String address,
-      String phoneNumber, String mailId) async {
+  Future<void> addUser(
+    String uid,
+    String name,
+    String address,
+    String phoneNumber,
+    String mailId,
+    String fcmToken,
+  ) async {
     try {
       String url = await uploadImage(selectedImage!);
       await userCollectionReference.doc(uid).set({
@@ -33,6 +39,7 @@ class UserDatabaseService {
         "phone_number": phoneNumber,
         "email": mailId,
         "address": address,
+        'fcmToken':fcmToken
       });
     } catch (e) {
       print("An error occurred while adding the user: $e");
@@ -63,9 +70,7 @@ class UserDatabaseService {
     });
   }
 
-
-
-   Future<String> getCurrentUserName(String uid) async {
+  Future<String> getCurrentUserName(String uid) async {
     try {
       final userSnapshot = await userCollectionReference.doc(uid).get();
       final userData = userSnapshot.data() as Map<String, dynamic>?;
@@ -154,8 +159,18 @@ class UserDatabaseService {
     }
   }
 
+  Future<void> addFcmToken(String uid, String? fcmToken) async {
+    try {
+      await userCollectionReference.doc(uid).update({
+        "fcmToken": FieldValue.arrayUnion([fcmToken]),
+      });
+    } catch (e) {
+      print("An error occurred while adding the fcm Token: $e");
+      throw e;
+    }
+  }
 
-    Future<void> addNotification(String uid, String notificationId) async {
+  Future<void> addNotification(String uid, String notificationId) async {
     try {
       await userCollectionReference.doc(uid).update({
         "notifications": FieldValue.arrayUnion([notificationId]),
