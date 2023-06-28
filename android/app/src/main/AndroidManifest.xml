@@ -36,10 +36,10 @@
             android:name="flutterEmbedding"
             android:value="2" />
         <meta-data android:name="com.google.android.geo.API_KEY"
-           android:value="$gMapApiKey"/>
+           android:value="AIzaSyB5Na9mYeneCTz8gKvdrwxRgNNK2zUUNQY"/>
          <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="$gMapApiKey" />
+            android:value="AIzaSyB5Na9mYeneCTz8gKvdrwxRgNNK2zUUNQY" />
 
         <!-- <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
