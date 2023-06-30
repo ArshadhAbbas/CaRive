@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import '../../screens/profile/profile_screen.dart';
 import '../../services/auth.dart';
 import '../../services/user_database_service.dart';
+import '../circular_progress_indicator.dart';
 
 class BottomNavBar extends StatefulWidget {
   const BottomNavBar({Key? key});
@@ -45,11 +46,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Display a loading indicator if data is still loading
-          return Center(
-            child: CircularProgressIndicator(
-              color: themeColorGreen,
-            ),
-          );
+         const CustomProgressIndicator();
         }
         if (snapshot.hasError) {
           // Display an error message if there's an error in fetching the data

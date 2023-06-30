@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:carive/shared/circular_progress_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:carive/models/user_model.dart';
 import 'package:carive/screens/profile/create_profile/create_profile.dart';
@@ -12,6 +13,7 @@ import 'package:carive/shared/custom_scaffold.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+// ignore: must_be_immutable
 class ProfileScreen extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   UserDatabaseService userDatabaseService = UserDatabaseService();
@@ -25,11 +27,7 @@ class ProfileScreen extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             // Display a loading indicator if data is still loading
-            return Center(
-              child: CircularProgressIndicator(
-                color: themeColorGreen,
-              ),
-            );
+           const CustomProgressIndicator();
           }
           if (snapshot.hasError) {
             // Display an error message if there's an error in fetching the data

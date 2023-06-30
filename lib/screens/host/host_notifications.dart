@@ -1,3 +1,4 @@
+import 'package:carive/shared/circular_progress_indicator.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -133,9 +134,7 @@ class _HostNotificationsState extends State<HostNotifications> {
                 ),
               );
             } else {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return const CustomProgressIndicator();
             }
           },
         ),

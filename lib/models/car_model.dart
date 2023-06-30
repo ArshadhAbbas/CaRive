@@ -13,6 +13,8 @@ class CarModel {
   final bool isAvailable;
   final String ownerFcmToken;
   final String userId; // New field for user ID
+  final double latitude;
+  final double longitude;
 
   CarModel(
       {this.carId,
@@ -26,6 +28,8 @@ class CarModel {
       required this.location,
       required this.imageUrl,
       required this.userId,
+      required this.latitude,
+      required this.longitude,
       required this.isAvailable // Added field for user ID
       });
 
@@ -33,19 +37,20 @@ class CarModel {
     final data = snapshot.data() as Map<String, dynamic>;
     final carId = snapshot.id; // Retrieve the document ID
     return CarModel(
-      ownerFcmToken: data['ownerFcmToken'],
-      carId: carId,
-      carModel: data['carModel'],
-      make: data['make'],
-      fuelType: data['fuelType'],
-      seatCapacity: data['seatCapacity'],
-      modelYear: data['modelYear'],
-      amount: data['amount'],
-      location: data['location'],
-      imageUrl: data['imageUrl'],
-      isAvailable: data['isAvailable'],
-      userId: data['userId'],
-    );
+        ownerFcmToken: data['ownerFcmToken'],
+        carId: carId,
+        carModel: data['carModel'],
+        make: data['make'],
+        fuelType: data['fuelType'],
+        seatCapacity: data['seatCapacity'],
+        modelYear: data['modelYear'],
+        amount: data['amount'],
+        location: data['location'],
+        imageUrl: data['imageUrl'],
+        isAvailable: data['isAvailable'],
+        userId: data['userId'],
+        latitude: data['latitude'],
+        longitude: data['longitude']);
   }
 
   Map<String, dynamic> toMap() {
@@ -60,7 +65,9 @@ class CarModel {
       'imageUrl': imageUrl,
       'userId': userId,
       'isAvailable': isAvailable,
-      'ownerFcmToken':ownerFcmToken
+      'ownerFcmToken': ownerFcmToken,
+      'latitude': latitude,
+      'longitude': longitude
     };
   }
   // factory Car.fromMap(Map<String, dynamic> map) {

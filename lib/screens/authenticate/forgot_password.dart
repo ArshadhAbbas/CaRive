@@ -2,11 +2,11 @@ import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:carive/shared/custom_scaffold.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 import '../../services/auth.dart';
 import '../../shared/custom_text_form_field.dart';
 
+// ignore: must_be_immutable
 class ForgotPassword extends StatelessWidget {
   ForgotPassword({super.key});
 
@@ -37,6 +37,7 @@ class ForgotPassword extends StatelessWidget {
                   if (value!.isEmpty) {
                     return "Please Enter valid Mail";
                   }
+                  return null;
                 },
                 ),
                 hSizedBox30,

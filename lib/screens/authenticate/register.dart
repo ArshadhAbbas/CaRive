@@ -1,9 +1,8 @@
+import 'package:carive/shared/circular_progress_indicator.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:carive/shared/custom_text_form_field.dart';
 import 'package:carive/shared/logo.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import '../../services/auth.dart';
 
@@ -77,9 +76,7 @@ class _RegisterState extends State<Register> {
               ),
               hSizedBox30,
               isLoading
-                  ? CircularProgressIndicator(
-                      color: themeColorGreen,
-                    )
+                  ? const CustomProgressIndicator()
                   : CustomElevatedButton(
                       text: "Register Now", onPressed: _registerButtonPressed),
               hSizedBox20,

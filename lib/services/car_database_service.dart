@@ -42,48 +42,51 @@ class CarService {
 
 // Inside the _NewPostScreenState class
 
- Future<void> postNewCar({
-  required String uid,
-  required String carModel,
-  required String make,
-  required String fuelType,
-  required String seatCapacity,
-  required String modelYear,
-  required String amount,
-  required String location,
-  required bool isAvailable,
-  required String ownerFcmToken,
-}) async {
-  if (selectedImage == null) {
-    throw Exception('No image selected for the car');
+  Future<void> postNewCar({
+    required String uid,
+    required String carModel,
+    required String make,
+    required String fuelType,
+    required String seatCapacity,
+    required String modelYear,
+    required String amount,
+    required String location,
+    required bool isAvailable,
+    required String ownerFcmToken,
+    required double latitude,
+    required double longitude,
+  }) async {
+    if (selectedImage == null) {
+      throw Exception('No image selected for the car');
+    }
+
+    final imageUrl = await uploadImage(selectedImage!);
+
+    final newCar = CarModel(
+      latitude: latitude,
+      longitude: longitude,
+      userId: uid,
+      carModel: carModel,
+      make: make,
+      fuelType: fuelType,
+      seatCapacity: seatCapacity,
+      modelYear: modelYear,
+      amount: amount,
+      location: location,
+      imageUrl: imageUrl,
+      isAvailable: isAvailable,
+      ownerFcmToken: ownerFcmToken,
+    );
+
+    final newCarDocRef = carCollectionReference.doc();
+    final newCarId = newCarDocRef.id;
+
+    await newCarDocRef.set(
+      newCar.toMap()..addAll({'carId': newCarId}),
+    );
+
+    await userDatabaseService.addPost(uid, newCarId);
   }
-
-  final imageUrl = await uploadImage(selectedImage!);
-
-  final newCar = CarModel(
-    userId: uid,
-    carModel: carModel,
-    make: make,
-    fuelType: fuelType,
-    seatCapacity: seatCapacity,
-    modelYear: modelYear,
-    amount: amount,
-    location: location,
-    imageUrl: imageUrl,
-    isAvailable: isAvailable,
-    ownerFcmToken: ownerFcmToken,
-  );
-
-  final newCarDocRef = carCollectionReference.doc();
-  final newCarId = newCarDocRef.id;
-
-  await newCarDocRef.set(
-    newCar.toMap()..addAll({'carId': newCarId}),
-  );
-
-  await userDatabaseService.addPost(uid, newCarId);
-}
-
 
   Future<void> updateCarDetails({
     required String carId,
@@ -94,6 +97,8 @@ class CarService {
     required String modelYear,
     required String amount,
     required String location,
+    required double latitude,
+    required double longitude,
   }) async {
     final carDocRef = carCollectionReference.doc(carId);
     if (selectedImage != null) {
@@ -111,6 +116,8 @@ class CarService {
       'modelYear': modelYear,
       'amount': amount,
       'location': location,
+      'latitude':latitude,
+      'longitude':longitude
     });
   }
 

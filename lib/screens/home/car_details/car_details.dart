@@ -3,14 +3,17 @@ import 'package:carive/services/user_database_service.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:carive/shared/custom_scaffold.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:custom_date_range_picker/custom_date_range_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:map_launcher/map_launcher.dart' as launcher;
 
 import '../../../services/notification_service.dart';
+import '../../../shared/circular_progress_indicator.dart';
 
+// ignore: must_be_immutable
 class CarDetails extends StatefulWidget {
   CarDetails(
       {super.key,
@@ -24,6 +27,8 @@ class CarDetails extends StatefulWidget {
       required this.seatCapacity,
       required this.fuelType,
       required this.ownerId,
+      required this.latitude,
+      required this.longitude,
       required this.ownerFcmToken,
       required this.isAvailable});
   String carId;
@@ -38,6 +43,8 @@ class CarDetails extends StatefulWidget {
   String ownerId;
   bool isAvailable;
   String ownerFcmToken;
+  double latitude;
+  double longitude;
 
   DateTime? start;
   DateTime? end;
@@ -48,10 +55,17 @@ class CarDetails extends StatefulWidget {
 
 class _CarDetailsState extends State<CarDetails> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
   final notificationService = NotificationService();
-
   final userDatabaseService = UserDatabaseService();
+
+  _mapLauncher(location) async {
+    final availableMaps = await launcher.MapLauncher.installedMaps;
+
+    await availableMaps.first.showMarker(
+      coords: launcher.Coords(location.latitude, location.longitude),
+      title: "Car Location",
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,10 +73,7 @@ class _CarDetailsState extends State<CarDetails> {
       future: userDatabaseService.getUserData(widget.ownerId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-              child: CircularProgressIndicator(
-            color: themeColorGreen,
-          ));
+          return const CustomProgressIndicator();
         }
         if (!snapshot.hasData || !snapshot.data!.exists) {
           return const Center(
@@ -151,7 +162,8 @@ class _CarDetailsState extends State<CarDetails> {
                                       widget.isAvailable
                                           ? "Available"
                                           : "Unavailable",
-                                      style: TextStyle(color: Colors.white),
+                                      style:
+                                          const TextStyle(color: Colors.white),
                                     ),
                                   ],
                                 ),
@@ -251,19 +263,39 @@ class _CarDetailsState extends State<CarDetails> {
                                     ),
                                   ),
                                   hSizedBox20,
-                                  Container(
-                                    height: 300,
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                        border:
-                                            Border.all(color: themeColorGreen),
-                                        borderRadius:
-                                            BorderRadius.circular(20)),
-                                    child: const Center(
-                                        child: Text(
-                                      "Location",
-                                      style: TextStyle(color: Colors.white),
-                                    )),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      _mapLauncher(LatLng(
+                                          widget.latitude, widget.longitude));
+                                    },
+                                    child: Container(
+                                      height: 300,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                          border: Border.all(
+                                              color: themeColorGreen),
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: GoogleMap(
+                                            markers: {
+                                              Marker(
+                                                markerId: const MarkerId(
+                                                    'carLocation'),
+                                                position: LatLng(
+                                                    widget.latitude,
+                                                    widget.longitude),
+                                              ),
+                                            },
+                                            initialCameraPosition:
+                                                CameraPosition(
+                                                    target: LatLng(
+                                                        widget.latitude,
+                                                        widget.longitude),
+                                                    zoom: 8)),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -298,6 +330,8 @@ class _CarDetailsState extends State<CarDetails> {
                                     Navigator.of(context).push(
                                         MaterialPageRoute(builder: (context) {
                                       return EditCarScreen(
+                                        latitude: widget.latitude,
+                                        longitude: widget.longitude,
                                         carId: widget.carId,
                                         selectedCarModel: widget.model,
                                         selectedMake: widget.brand,
@@ -402,7 +436,7 @@ class _CarDetailsState extends State<CarDetails> {
                           final currentUserName = await userDatabaseService
                               .getCurrentUserName(currentUserId);
                           Navigator.of(context).pop(); // Close the dialog
-                         
+
                           if (currentUserName == '') {
                             // ignore: use_build_context_synchronously
                             showDialog(
