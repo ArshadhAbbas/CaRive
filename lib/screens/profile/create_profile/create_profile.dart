@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../services/auth.dart';
 import '../../../services/user_database_service.dart';
+import '../../../shared/circular_progress_indicator.dart';
 import '../../../shared/constants.dart';
 import '../../../shared/custom_elevated_button.dart';
 import '../../../shared/custom_scaffold.dart';
@@ -191,9 +192,7 @@ class _CreateProfileState extends State<CreateProfile> {
                       hSizedBox30,
                       Center(
                         child: isLoading
-                            ? CircularProgressIndicator(
-                                color: themeColorGreen,
-                              )
+                            ? const CustomProgressIndicator()
                             : CustomElevatedButton(
                                 text: "Save",
                                 onPressed: () async {

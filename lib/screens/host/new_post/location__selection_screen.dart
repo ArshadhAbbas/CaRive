@@ -1,3 +1,4 @@
+import 'package:carive/shared/circular_progress_indicator.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -156,23 +157,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
             markers: markers,
           ),
           if (isLoading)
-            Center(
-              child: Container(
-                decoration: BoxDecoration(
-                    color: themeColorGrey,
-                    border: Border.all(
-                      width: 3,
-                      color: Colors.white,
-                    ),
-                    borderRadius: BorderRadius.circular(20)),
-                child: Padding(
-                  padding: const EdgeInsets.all(18.0),
-                  child: CircularProgressIndicator(
-                    color: themeColorGreen,
-                  ),
-                ),
-              ),
-            ), // Show circular progress indicator while loading
+            const CustomProgressIndicator(), // Show circular progress indicator while loading
         ],
       ),
       floatingActionButton: FloatingActionButton(

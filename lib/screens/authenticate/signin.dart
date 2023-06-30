@@ -7,6 +7,8 @@ import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:carive/shared/custom_scaffold.dart';
 import 'package:carive/shared/custom_text_form_field.dart';
 
+import '../../shared/circular_progress_indicator.dart';
+
 class SignIn extends StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
 
@@ -71,6 +73,7 @@ class _SignInState extends State<SignIn> {
                             if (value!.isEmpty) {
                               return "Please Enter valid Mail";
                             }
+                            return null;
                           },
                         ),
                         hSizedBox10,
@@ -84,13 +87,12 @@ class _SignInState extends State<SignIn> {
                             if (value!.isEmpty) {
                               return "Please Enter Password containing atleast 6 characters";
                             }
+                            return null;
                           },
                         ),
                         hSizedBox20,
                         isLoading
-                            ? CircularProgressIndicator(
-                                color: themeColorGreen,
-                              )
+                            ? const CustomProgressIndicator()
                             : CustomElevatedButton(
                                 text: "Sign In",
                                 onPressed: _signInButtonPressed),

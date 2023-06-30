@@ -7,6 +7,7 @@ import 'package:carive/shared/transluscent_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../../shared/circular_progress_indicator.dart';
 import '../host/new_post/location__selection_screen.dart';
 
 class Home extends StatefulWidget {
@@ -30,8 +31,7 @@ class _HomeState extends State<Home> {
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-              child: CircularProgressIndicator(color: themeColorGreen));
+          return const CustomProgressIndicator();
         }
 
         final List<CarModel> cars = snapshot.data!.docs
@@ -90,11 +90,7 @@ class _HomeState extends State<Home> {
                               Icons.filter_alt_outlined,
                               color: themeColorGreen,
                             ),
-                            onPressed: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => LocationSelectionScreen(),
-                              ));
-                            },
+                            onPressed: () {},
                           ),
                         ],
                       ),
@@ -112,6 +108,8 @@ class _HomeState extends State<Home> {
                         physics: const NeverScrollableScrollPhysics(),
                         itemBuilder: (context, index) {
                           return TransluscentCard(
+                            latitude: cars[index].latitude,
+                            longitude: cars[index].longitude,
                             carId: cars[index].carId!,
                             image: cars[index].imageUrl,
                             brand: cars[index].make,

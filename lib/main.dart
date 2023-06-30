@@ -1,10 +1,8 @@
-import 'package:carive/firebase_options.dart';
 import 'package:carive/models/custom_user.dart';
 import 'package:carive/screens/host/host_notifications.dart';
 import 'package:carive/services/auth.dart';
 import 'package:carive/services/firebase__notification_api.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

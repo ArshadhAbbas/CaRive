@@ -1,7 +1,7 @@
-
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:carive/screens/host/new_post/location__selection_screen.dart';
 import 'package:carive/services/auth.dart';
 import 'package:carive/services/car_database_service.dart';
 import 'package:carive/shared/cars_list.dart';
@@ -9,10 +9,13 @@ import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:carive/shared/custom_scaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../shared/circular_progress_indicator.dart';
 import '../../../shared/custom_text_form_field.dart';
 
+// ignore: must_be_immutable
 class EditCarScreen extends StatefulWidget {
   String carId;
   String? selectedCarModel;
@@ -23,8 +26,11 @@ class EditCarScreen extends StatefulWidget {
   final String amount;
   final String location;
   final String image;
+  final double latitude;
+  final double longitude;
 
-  EditCarScreen({super.key, 
+  EditCarScreen({
+    super.key,
     required this.carId,
     required this.selectedCarModel,
     required this.selectedMake,
@@ -34,6 +40,8 @@ class EditCarScreen extends StatefulWidget {
     required this.amount,
     required this.location,
     required this.image,
+    required this.latitude,
+    required this.longitude,
   });
 
   @override
@@ -49,6 +57,7 @@ class _EditCarScreenState extends State<EditCarScreen> {
   TextEditingController locationController = TextEditingController();
   TextEditingController addInfoController = TextEditingController();
   String? photo;
+  late LatLng selectedLocation;
 
   AuthService auth = AuthService();
   final CarService carService = CarService();
@@ -60,6 +69,10 @@ class _EditCarScreenState extends State<EditCarScreen> {
     amountController.text = widget.amount;
     locationController.text = widget.location;
     photo = null;
+    selectedLocation = LatLng(
+        widget.latitude,
+        widget
+            .longitude); // Initialize selectedLocation with the provided latitude and longitude
   }
 
   @override
@@ -111,12 +124,13 @@ class _EditCarScreenState extends State<EditCarScreen> {
             ],
           ),
           body: SingleChildScrollView(
-            child: Center(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    StreamBuilder<File?>(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: StreamBuilder<File?>(
                       stream: carService.selectedImageStream,
                       builder: (context, snapshot) {
                         final File? selectedImage = snapshot.data;
@@ -176,253 +190,346 @@ class _EditCarScreenState extends State<EditCarScreen> {
                         );
                       },
                     ),
-                    const SizedBox(height: 20),
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: themeColorGreen),
-                      ),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButtonFormField<String?>(
-                            validator: (value) =>
-                                value == null ? "Field required" : null,
-                            borderRadius: BorderRadius.circular(20),
-                            isExpanded: true,
-                            icon: Visibility(
-                              visible: false,
-                              child: Icon(Icons.arrow_downward),
-                            ),
-                            dropdownColor: themeColorGrey,
-                            style: TextStyle(color: Colors.white),
-                            hint: Center(
-                              child: Text(
-                                'Select Car Brand',
-                                style: TextStyle(color: themeColorblueGrey),
-                              ),
-                            ),
-                            value: widget.selectedMake,
-                            items: carDataset.keys.map((e) {
-                              return DropdownMenuItem<String?>(
-                                value: e,
-                                child: Center(child: Text(e)),
-                              );
-                            }).toList(),
-                            onChanged: onCarModelChanged,
-                          ),
-                        ),
-                      ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    "Car Brand",
+                    style: TextStyle(
+                      color: themeColorblueGrey,
+                      fontSize: 18,
                     ),
-                    const SizedBox(height: 20),
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: themeColorGreen),
-                      ),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButtonFormField<String?>(
-                            validator: (value) =>
-                                value == null ? "Field required" : null,
-                            borderRadius: BorderRadius.circular(20),
-                            isExpanded: true,
-                            icon: Visibility(
-                              visible: false,
-                              child: Icon(Icons.arrow_downward),
-                            ),
-                            dropdownColor: themeColorGrey,
-                            style: TextStyle(color: Colors.white),
-                            value: widget.selectedCarModel != null
-                                ? widget.selectedCarModel
-                                : null,
-                            hint: Center(
-                              child: Text(
-                                'Select Car Model',
-                                style: TextStyle(color: themeColorblueGrey),
-                              ),
-                            ),
-                            items: (carDataset[widget.selectedMake] ?? [])
-                                .map((e) {
-                              return DropdownMenuItem<String?>(
-                                value: e,
-                                child: Center(child: Text('$e')),
-                              );
-                            }).toList(),
-                            onChanged: (val) {
-                              setState(() {
-                                widget.selectedCarModel = val!;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
+                  ),
+                  hSizedBox10,
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: themeColorGreen),
                     ),
-                    const SizedBox(height: 20),
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: themeColorGreen),
-                      ),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButtonFormField<String?>(
-                            validator: (value) =>
-                                value == null ? "Field required" : null,
-                            borderRadius: BorderRadius.circular(20),
-                            isExpanded: true,
-                            icon: Visibility(
-                              visible: false,
-                              child: Icon(Icons.arrow_downward),
-                            ),
-                            dropdownColor: themeColorGrey,
-                            style: TextStyle(color: Colors.white),
-                            value: widget.selectedFuel,
-                            hint: Center(
-                              child: Text(
-                                'Select Fuel type',
-                                style: TextStyle(color: themeColorblueGrey),
-                              ),
-                            ),
-                            items: fuelType.map((e) {
-                              return DropdownMenuItem<String?>(
-                                value: e,
-                                child: Center(child: Text('$e')),
-                              );
-                            }).toList(),
-                            onChanged: (val) {
-                              setState(() {
-                                widget.selectedFuel = val!;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: themeColorGreen),
-                      ),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButtonFormField<String?>(
-                            validator: (value) =>
-                                value == null ? "Field required" : null,
-                            borderRadius: BorderRadius.circular(20),
-                            isExpanded: true,
-                            icon: Visibility(
-                              visible: false,
-                              child: Icon(Icons.arrow_downward),
-                            ),
-                            dropdownColor: themeColorGrey,
-                            style: TextStyle(color: Colors.white),
-                            value: widget.selectedSeatCapacity,
-                            hint: Center(
-                              child: Text(
-                                'Select Seat Capacity',
-                                style: TextStyle(color: themeColorblueGrey),
-                              ),
-                            ),
-                            items: seatCapacity.map((e) {
-                              return DropdownMenuItem<String?>(
-                                value: e,
-                                child: Center(child: Text('$e')),
-                              );
-                            }).toList(),
-                            onChanged: (val) {
-                              setState(() {
-                                widget.selectedSeatCapacity = val!;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                    hSizedBox20,
-                    CustomTextFormField(
-                      controller: modelYearController,
-                      hintText: "Enter Model Year",
-                      validator: (value) =>
-                          value == null ? "Enter Model Year" : null,
-                    ),
-                    hSizedBox20,
-                    TextFormField(
-                      validator: (value) =>
-                          value == null ? "Enter amount" : null,
-                      style: TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        hintText: "Enter amount",
-                        hintStyle: TextStyle(color: themeColorblueGrey),
-                        enabledBorder: OutlineInputBorder(
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButtonFormField<String?>(
+                          validator: (value) =>
+                              value == null ? "Field required" : null,
                           borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide(color: themeColorGreen),
+                          isExpanded: true,
+                          icon: Visibility(
+                            visible: false,
+                            child: Icon(Icons.arrow_downward),
+                          ),
+                          dropdownColor: themeColorGrey,
+                          style: TextStyle(color: Colors.white),
+                          value: widget.selectedMake,
+                          items: carDataset.keys.map((e) {
+                            return DropdownMenuItem<String?>(
+                              value: e,
+                              child: Center(child: Text(e)),
+                            );
+                          }).toList(),
+                          onChanged: onCarModelChanged,
                         ),
-                        focusedBorder: OutlineInputBorder(
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    "Car Model",
+                    style: TextStyle(
+                      color: themeColorblueGrey,
+                      fontSize: 18,
+                    ),
+                  ),
+                  hSizedBox10,
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: themeColorGreen),
+                    ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButtonFormField<String?>(
+                          validator: (value) =>
+                              value == null ? "Field required" : null,
                           borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide(color: themeColorGreen),
+                          isExpanded: true,
+                          icon: Visibility(
+                            visible: false,
+                            child: Icon(Icons.arrow_downward),
+                          ),
+                          dropdownColor: themeColorGrey,
+                          style: TextStyle(color: Colors.white),
+                          value: widget.selectedCarModel != null
+                              ? widget.selectedCarModel
+                              : null,
+                          items:
+                              (carDataset[widget.selectedMake] ?? []).map((e) {
+                            return DropdownMenuItem<String?>(
+                              value: e,
+                              child: Center(child: Text('$e')),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            setState(() {
+                              widget.selectedCarModel = val!;
+                            });
+                          },
                         ),
-                        suffixIcon: Padding(
-                          padding: const EdgeInsets.all(18.0),
-                          child: Text(
-                            '₹/Day',
-                            style: TextStyle(
-                                color: themeColorblueGrey, fontSize: 20),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    "Fuel Type",
+                    style: TextStyle(
+                      color: themeColorblueGrey,
+                      fontSize: 18,
+                    ),
+                  ),
+                  hSizedBox10,
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: themeColorGreen),
+                    ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButtonFormField<String?>(
+                          validator: (value) =>
+                              value == null ? "Field required" : null,
+                          borderRadius: BorderRadius.circular(20),
+                          isExpanded: true,
+                          icon: Visibility(
+                            visible: false,
+                            child: Icon(Icons.arrow_downward),
+                          ),
+                          dropdownColor: themeColorGrey,
+                          style: TextStyle(color: Colors.white),
+                          value: widget.selectedFuel,
+                          hint: Center(
+                            child: Text(
+                              'Select Fuel type',
+                              style: TextStyle(color: themeColorblueGrey),
+                            ),
+                          ),
+                          items: fuelType.map((e) {
+                            return DropdownMenuItem<String?>(
+                              value: e,
+                              child: Center(child: Text('$e')),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            setState(() {
+                              widget.selectedFuel = val!;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    "Seat Capacity",
+                    style: TextStyle(
+                      color: themeColorblueGrey,
+                      fontSize: 18,
+                    ),
+                  ),
+                  hSizedBox10,
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: themeColorGreen),
+                    ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButtonFormField<String?>(
+                          validator: (value) =>
+                              value == null ? "Field required" : null,
+                          borderRadius: BorderRadius.circular(20),
+                          isExpanded: true,
+                          icon: Visibility(
+                            visible: false,
+                            child: Icon(Icons.arrow_downward),
+                          ),
+                          dropdownColor: themeColorGrey,
+                          style: TextStyle(color: Colors.white),
+                          value: widget.selectedSeatCapacity,
+                          items: seatCapacity.map((e) {
+                            return DropdownMenuItem<String?>(
+                              value: e,
+                              child: Center(child: Text('$e')),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            setState(() {
+                              widget.selectedSeatCapacity = val!;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  hSizedBox20,
+                  Text(
+                    "Model Year",
+                    style: TextStyle(
+                      color: themeColorblueGrey,
+                      fontSize: 18,
+                    ),
+                  ),
+                  hSizedBox10,
+                  CustomTextFormField(
+                    controller: modelYearController,
+                    validator: (value) =>
+                        value == null ? "Enter Model Year" : null,
+                  ),
+                  hSizedBox20,
+                  Text(
+                    "Amount Per Day",
+                    style: TextStyle(
+                      color: themeColorblueGrey,
+                      fontSize: 18,
+                    ),
+                  ),
+                  hSizedBox10,
+                  TextFormField(
+                    validator: (value) => value == null ? "Enter amount" : null,
+                    style: TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      hintText: "Enter amount",
+                      hintStyle: TextStyle(color: themeColorblueGrey),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide(color: themeColorGreen),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide(color: themeColorGreen),
+                      ),
+                      suffixIcon: Padding(
+                        padding: const EdgeInsets.all(18.0),
+                        child: Text(
+                          '₹/Day',
+                          style: TextStyle(
+                              color: themeColorblueGrey, fontSize: 20),
+                        ),
+                      ),
+                    ),
+                    controller: amountController,
+                  ),
+                  hSizedBox20,
+                  Text(
+                    "Location Name",
+                    style: TextStyle(
+                      color: themeColorblueGrey,
+                      fontSize: 18,
+                    ),
+                  ),
+                  hSizedBox10,
+                  CustomTextFormField(
+                    controller: locationController,
+                  ),
+                  hSizedBox20,
+                  Text(
+                    "Location",
+                    style: TextStyle(
+                      color: themeColorblueGrey,
+                      fontSize: 18,
+                    ),
+                  ),
+                  hSizedBox10,
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: themeColorGreen),
+                    ),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                      ),
+                      onPressed: () async {
+                        final selectedLatLng = await Navigator.push<LatLng>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LocationSelectionScreen(
+                              onLocationSelected: (LatLng selectedLatLng) {
+                                Navigator.pop(context, selectedLatLng);
+                              },
+                            ),
+                          ),
+                        );
+
+                        if (selectedLatLng != null) {
+                          setState(() {
+                            selectedLocation = LatLng(
+                              selectedLatLng.latitude,
+                              selectedLatLng.longitude,
+                            );
+                          });
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(18.0),
+                        child: FractionallySizedBox(
+                          widthFactor: 1.0,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Latitude: ${selectedLocation.latitude}',
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                'Longitude: ${selectedLocation.longitude}',
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                      controller: amountController,
                     ),
-                    hSizedBox20,
-                    CustomTextFormField(
-                      controller: locationController,
-                      hintText: "Enter location details",
-                    ),
-                    hSizedBox20,
-                    isLoading
-                        ? CircularProgressIndicator(
-                            color: themeColorGreen,
-                          )
-                        : CustomElevatedButton(
-                            text: "Update details",
-                            onPressed: () async {
-                              if (_formKey.currentState!.validate()) {
-                                FocusScopeNode currentfocus = FocusScope.of(
-                                    context); //get the currnet focus node
-                                if (!currentfocus.hasPrimaryFocus) {
-                                  //prevent Flutter from throwing an exception
-                                  currentfocus
-                                      .unfocus(); //unfocust from current focust, so that keyboard will dismiss
-                                }
-                                setState(() {
-                                  isLoading = true;
-                                });
-
-                                await carService.updateCarDetails(
-                                  carId: widget
-                                      .carId, // Pass the car ID of the car being edited
-                                  carModel: widget.selectedCarModel!,
-                                  make: widget.selectedMake,
-                                  fuelType: widget.selectedFuel,
-                                  seatCapacity: widget.selectedSeatCapacity,
-                                  modelYear: modelYearController.text,
-                                  amount: amountController.text,
-                                  location: locationController.text,
-                                );
-
-                                Navigator.of(context).pop();
-                                setState(() {
-                                  isLoading = false;
-                                });
+                  ),
+                  hSizedBox20,
+                  isLoading
+                      ? const CustomProgressIndicator()
+                      : CustomElevatedButton(
+                          text: "Update details",
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              FocusScopeNode currentfocus =
+                                  FocusScope.of(context);
+                              if (!currentfocus.hasPrimaryFocus) {
+                                currentfocus.unfocus();
                               }
-                            },
-                          )
-                  ],
-                ),
+                              setState(() {
+                                isLoading = true;
+                              });
+
+                              await carService.updateCarDetails(
+                                carId: widget
+                                    .carId, // Pass the car ID of the car being edited
+                                carModel: widget.selectedCarModel!,
+                                make: widget.selectedMake,
+                                fuelType: widget.selectedFuel,
+                                seatCapacity: widget.selectedSeatCapacity,
+                                modelYear: modelYearController.text,
+                                amount: amountController.text,
+                                location: locationController.text,
+                                latitude: selectedLocation.latitude,
+                                longitude: selectedLocation.longitude,
+                              );
+
+                              Navigator.of(context).pop();
+                              setState(() {
+                                isLoading = false;
+                              });
+                            }
+                          },
+                        )
+                ],
               ),
             ),
           ),

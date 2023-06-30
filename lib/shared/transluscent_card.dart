@@ -1,10 +1,10 @@
 import 'dart:ui';
 
 import 'package:carive/screens/home/car_details/car_details.dart';
-import 'package:carive/shared/cars_list.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class TransluscentCard extends StatelessWidget {
   TransluscentCard({
     super.key,
@@ -19,7 +19,9 @@ class TransluscentCard extends StatelessWidget {
     required this.fuelType,
     required this.ownerId,
     required this.isAvailable,
-    required this.ownerFcmToken
+    required this.ownerFcmToken,
+    required this.latitude,
+    required this.longitude
   });
   String carId;
   String brand;
@@ -32,6 +34,8 @@ class TransluscentCard extends StatelessWidget {
   String seatCapacity;
   String ownerId;
   bool isAvailable;
+  double latitude;
+  double longitude;
   String ownerFcmToken;
 
   @override
@@ -133,6 +137,8 @@ class TransluscentCard extends StatelessWidget {
                         onPressed: () {
                           Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => CarDetails(
+                              latitude: latitude,
+                              longitude: longitude,
                               carId: carId,
                               brand: brand,
                               image: image,

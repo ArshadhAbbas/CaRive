@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../shared/custom_elevated_button.dart';
 
+// ignore: must_be_immutable
 class NotificationScreen extends StatelessWidget {
   NotificationScreen({super.key});
   AuthService auth = AuthService();

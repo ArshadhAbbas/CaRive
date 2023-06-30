@@ -6,6 +6,8 @@ import 'package:carive/shared/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../shared/circular_progress_indicator.dart';
+
 class HostYourCars extends StatefulWidget {
   HostYourCars({Key? key}) : super(key: key);
 
@@ -67,6 +69,8 @@ class _HostYourCarsState extends State<HostYourCars> {
                 final modelYear = car['modelYear'];
                 final location = car['location'];
                 final amount = car['amount'];
+                final latitude=car['latitude'];
+                final longitude=car['longitude'];
 
 
                 return GestureDetector(
@@ -74,6 +78,8 @@ class _HostYourCarsState extends State<HostYourCars> {
                     Navigator.of(context)
                         .push(MaterialPageRoute(builder: (context) {
                       return EditCarScreen(
+                        latitude: latitude,
+                        longitude: longitude,
                         carId: carId,
                         selectedCarModel: carName,
                         selectedMake: carMake,
@@ -198,9 +204,7 @@ class _HostYourCarsState extends State<HostYourCars> {
             ),
           );
         } else {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const CustomProgressIndicator();
         }
       },
     );
