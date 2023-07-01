@@ -29,7 +29,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   String guestOrHost = "Guest";
   int selectedIndex = 2;
   List<Widget> widgetOptions = [
-    const ChatScreen(),
+    ChatScreen(),
     const SettingsScreen(),
     const Home(),
     NotificationScreen(),
@@ -46,7 +46,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Display a loading indicator if data is still loading
-         const CustomProgressIndicator();
+          const CustomProgressIndicator();
         }
         if (snapshot.hasError) {
           // Display an error message if there's an error in fetching the data
@@ -54,7 +54,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
             child: Text('Error retrieving user data'),
           );
         }
-        final userData = snapshot.data!.docs;
+        final userData = snapshot.data?.docs ?? [];
         final currentUser = _auth.currentUser;
 
         UserModel? myUser;
@@ -66,7 +66,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
             }
           }
         }
-
 
         return Scaffold(
           appBar: AppBar(
@@ -97,7 +96,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                     inactiveTrackColor: Colors.white,
                     value: isHost,
                     onChanged: (value) {
-                      if (myUser?.name !=null || !value) {
+                      if (myUser?.name != null || !value) {
                         // Allow switching to host mode if the profile is created
                         setState(() {
                           isHost = value;
@@ -138,7 +137,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
               )
             ],
           ),
-          body: isHost ? const HostScreen() : widgetOptions.elementAt(selectedIndex),
+          body: isHost
+              ? const HostScreen()
+              : widgetOptions.elementAt(selectedIndex),
           bottomNavigationBar: Visibility(
             visible: !isHost,
             child: CurvedNavigationBar(

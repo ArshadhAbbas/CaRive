@@ -7,8 +7,8 @@ import 'package:intl/intl.dart';
 
 class NotificationService {
   final UserDatabaseService userDatabaseService = UserDatabaseService();
-  final CollectionReference notificationCollectionReference =
-      FirebaseFirestore.instance.collection('notifications');
+  final CollectionReference userCollectionReference =
+      FirebaseFirestore.instance.collection("users");
 
   Future<void> sendNotificationToOwner(
     String userId,
@@ -50,14 +50,19 @@ class NotificationService {
       );
 
       if (response.statusCode == 200) {
-        final notification = notificationCollectionReference.doc();
-        final notificationId = notification.id;
         final timestamp = DateTime.now();
 
-        // Save the notification to Firestore
-        await notification.set({
+        // Create a new document in the "ownerNotifications" subcollection
+        final ownerNotificationRef = userCollectionReference
+            .doc(ownerId)
+            .collection("ownerNotifications")
+            .doc();
+
+        final notificationId = ownerNotificationRef.id;
+
+        // Save the notification data
+        await ownerNotificationRef.set({
           'notificationId': notificationId,
-          'ownerId': ownerId,
           'message': '$userName requested for a new booking request from ',
           'timestamp': timestamp.toIso8601String(),
           'startDate': startDate.toIso8601String(),
@@ -65,15 +70,50 @@ class NotificationService {
           'customerId': userId
         });
 
-        // Add the notification ID to the owner's ID
-        await userDatabaseService.addNotification(ownerId, notificationId);
-
         print('Notification sent successfully');
       } else {
         print('Failed to send notification. Error: ${response.reasonPhrase}');
       }
     } catch (e) {
       print('Error sending notification: $e');
+    }
+  }
+
+
+   Future<void> sendApprovalNotificationToCustomer(String customerFcmToken) async {
+    try {
+      final url = Uri.parse('https://fcm.googleapis.com/fcm/send');
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $fcmServiceKey',
+      };
+
+      final body = {
+        'to': customerFcmToken,
+        'notification': {
+          'body': 'Your request has been approved.',
+          'title': 'caRive'
+        },
+        'data': {
+          'title': 'Push Notification',
+          'message': 'Request Approved',
+          'redirect': 'product'
+        }
+      };
+
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: json.encode(body),
+      );
+
+      if (response.statusCode == 200) {
+        print('Approval notification sent successfully');
+      } else {
+        print('Failed to send approval notification. Error: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Error sending approval notification: $e');
     }
   }
 }

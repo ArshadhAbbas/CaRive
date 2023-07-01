@@ -1,3 +1,4 @@
+import 'package:carive/services/notification_service.dart';
 import 'package:carive/shared/circular_progress_indicator.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,15 +17,25 @@ class HostNotifications extends StatefulWidget {
 
 class _HostNotificationsState extends State<HostNotifications> {
   AuthService auth = AuthService();
-
   late String userId;
   List<bool> iconButtonsDisabled = [];
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     userId = auth.auth.currentUser?.uid ?? '';
+  }
+
+  Future<void> sendApprovalNotification(String customerId) async {
+    try {
+      final notificationService = NotificationService();
+      final customerFcmToken = await getCustomerFCMToken(customerId);
+      await notificationService
+          .sendApprovalNotificationToCustomer(customerFcmToken);
+      print('Approval notification sent successfully');
+    } catch (e) {
+      print('Error sending approval notification: $e');
+    }
   }
 
   @override
@@ -34,8 +45,9 @@ class _HostNotificationsState extends State<HostNotifications> {
       child: Scaffold(
         body: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
-              .collection('notifications')
-              .where('ownerId', isEqualTo: userId)
+              .collection('users')
+              .doc(userId)
+              .collection('ownerNotifications')
               .orderBy('timestamp', descending: true)
               .snapshots(),
           builder: (context, snapshot) {
@@ -80,12 +92,9 @@ class _HostNotificationsState extends State<HostNotifications> {
                       DateTime.parse(endDateTimestampString);
                   final endDateFormattedDate =
                       DateFormat('dd/MM/yy').format(endDateTimestamp);
-                      final customerAddress =
-                       getCustomerAddress(notification['customerId'] as String);
-                      
                   return ListTile(
                     title: Text(
-                      "${notification['message']} $startDateFormattedDate to $endDateFormattedDate address $customerAddress.",
+                      "${notification['message']} $startDateFormattedDate to $endDateFormattedDate.",
                       style: TextStyle(color: Colors.white),
                     ),
                     subtitle: Text(
@@ -114,10 +123,12 @@ class _HostNotificationsState extends State<HostNotifications> {
                               Icons.check_circle_outline,
                               color: themeColorGreen,
                             ),
-                            onPressed: () {
+                            onPressed: () async {
                               setState(() {
                                 iconButtonsDisabled[index] = true;
                               });
+                              await sendApprovalNotification(
+                                  notification['customerId'] as String);
                               // Perform action for second IconButton
                             },
                           ),
@@ -143,14 +154,12 @@ class _HostNotificationsState extends State<HostNotifications> {
   }
 }
 
-
-Future<String> getCustomerAddress(String customerId) async {
-    final DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(customerId)
-        .get();
-    final userData = snapshot.data() as Map<String, dynamic>?;
-    final address = userData?['address'] as String? ?? '';
-    return address;
-  }
-
+Future<String> getCustomerFCMToken(String customerId) async {
+  final DocumentSnapshot snapshot = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(customerId)
+      .get();
+  final userData = snapshot.data() as Map<String, dynamic>?;
+  final fcmToken = userData?['fcmToken'] as String? ?? '';
+  return fcmToken;
+}
