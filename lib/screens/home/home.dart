@@ -8,7 +8,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../shared/circular_progress_indicator.dart';
-import '../host/new_post/location__selection_screen.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
