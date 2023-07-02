@@ -30,7 +30,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   int selectedIndex = 2;
   List<Widget> widgetOptions = [
     ChatScreen(),
-    const SettingsScreen(),
+     SettingsScreen(),
     const Home(),
     NotificationScreen(),
     ProfileScreen()

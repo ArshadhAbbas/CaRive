@@ -466,11 +466,14 @@ class _CarDetailsState extends State<CarDetails> {
                               },
                             );
                           } else {
+                            final carModel = '${widget.brand} ${widget.model}';
                             await notificationService.sendNotificationToOwner(
                                 currentUserId,
                                 widget.ownerFcmToken,
                                 currentUserName,
                                 widget.ownerId,
+                                carModel,
+                                widget.price,
                                 widget.start!,
                                 widget.end!);
                             showSnackbar(

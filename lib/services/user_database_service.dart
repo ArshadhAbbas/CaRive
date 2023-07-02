@@ -7,9 +7,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as Path;
 
 class UserDatabaseService {
-  UserDatabaseService({this.uid});
-  final String? uid;
-
   final StreamController<File?> _selectedImageController =
       StreamController<File?>.broadcast();
 
@@ -76,6 +73,19 @@ class UserDatabaseService {
       final userData = userSnapshot.data() as Map<String, dynamic>?;
       if (userData != null) {
         return userData['name'] ?? '';
+      }
+    } catch (e) {
+      print('An error occurred while getting the user name: $e');
+    }
+    return '';
+  }
+
+    Future<String> getCurrentUserImage(String uid) async {
+    try {
+      final userSnapshot = await userCollectionReference.doc(uid).get();
+      final userData = userSnapshot.data() as Map<String, dynamic>?;
+      if (userData != null) {
+        return userData['image'] ?? '';
       }
     } catch (e) {
       print('An error occurred while getting the user name: $e');

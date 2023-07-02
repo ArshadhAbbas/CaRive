@@ -40,39 +40,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
               ElevatedButton(
-                onPressed: () {
-                  try {
-                    int amount = int.parse(payController.text);
-                    int amountInPaise = amount * 100;
-                    String amountString = amountInPaise.toString();
-
-                    Razorpay razorpay = Razorpay();
-                    var options = {
-                      'key': razorPayKey,
-                      'amount': amountString,
-                      'name': 'Name',
-                      'description': 'For car',
-                      'retry': {'enabled': true, 'max_count': 1},
-                      'send_sms_hash': true,
-                      'prefill': {
-                        'contact': '9633760600',
-                        'email': 'arshadhp98@gmail.com'
-                      },
-                      'external': {
-                        'wallets': ['paytm']
-                      }
-                    };
-                    razorpay.on(Razorpay.EVENT_PAYMENT_ERROR,
-                        handlePaymentErrorResponse);
-                    razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS,
-                        handlePaymentSuccessResponse);
-                    razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET,
-                        handleExternalWalletSelected);
-                    razorpay.open(options);
-                  } catch (e) {
-                    showAlertDialog(context, 'Error', 'Invalid input');
-                  }
-                },
+                onPressed: () {},
                 child: Text("Pay"),
               ),
             ],
@@ -82,48 +50,4 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  void handlePaymentErrorResponse(PaymentFailureResponse response) {
-    showAlertDialog(context, "Payment Failed", "${response.message}");
-  }
-
-  void handlePaymentSuccessResponse(PaymentSuccessResponse response) {
-    showAlertDialog(
-        context, "Payment Successful", "Payment ID: ${response.paymentId}");
-  }
-
-  void handleExternalWalletSelected(ExternalWalletResponse response) {
-    showAlertDialog(
-        context, "External Wallet Selected", "${response.walletName}");
-  }
-
-  void showAlertDialog(BuildContext context, String title, String message) {
-    // set up the buttons
-    Widget continueButton = CustomElevatedButton(
-      paddingHorizontal: 3,
-      paddingVertical: 3,
-      text: "Continue",
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
-    );
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      backgroundColor: themeColorGrey,
-      titleTextStyle: TextStyle(
-          color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-      contentTextStyle: TextStyle(color: Colors.white),
-      title: Text(title),
-      content: Text(message),
-      actions: [
-        continueButton,
-      ],
-    );
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
 }

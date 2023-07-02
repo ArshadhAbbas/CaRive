@@ -18,7 +18,6 @@ class HostNotifications extends StatefulWidget {
 class _HostNotificationsState extends State<HostNotifications> {
   AuthService auth = AuthService();
   late String userId;
-  List<bool> iconButtonsDisabled = [];
 
   @override
   void initState() {
@@ -26,13 +25,30 @@ class _HostNotificationsState extends State<HostNotifications> {
     userId = auth.auth.currentUser?.uid ?? '';
   }
 
-  Future<void> sendApprovalNotification(String customerId) async {
+  Future<void> sendApprovalNotification(
+      String customerId, String carModel, String amount) async {
     try {
       final notificationService = NotificationService();
       final customerFcmToken = await getCustomerFCMToken(customerId);
-      await notificationService
-          .sendApprovalNotificationToCustomer(customerFcmToken);
-      print('Approval notification sent successfully');
+      await notificationService.sendApprovalNotificationToCustomer(
+        customerFcmToken,
+        customerId,
+        userId,
+        carModel,
+        amount,
+      );
+    } catch (e) {
+      print('Error sending approval notification: $e');
+    }
+  }
+
+  Future<void> sendRejectionNotification(
+      String customerId, String carModel) async {
+    try {
+      final notificationService = NotificationService();
+      final customerFcmToken = await getCustomerFCMToken(customerId);
+      await notificationService.sendRejectionNotificationToCustomer(
+          customerFcmToken, customerId, userId, carModel);
     } catch (e) {
       print('Error sending approval notification: $e');
     }
@@ -61,15 +77,11 @@ class _HostNotificationsState extends State<HostNotifications> {
                   ),
                 );
               }
-
               return ListView.separated(
                 separatorBuilder: (context, index) =>
                     Divider(color: themeColorGreen),
                 itemCount: notifications.length,
                 itemBuilder: (context, index) {
-                  if (index >= iconButtonsDisabled.length) {
-                    iconButtonsDisabled.add(false);
-                  }
                   final notification =
                       notifications[index].data() as Map<String, dynamic>;
                   final notifcationTimestampString =
@@ -79,66 +91,106 @@ class _HostNotificationsState extends State<HostNotifications> {
                   final notifcationFormattedDate =
                       DateFormat('dd/MM hh:mm').format(notifcationTimestamp);
 
-                  final startDateTimestampString =
-                      notification['startDate'] as String;
-                  final startDateTimestamp =
-                      DateTime.parse(startDateTimestampString);
-                  final startDateFormattedDate =
-                      DateFormat('dd/MM/yy').format(startDateTimestamp);
+                  final customerId = notification['customerId'] as String;
 
-                  final endDateTimestampString =
-                      notification['endDate'] as String;
-                  final endDateTimestamp =
-                      DateTime.parse(endDateTimestampString);
-                  final endDateFormattedDate =
-                      DateFormat('dd/MM/yy').format(endDateTimestamp);
-                  return ListTile(
-                    title: Text(
-                      "${notification['message']} $startDateFormattedDate to $endDateFormattedDate.",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    subtitle: Text(
-                      notifcationFormattedDate,
-                      style: TextStyle(color: themeColorblueGrey),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (!iconButtonsDisabled[index])
-                          IconButton(
-                            icon: Icon(
-                              Icons.highlight_remove_rounded,
-                              color: Colors.grey,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                iconButtonsDisabled[index] = true;
-                              });
-                              // Perform action for first IconButton
-                            },
+                  return FutureBuilder<Map<String, dynamic>?>(
+                    future: getCustomerData(customerId),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return const ListTile(
+                          title: Text('Error loading customer data.'),
+                        );
+                      }
+                      final customerData = snapshot.data;
+                      final customerImage = customerData?['image'] as String?;
+
+                      return ListTile(
+                        leading: CircleAvatar(
+                          radius: 30,
+                          backgroundColor: Colors.transparent,
+                          backgroundImage: customerImage != null
+                              ? NetworkImage(customerImage)
+                              : AssetImage('assets/dp.png')
+                                  as ImageProvider<Object>,
+                        ),
+                        title: Text(
+                          "${notification['message']}",
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        subtitle: Text(
+                          notifcationFormattedDate,
+                          style: TextStyle(color: themeColorblueGrey),
+                        ),
+                        trailing: Visibility(
+                          visible: !notification['didReply'],
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.highlight_remove_rounded,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: () async {
+                                  await sendRejectionNotification(
+                                    notification['customerId'] as String,
+                                    notification['car'] as String,
+                                  );
+                                  final notificationId =
+                                      notification['notificationId'] as String;
+                                  final ownerNotificationRef = FirebaseFirestore
+                                      .instance
+                                      .collection('users')
+                                      .doc(userId)
+                                      .collection('ownerNotifications')
+                                      .doc(notificationId);
+                                  try {
+                                    await ownerNotificationRef
+                                        .update({'didReply': true});
+                                  } catch (e) {
+                                    print(
+                                        'Error updating "didReply" field in Firestore: $e');
+                                  }
+                                },
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.check_circle_outline,
+                                  color: themeColorGreen,
+                                ),
+                                onPressed: () async {
+                                  await sendApprovalNotification(
+                                    notification['customerId'] as String,
+                                    notification['car'] as String,
+                                    notification['amount'] as String
+                                  );
+                                  final notificationId =
+                                      notification['notificationId'] as String;
+                                  final ownerNotificationRef = FirebaseFirestore
+                                      .instance
+                                      .collection('users')
+                                      .doc(userId)
+                                      .collection('ownerNotifications')
+                                      .doc(notificationId);
+                                  try {
+                                    await ownerNotificationRef
+                                        .update({'didReply': true});
+                                  } catch (e) {
+                                    print(
+                                        'Error updating "didReply" field in Firestore: $e');
+                                  }
+                                },
+                              ),
+                            ],
                           ),
-                        if (!iconButtonsDisabled[index])
-                          IconButton(
-                            icon: Icon(
-                              Icons.check_circle_outline,
-                              color: themeColorGreen,
-                            ),
-                            onPressed: () async {
-                              setState(() {
-                                iconButtonsDisabled[index] = true;
-                              });
-                              await sendApprovalNotification(
-                                  notification['customerId'] as String);
-                              // Perform action for second IconButton
-                            },
-                          ),
-                      ],
-                    ),
+                        ),
+                      );
+                    },
                   );
                 },
               );
             } else if (snapshot.hasError) {
-              return Center(
+              return const Center(
                 child: Text(
                   'Error fetching Notification.',
                   style: TextStyle(color: Colors.white),
@@ -162,4 +214,12 @@ Future<String> getCustomerFCMToken(String customerId) async {
   final userData = snapshot.data() as Map<String, dynamic>?;
   final fcmToken = userData?['fcmToken'] as String? ?? '';
   return fcmToken;
+}
+
+Future<Map<String, dynamic>?> getCustomerData(String customerId) async {
+  final DocumentSnapshot snapshot = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(customerId)
+      .get();
+  return snapshot.data() as Map<String, dynamic>?;
 }

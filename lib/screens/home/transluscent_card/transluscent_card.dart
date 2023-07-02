@@ -6,23 +6,22 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class TransluscentCard extends StatelessWidget {
-  TransluscentCard({
-    super.key,
-    required this.carId,
-    required this.brand,
-    required this.model,
-    required this.price,
-    required this.location,
-    required this.image,
-    required this.modelYear,
-    required this.seatCapacity,
-    required this.fuelType,
-    required this.ownerId,
-    required this.isAvailable,
-    required this.ownerFcmToken,
-    required this.latitude,
-    required this.longitude
-  });
+  TransluscentCard(
+      {super.key,
+      required this.carId,
+      required this.brand,
+      required this.model,
+      required this.price,
+      required this.location,
+      required this.image,
+      required this.modelYear,
+      required this.seatCapacity,
+      required this.fuelType,
+      required this.ownerId,
+      required this.isAvailable,
+      required this.ownerFcmToken,
+      required this.latitude,
+      required this.longitude});
   String carId;
   String brand;
   String model;
@@ -45,7 +44,6 @@ class TransluscentCard extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
         child: Container(
-          height: 400,
           decoration: BoxDecoration(
             gradient: LinearGradient(
                 colors: [Colors.white60.withOpacity(0.13), Colors.white10],
@@ -57,8 +55,8 @@ class TransluscentCard extends StatelessWidget {
             child: Column(
               children: [
                 Container(
-                  height: 130,
-                  width: 170,
+                  // height: 130,
+                  // width: 170,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: Image.network(
@@ -85,8 +83,8 @@ class TransluscentCard extends StatelessWidget {
                             child: const CircleAvatar(
                               backgroundColor: Colors.green,
                             )),
-                         Text(
-                          isAvailable?"Available":"Unavailable",
+                        Text(
+                          isAvailable ? "Available" : "Unavailable",
                           style: TextStyle(fontSize: 12, color: Colors.white),
                         ),
                       ],
@@ -137,21 +135,20 @@ class TransluscentCard extends StatelessWidget {
                         onPressed: () {
                           Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => CarDetails(
-                              latitude: latitude,
-                              longitude: longitude,
-                              carId: carId,
-                              brand: brand,
-                              image: image,
-                              location: location,
-                              model: model,
-                              price: price,
-                              modelYear: modelYear,
-                              seatCapacity: seatCapacity,
-                              fuelType: fuelType,
-                              ownerId: ownerId,
-                              isAvailable:isAvailable,
-                              ownerFcmToken:ownerFcmToken
-                            ),
+                                latitude: latitude,
+                                longitude: longitude,
+                                carId: carId,
+                                brand: brand,
+                                image: image,
+                                location: location,
+                                model: model,
+                                price: price,
+                                modelYear: modelYear,
+                                seatCapacity: seatCapacity,
+                                fuelType: fuelType,
+                                ownerId: ownerId,
+                                isAvailable: isAvailable,
+                                ownerFcmToken: ownerFcmToken),
                           ));
                         },
                       )

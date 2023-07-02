@@ -3,7 +3,7 @@ import 'package:carive/services/auth.dart';
 import 'package:carive/services/car_database_service.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_scaffold.dart';
-import 'package:carive/shared/transluscent_card.dart';
+import 'package:carive/screens/home/transluscent_card/transluscent_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
