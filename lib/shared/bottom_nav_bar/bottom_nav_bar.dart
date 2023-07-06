@@ -75,7 +75,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 const LogoWidget(30, 30),
                 wSizedBox10,
                 Text(
-                  "${myUser?.name ?? "Carive"}",
+                  myUser?.name ?? "Carive",
                   style: const TextStyle(color: Colors.white),
                 ),
               ],
@@ -97,13 +97,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
                     value: isHost,
                     onChanged: (value) {
                       if (myUser?.name != null || !value) {
-                        // Allow switching to host mode if the profile is created
                         setState(() {
                           isHost = value;
                           guestOrHost = value ? "Host" : "Guest";
                         });
                       } else {
-                        // Prompt the user to create a profile first
                         showDialog(
                           context: context,
                           builder: (context) {
@@ -145,7 +143,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
             child: CurvedNavigationBar(
               height: 60,
               color: themeColorGreen,
-              animationCurve: Curves.bounceIn,
+              animationCurve: Curves.ease,
               buttonBackgroundColor: themeColorblueGrey,
               backgroundColor: Colors.transparent,
               items: const [

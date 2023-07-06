@@ -55,8 +55,8 @@ class TransluscentCard extends StatelessWidget {
             child: Column(
               children: [
                 Container(
-                  // height: 130,
-                  // width: 170,
+                  height: 130,
+                  width: 170,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: Image.network(
@@ -91,17 +91,25 @@ class TransluscentCard extends StatelessWidget {
                     )
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Image.asset(
-                      'assets/map-marker.png',
-                      width: 15,
-                    ),
-                    wSizedBox10,
-                    Text(location,
-                        style: TextStyle(color: Colors.white, fontSize: 15))
-                  ],
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Image.asset(
+                        'assets/map-marker.png',
+                        width: 15,
+                      ),
+                      wSizedBox10,
+                      Expanded(
+                        child: Text(
+                          location,
+                          style: TextStyle(color: Colors.white, fontSize: 15),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 Expanded(
                   child: Row(

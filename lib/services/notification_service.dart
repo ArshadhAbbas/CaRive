@@ -81,6 +81,69 @@ class NotificationService {
     }
   }
 
+  Future<void> sendPaidNotificationToOwner({
+    required String userId,
+    required String ownerFCMToken,
+    required String userName,
+    required String ownerId,
+    required String carModel,
+    required String amount,
+  }) async {
+    try {
+      final url = Uri.parse('https://fcm.googleapis.com/fcm/send');
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Bearer $fcmServiceKey', // Replace with your server key
+      };
+
+      final body = {
+        'to': ownerFCMToken,
+        'notification': {
+          'body': '$userName has paid you an amount of $amount for $carModel.',
+          'title': 'caRive'
+        },
+        "data": {
+          "title": "Push Notification",
+          "message": "Test Push Notification",
+          "redirect": "product"
+        }
+      };
+
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: json.encode(body),
+      );
+
+      if (response.statusCode == 200) {
+        final timestamp = DateTime.now();
+
+        // Create a new document in the "ownerNotifications" subcollection
+        final ownerNotificationRef = userCollectionReference
+            .doc(ownerId)
+            .collection("ownerNotifications")
+            .doc();
+
+        final notificationId = ownerNotificationRef.id;
+
+        // Save the notification data
+        await ownerNotificationRef.set({
+          'notificationId': notificationId,
+          'message':
+              '$userName has paid you an amount of $amount for $carModel.',
+          'timestamp': timestamp.toIso8601String(),
+          'customerId': userId,
+          'car': carModel,
+          'amount': amount,
+          'didReply': true
+        });
+      }
+    } catch (e) {
+      print('Error sending notification: $e');
+    }
+  }
+
   Future<void> sendApprovalNotificationToCustomer(
     String customerFcmToken,
     String customerId,

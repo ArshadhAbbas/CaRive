@@ -153,6 +153,7 @@ class _HostNotificationsState extends State<HostNotifications> {
                                   }
                                 },
                               ),
+                              
                               IconButton(
                                 icon: Icon(
                                   Icons.check_circle_outline,

@@ -1,4 +1,5 @@
 import 'package:carive/services/auth.dart';
+import 'package:carive/services/notification_service.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_scaffold.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -156,7 +157,31 @@ class _NotificationScreenState extends State<NotificationScreen> {
           .collection('customerNotifications')
           .doc(documentId)
           .update({'didPay': true});
-      // ignore: use_build_context_synchronously
+
+      final String ownerId = documentSnapshot['ownerId'];
+      final String carModel = documentSnapshot['car'];
+      final String amount = documentSnapshot['amount'].toString();
+
+      final NotificationService notificationService = NotificationService();
+      final userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+      final String userName = userSnapshot['name'];
+      final ownerSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(ownerId)
+          .get();
+      final String ownerFCMToken = ownerSnapshot['fcmToken'];
+
+      await notificationService.sendPaidNotificationToOwner(
+          userId: userId,
+          ownerFCMToken: ownerFCMToken,
+          userName: userName,
+          ownerId: ownerId,
+          carModel: carModel,
+          amount: amount);
+
       showAlertDialog(
           context, "Payment Successful", "Payment ID: ${response.paymentId}");
     } catch (e) {
