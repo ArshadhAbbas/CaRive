@@ -58,7 +58,7 @@ class _HostYourCarsState extends State<HostYourCars> {
               physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
                 final car = cars[index].data() as Map<String, dynamic>;
-                final carId=car['carId'];
+                final carId = car['carId'];
                 final carName = car['carModel'];
                 final carImage = car['imageUrl'];
                 final carLocation = car['location'];
@@ -69,15 +69,16 @@ class _HostYourCarsState extends State<HostYourCars> {
                 final modelYear = car['modelYear'];
                 final location = car['location'];
                 final amount = car['amount'];
-                final latitude=car['latitude'];
-                final longitude=car['longitude'];
-
+                final latitude = car['latitude'];
+                final longitude = car['longitude'];
+                final isAvailable = car['isAvailable'];
 
                 return GestureDetector(
                   onTap: () {
                     Navigator.of(context)
                         .push(MaterialPageRoute(builder: (context) {
                       return EditCarScreen(
+                        isAvailable: isAvailable,
                         latitude: latitude,
                         longitude: longitude,
                         carId: carId,
@@ -138,11 +139,15 @@ class _HostYourCarsState extends State<HostYourCars> {
                                     children: [
                                       Container(
                                           width: 10,
-                                          child: const CircleAvatar(
-                                            backgroundColor: Colors.green,
+                                          child: CircleAvatar(
+                                            backgroundColor: isAvailable
+                                                ? Colors.green
+                                                : Colors.red,
                                           )),
-                                      const Text(
-                                        "Available",
+                                      Text(
+                                        isAvailable
+                                            ? "Available"
+                                            : "Unavailable",
                                         style: TextStyle(
                                             fontSize: 12, color: Colors.white),
                                       ),
@@ -158,9 +163,15 @@ class _HostYourCarsState extends State<HostYourCars> {
                                     width: 15,
                                   ),
                                   wSizedBox10,
-                                  Text(carLocation,
+                                  Expanded(
+                                    child: Text(
+                                      carLocation,
                                       style: TextStyle(
-                                          color: Colors.white, fontSize: 15))
+                                          color: Colors.white, fontSize: 15),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                  )
                                 ],
                               ),
                               Expanded(

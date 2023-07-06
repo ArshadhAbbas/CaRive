@@ -156,7 +156,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
           .doc(userId)
           .collection('customerNotifications')
           .doc(documentId)
-          .update({'didPay': true});
+          .update({
+        'didPay': true,
+      });
 
       final String ownerId = documentSnapshot['ownerId'];
       final String carModel = documentSnapshot['car'];

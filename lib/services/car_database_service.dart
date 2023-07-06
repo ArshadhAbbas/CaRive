@@ -63,20 +63,20 @@ class CarService {
     final imageUrl = await uploadImage(selectedImage!);
 
     final newCar = CarModel(
-      latitude: latitude,
-      longitude: longitude,
-      userId: uid,
-      carModel: carModel,
-      make: make,
-      fuelType: fuelType,
-      seatCapacity: seatCapacity,
-      modelYear: modelYear,
-      amount: amount,
-      location: location,
-      imageUrl: imageUrl,
-      isAvailable: isAvailable,
-      ownerFcmToken: ownerFcmToken,
-    );
+        latitude: latitude,
+        longitude: longitude,
+        userId: uid,
+        carModel: carModel,
+        make: make,
+        fuelType: fuelType,
+        seatCapacity: seatCapacity,
+        modelYear: modelYear,
+        amount: amount,
+        location: location,
+        imageUrl: imageUrl,
+        isAvailable: isAvailable,
+        ownerFcmToken: ownerFcmToken,
+        postDate: DateTime.now());
 
     final newCarDocRef = carCollectionReference.doc();
     final newCarId = newCarDocRef.id;
@@ -99,6 +99,7 @@ class CarService {
     required String location,
     required double latitude,
     required double longitude,
+    required bool isAvailable,
   }) async {
     final carDocRef = carCollectionReference.doc(carId);
     if (selectedImage != null) {
@@ -116,8 +117,9 @@ class CarService {
       'modelYear': modelYear,
       'amount': amount,
       'location': location,
-      'latitude':latitude,
-      'longitude':longitude
+      'latitude': latitude,
+      'longitude': longitude,
+      'isAvailable': isAvailable,
     });
   }
 

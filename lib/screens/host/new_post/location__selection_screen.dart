@@ -1,6 +1,8 @@
 import 'package:carive/shared/circular_progress_indicator.dart';
 import 'package:carive/shared/constants.dart';
+import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -16,6 +18,7 @@ class LocationSelectionScreen extends StatefulWidget {
 }
 
 class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
+  String address = "Choose Location";
   late GoogleMapController googleMapController;
   Set<Marker> markers = {}; // Set to hold the selected marker
   LatLng? selectedLatLng; // Variable to store the selected LatLng
@@ -36,6 +39,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
   }
 
   void onMapTap(LatLng latLng) {
+    getAddress(latLng);
     setState(() {
       markers = {}; // Clear existing markers
       selectedLatLng = latLng; // Set selected LatLng
@@ -46,7 +50,8 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
           position: latLng,
         ),
       );
-    });
+    }
+    );
   }
 
   Future<LatLng> getCurrentLocation() async {
@@ -65,6 +70,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
       });
 
       LatLng currentLocation = await getCurrentLocation();
+      getAddress(currentLocation);
 
       setState(() {
         markers = {}; // Clear existing markers
@@ -96,6 +102,18 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
       showPermissionAlertDialog(
           'Permission Restricted', 'Location permission is restricted.');
     }
+  }
+
+  getAddress(LatLng latLong) async {
+    List<Placemark> placemark =
+        await placemarkFromCoordinates(latLong.latitude, latLong.longitude);
+    setState(() {
+      address = placemark[0].subLocality! +
+          " " +
+          placemark[0].locality! +
+          " " +
+          placemark[0].country!;
+    });
   }
 
   void onCheckIconPressed() {
@@ -156,6 +174,18 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
             onTap: onMapTap,
             markers: markers,
           ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Align(
+                alignment: Alignment.topCenter,
+                child: CustomElevatedButton(
+                  text: address,
+                  onPressed: () {},
+                  paddingHorizontal: 3,
+                  paddingVertical: 3,
+                )),
+          ),
+
           if (isLoading)
             const CustomProgressIndicator(), // Show circular progress indicator while loading
         ],

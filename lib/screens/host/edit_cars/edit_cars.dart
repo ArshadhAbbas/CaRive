@@ -29,6 +29,7 @@ class EditCarScreen extends StatefulWidget {
   final String image;
   final double latitude;
   final double longitude;
+  bool isAvailable;
 
   EditCarScreen({
     super.key,
@@ -43,6 +44,7 @@ class EditCarScreen extends StatefulWidget {
     required this.image,
     required this.latitude,
     required this.longitude,
+    required this.isAvailable,
   });
 
   @override
@@ -58,7 +60,6 @@ class _EditCarScreenState extends State<EditCarScreen> {
   String? photo;
   late LatLng selectedLocation;
   String? address;
-
   AuthService auth = AuthService();
   final CarService carService = CarService();
 
@@ -70,9 +71,9 @@ class _EditCarScreenState extends State<EditCarScreen> {
     photo = null;
     address = widget.location;
     selectedLocation = LatLng(
-        widget.latitude,
-        widget
-            .longitude); // Initialize selectedLocation with the provided latitude and longitude
+      widget.latitude,
+      widget.longitude,
+    );
   }
 
   @override
@@ -173,14 +174,17 @@ class _EditCarScreenState extends State<EditCarScreen> {
                             Positioned(
                               bottom: 0,
                               right: 0,
-                              child: CircleAvatar(
-                                child: IconButton(
-                                  onPressed: () {
-                                    carService.getImage(
-                                      ImageSource.gallery,
-                                    );
-                                  },
-                                  icon: Icon(Icons.edit),
+                              child: ClipRRect(borderRadius: BorderRadius.circular(20),
+                                child: Container(
+                                  color: themeColorGreen,
+                                  child: IconButton(
+                                    onPressed: () {
+                                      carService.getImage(
+                                        ImageSource.gallery,
+                                      );
+                                    },
+                                    icon: Icon(Icons.edit,color: Colors.white,),
+                                  ),
                                 ),
                               ),
                             ),
@@ -483,42 +487,80 @@ class _EditCarScreenState extends State<EditCarScreen> {
                       ),
                     ),
                   ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Radio(
+                        fillColor: MaterialStateColor.resolveWith(
+                            (states) => Colors.white),
+                        value: true,
+                        groupValue: widget.isAvailable,
+                        onChanged: (value) {
+                          setState(() {
+                            widget.isAvailable = value!;
+                          });
+                        },
+                      ),
+                      const Text(
+                        "Available",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.1,
+                      ),
+                      Radio(
+                        fillColor: MaterialStateColor.resolveWith(
+                            (states) => Colors.white),
+                        value: false,
+                        groupValue: widget.isAvailable,
+                        onChanged: (value) {
+                          setState(() {
+                            widget.isAvailable = value!;
+                          });
+                        },
+                      ),
+                      const Text("Unavailable",
+                          style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
                   hSizedBox20,
                   isLoading
                       ? const CustomProgressIndicator()
-                      : CustomElevatedButton(
-                          text: "Update details",
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              FocusScopeNode currentfocus =
-                                  FocusScope.of(context);
-                              if (!currentfocus.hasPrimaryFocus) {
-                                currentfocus.unfocus();
+                      : Center(
+                          child: CustomElevatedButton(
+                            text: "Update details",
+                            onPressed: () async {
+                              if (_formKey.currentState!.validate()) {
+                                FocusScopeNode currentfocus =
+                                    FocusScope.of(context);
+                                if (!currentfocus.hasPrimaryFocus) {
+                                  currentfocus.unfocus();
+                                }
+                                setState(() {
+                                  isLoading = true;
+                                });
+
+                                await carService.updateCarDetails(
+                                    carId: widget
+                                        .carId, // Pass the car ID of the car being edited
+                                    carModel: widget.selectedCarModel!,
+                                    make: widget.selectedMake,
+                                    fuelType: widget.selectedFuel,
+                                    seatCapacity: widget.selectedSeatCapacity,
+                                    modelYear: modelYearController.text,
+                                    amount: amountController.text,
+                                    location: address!,
+                                    latitude: selectedLocation.latitude,
+                                    longitude: selectedLocation.longitude,
+                                    isAvailable: widget.isAvailable);
+
+                                Navigator.of(context).pop();
+                                setState(() {
+                                  isLoading = false;
+                                });
                               }
-                              setState(() {
-                                isLoading = true;
-                              });
-
-                              await carService.updateCarDetails(
-                                carId: widget
-                                    .carId, // Pass the car ID of the car being edited
-                                carModel: widget.selectedCarModel!,
-                                make: widget.selectedMake,
-                                fuelType: widget.selectedFuel,
-                                seatCapacity: widget.selectedSeatCapacity,
-                                modelYear: modelYearController.text,
-                                amount: amountController.text,
-                                location: address!,
-                                latitude: selectedLocation.latitude,
-                                longitude: selectedLocation.longitude,
-                              );
-
-                              Navigator.of(context).pop();
-                              setState(() {
-                                isLoading = false;
-                              });
-                            }
-                          },
+                            },
+                          ),
                         )
                 ],
               ),

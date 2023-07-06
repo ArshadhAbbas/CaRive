@@ -1,7 +1,9 @@
 import 'dart:ui';
 
 import 'package:carive/screens/home/car_details/car_details.dart';
+import 'package:carive/screens/host/edit_cars/edit_cars.dart';
 import 'package:carive/shared/constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
@@ -36,9 +38,12 @@ class TransluscentCard extends StatelessWidget {
   double latitude;
   double longitude;
   String ownerFcmToken;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
+    final user = _auth.currentUser;
+    final isCurrentUserOwner = user != null && user.uid == ownerId;
     return ClipRRect(
       borderRadius: BorderRadius.circular(25),
       child: BackdropFilter(
@@ -80,8 +85,9 @@ class TransluscentCard extends StatelessWidget {
                       children: [
                         Container(
                             width: 10,
-                            child: const CircleAvatar(
-                              backgroundColor: Colors.green,
+                            child: CircleAvatar(
+                              backgroundColor:
+                                  isAvailable ? Colors.green : Colors.red,
                             )),
                         Text(
                           isAvailable ? "Available" : "Unavailable",
@@ -128,38 +134,70 @@ class TransluscentCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      ElevatedButton(
-                        style: ButtonStyle(
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                          backgroundColor: MaterialStateProperty.all(
-                              const Color(0xFF198396)),
-                        ),
-                        child: Text("Explore"),
-                        onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => CarDetails(
-                                latitude: latitude,
-                                longitude: longitude,
-                                carId: carId,
-                                brand: brand,
-                                image: image,
-                                location: location,
-                                model: model,
-                                price: price,
-                                modelYear: modelYear,
-                                seatCapacity: seatCapacity,
-                                fuelType: fuelType,
-                                ownerId: ownerId,
-                                isAvailable: isAvailable,
-                                ownerFcmToken: ownerFcmToken),
-                          ));
-                        },
-                      )
+                      !isCurrentUserOwner
+                          ? ElevatedButton(
+                              style: ButtonStyle(
+                                shape: MaterialStateProperty.all<
+                                    RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                backgroundColor: MaterialStateProperty.all(
+                                    const Color(0xFF198396)),
+                              ),
+                              child: Text("Explore"),
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => CarDetails(
+                                      latitude: latitude,
+                                      longitude: longitude,
+                                      carId: carId,
+                                      brand: brand,
+                                      image: image,
+                                      location: location,
+                                      model: model,
+                                      price: price,
+                                      modelYear: modelYear,
+                                      seatCapacity: seatCapacity,
+                                      fuelType: fuelType,
+                                      ownerId: ownerId,
+                                      isAvailable: isAvailable,
+                                      ownerFcmToken: ownerFcmToken),
+                                ));
+                              },
+                            )
+                          : ElevatedButton(
+                              style: ButtonStyle(
+                                shape: MaterialStateProperty.all<
+                                    RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                backgroundColor: MaterialStateProperty.all(
+                                    const Color(0xFF198396)),
+                              ),
+                              child: Text("Edit"),
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => EditCarScreen(
+                                    isAvailable: isAvailable,
+                                    latitude: latitude,
+                                    longitude: longitude,
+                                    carId: carId,
+                                    selectedMake: brand,
+                                    image: image,
+                                    location: location,
+                                    selectedCarModel: model,
+                                    amount: price,
+                                    modelYear: modelYear,
+                                    selectedSeatCapacity: seatCapacity,
+                                    selectedFuel: fuelType,
+                                  ),
+                                ));
+                              },
+                            )
                     ],
                   ),
                 )

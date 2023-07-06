@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+
 class CarModel {
   String? carId;
   final String carModel;
@@ -12,45 +13,49 @@ class CarModel {
   final String imageUrl;
   final bool isAvailable;
   final String ownerFcmToken;
-  final String userId; // New field for user ID
+  final String userId;
   final double latitude;
   final double longitude;
+  final DateTime postDate;
 
-  CarModel(
-      {this.carId,
-      required this.ownerFcmToken,
-      required this.carModel,
-      required this.make,
-      required this.fuelType,
-      required this.seatCapacity,
-      required this.modelYear,
-      required this.amount,
-      required this.location,
-      required this.imageUrl,
-      required this.userId,
-      required this.latitude,
-      required this.longitude,
-      required this.isAvailable // Added field for user ID
-      });
+  CarModel({
+    this.carId,
+    required this.ownerFcmToken,
+    required this.carModel,
+    required this.make,
+    required this.fuelType,
+    required this.seatCapacity,
+    required this.modelYear,
+    required this.amount,
+    required this.location,
+    required this.imageUrl,
+    required this.userId,
+    required this.latitude,
+    required this.longitude,
+    required this.isAvailable,
+    required this.postDate,
+  });
 
   factory CarModel.fromSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
     final carId = snapshot.id; // Retrieve the document ID
     return CarModel(
-        ownerFcmToken: data['ownerFcmToken'],
-        carId: carId,
-        carModel: data['carModel'],
-        make: data['make'],
-        fuelType: data['fuelType'],
-        seatCapacity: data['seatCapacity'],
-        modelYear: data['modelYear'],
-        amount: data['amount'],
-        location: data['location'],
-        imageUrl: data['imageUrl'],
-        isAvailable: data['isAvailable'],
-        userId: data['userId'],
-        latitude: data['latitude'],
-        longitude: data['longitude']);
+      ownerFcmToken: data['ownerFcmToken'],
+      carId: carId,
+      carModel: data['carModel'],
+      make: data['make'],
+      fuelType: data['fuelType'],
+      seatCapacity: data['seatCapacity'],
+      modelYear: data['modelYear'],
+      amount: data['amount'],
+      location: data['location'],
+      imageUrl: data['imageUrl'],
+      isAvailable: data['isAvailable'],
+      userId: data['userId'],
+      latitude: data['latitude'],
+      longitude: data['longitude'],
+      postDate: (data['postDate'] as Timestamp).toDate(),
+    );
   }
 
   Map<String, dynamic> toMap() {
@@ -67,21 +72,8 @@ class CarModel {
       'isAvailable': isAvailable,
       'ownerFcmToken': ownerFcmToken,
       'latitude': latitude,
-      'longitude': longitude
+      'longitude': longitude,
+      'postDate': postDate,
     };
   }
-  // factory Car.fromMap(Map<String, dynamic> map) {
-  //   return Car(
-  //     userId: map['userId'],
-  //     carModel: map['carModel'],
-  //     make: map['make'],
-  //     fuelType: map['fuelType'],
-  //     seatCapacity: map['seatCapacity'],
-  //     modelYear: map['modelYear'],
-  //     amount: map['amount'],
-  //     location: map['location'],
-  //     imageUrl: map['imageUrl'],
-  //     isAvailable: map['isAvailable'],
-  //   );
-  // }
 }

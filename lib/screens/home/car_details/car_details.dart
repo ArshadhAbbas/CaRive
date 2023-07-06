@@ -88,111 +88,119 @@ class _CarDetailsState extends State<CarDetails> {
         }
 
         final userData = snapshot.data!.data() as Map<String, dynamic>;
-        final user = _auth.currentUser;
-        final isCurrentUserOwner = user != null && user.uid == widget.ownerId;
+
         return CustomScaffold(
-          child: Scaffold(
-            extendBodyBehindAppBar: true,
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              leading: IconButton(
-                icon: const CircleAvatar(
-                  radius: 16,
-                  backgroundColor: Color(0xFF3E515F),
-                  child:
-                      Icon(Icons.arrow_back_ios_rounded, color: Colors.white),
-                ),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-              centerTitle: false,
-            ),
-            body: Stack(
+          child: SafeArea(
+            child: Stack(
               children: [
-                Image.network(
-                  widget.image,
+                SizedBox(
                   width: double.infinity,
-                  height: MediaQuery.of(context).size.height / 2,
-                  fit: BoxFit.cover,
+                  child: Image.network(
+                    widget.image,
+                    height: MediaQuery.of(context).size.height / 2,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-                Align(
-                  alignment: AlignmentDirectional.bottomCenter,
-                  child: Container(
-                    width: double.infinity,
-                    height: MediaQuery.of(context).size.height / 1.8,
-                    decoration: const BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
-                      ),
-                    ),
-                    child: SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            hSizedBox10,
-                            Text(
-                              "${widget.brand} ${widget.model}",
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 30),
-                            ),
-                            hSizedBox10,
-                            Text(
-                              "₹${widget.price}/Day",
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 30),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    hSizedBox10,
-                                    Text(
-                                      widget.location,
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                    ),
-                                    hSizedBox10,
-                                    Text(
-                                      widget.isAvailable
-                                          ? "Available"
-                                          : "Unavailable",
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                    ),
-                                  ],
+                IconButton(
+                  icon: const CircleAvatar(
+                    radius: 16,
+                    backgroundColor: Color(0xFF3E515F),
+                    child:
+                        Icon(Icons.arrow_back_ios_rounded, color: Colors.white),
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                DraggableScrollableSheet(
+                  initialChildSize: 0.6,
+                  maxChildSize: 0.8,
+                  minChildSize: 0.6,
+                  builder: (context, scrollController) {
+                    return SingleChildScrollView(
+                      controller: scrollController,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: themeColorGrey,
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20))),
+                        clipBehavior: Clip.hardEdge,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Center(
+                                child: Container(
+                                  width: 60,
+                                  height: 4,
+                                  decoration: BoxDecoration(
+                                      color:
+                                          const Color.fromARGB(255, 66, 66, 66),
+                                      borderRadius: BorderRadius.circular(30)),
                                 ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Seat Capacity : ${widget.seatCapacity}",
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                    ),
-                                    hSizedBox10,
-                                    Text(
-                                      "Fuel Type : ${widget.fuelType}",
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                    ),
-                                    hSizedBox10,
-                                    Text(
-                                      "Model Year : ${widget.modelYear}",
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                            hSizedBox20,
-                            if (!isCurrentUserOwner)
+                              ),
+                              hSizedBox10,
+                              Text(
+                                "${widget.brand} ${widget.model}",
+                                style: const TextStyle(
+                                    color: Colors.white, fontSize: 30),
+                              ),
+                              hSizedBox10,
+                              Text(
+                                "₹${widget.price}/Day",
+                                style: const TextStyle(
+                                    color: Colors.white, fontSize: 30),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      hSizedBox10,
+                                      Text(
+                                        widget.location,
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                      hSizedBox10,
+                                      Text(
+                                        widget.isAvailable
+                                            ? "Available"
+                                            : "Unavailable",
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Seat Capacity : ${widget.seatCapacity}",
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                      hSizedBox10,
+                                      Text(
+                                        "Fuel Type : ${widget.fuelType}",
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                      hSizedBox10,
+                                      Text(
+                                        "Model Year : ${widget.modelYear}",
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                              hSizedBox20,
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -299,8 +307,7 @@ class _CarDetailsState extends State<CarDetails> {
                                   ),
                                 ],
                               ),
-                            hSizedBox10,
-                            if (!isCurrentUserOwner)
+                              hSizedBox10,
                               Container(
                                 width: double.infinity,
                                 child: ElevatedButton(
@@ -316,54 +323,28 @@ class _CarDetailsState extends State<CarDetails> {
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                     ),
-                                    backgroundColor: MaterialStateProperty.all(
-                                        const Color(0xFF198396)),
+                                    backgroundColor: widget.isAvailable
+                                        ? MaterialStateProperty.all(
+                                            const Color(0xFF198396))
+                                        : MaterialStateProperty.all(
+                                            Color.fromARGB(255, 110, 128, 131)),
                                   ),
-                                  child: const Text("Book Now"),
+                                  child: Text(
+                                    "Book Now",
+                                    style: TextStyle(
+                                        color: widget.isAvailable
+                                            ? Colors.white
+                                            : Colors.grey),
+                                  ),
                                 ),
                               )
-                            else
-                              Container(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(builder: (context) {
-                                      return EditCarScreen(
-                                        latitude: widget.latitude,
-                                        longitude: widget.longitude,
-                                        carId: widget.carId,
-                                        selectedCarModel: widget.model,
-                                        selectedMake: widget.brand,
-                                        selectedFuel: widget.fuelType,
-                                        selectedSeatCapacity:
-                                            widget.seatCapacity,
-                                        modelYear: widget.modelYear,
-                                        amount: widget.price,
-                                        location: widget.location,
-                                        image: widget.image,
-                                      );
-                                    }));
-                                  },
-                                  style: ButtonStyle(
-                                    shape: MaterialStateProperty.all<
-                                        RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                    ),
-                                    backgroundColor: MaterialStateProperty.all(
-                                        const Color(0xFF198396)),
-                                  ),
-                                  child: const Text("Edit Details"),
-                                ),
-                              )
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ),
+                    );
+                  },
+                )
               ],
             ),
           ),
