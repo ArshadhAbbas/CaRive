@@ -80,7 +80,7 @@ class UserDatabaseService {
     return '';
   }
 
-    Future<String> getCurrentUserImage(String uid) async {
+  Future<String> getCurrentUserImage(String uid) async {
     try {
       final userSnapshot = await userCollectionReference.doc(uid).get();
       final userData = userSnapshot.data() as Map<String, dynamic>?;
@@ -116,28 +116,18 @@ class UserDatabaseService {
     TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
     await taskSnapshot.ref.getDownloadURL().then((value) {
       imageUrl = value;
-      print("DownloadUrl:$value");
     });
     return imageUrl;
   }
 
 //  Delete user profile
   Future<void> deleteUser(String deleteUid) async {
-    // Get the user document reference
     final userDocRef = userCollectionReference.doc(deleteUid);
-
-    // Get the user data from the document snapshot
     final userDocSnapshot = await userDocRef.get();
     final userData = userDocSnapshot.data() as Map<String, dynamic>?;
-
     if (userData != null) {
-      // Get the posts associated with the user
       final posts = userData['posts'] as List<dynamic>?;
-
-      // Delete the user document
       await userDocRef.delete();
-
-      // Delete the user image from Firebase Storage
       final imageUrl = userData['image'];
       if (imageUrl != null && imageUrl.isNotEmpty) {
         final imageRef = FirebaseStorage.instance.refFromURL(imageUrl);

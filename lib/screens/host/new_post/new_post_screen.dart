@@ -10,6 +10,7 @@ import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:carive/shared/custom_scaffold.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -33,9 +34,9 @@ class _NewPostScreenState extends State<NewPostScreen> {
 
   TextEditingController modelYearController = TextEditingController();
   TextEditingController amountController = TextEditingController();
-  TextEditingController locationController = TextEditingController();
   TextEditingController addInfoController = TextEditingController();
   LatLng? selectedLocation;
+  String? address;
 
   AuthService auth = AuthService();
   final CarService carService = CarService();
@@ -44,7 +45,6 @@ class _NewPostScreenState extends State<NewPostScreen> {
     carService.dispose();
     modelYearController.dispose();
     amountController.dispose();
-    locationController.dispose();
     super.dispose();
   }
 
@@ -361,18 +361,6 @@ class _NewPostScreenState extends State<NewPostScreen> {
                   ),
                   hSizedBox20,
                   Text(
-                    "Location Name",
-                    style: TextStyle(
-                      color: themeColorblueGrey,
-                      fontSize: 18,
-                    ),
-                  ),
-                  hSizedBox10,
-                  CustomTextFormField(
-                    controller: locationController,
-                  ),
-                  hSizedBox20,
-                  Text(
                     "Location",
                     style: TextStyle(
                       color: themeColorblueGrey,
@@ -406,7 +394,16 @@ class _NewPostScreenState extends State<NewPostScreen> {
                         );
 
                         if (selectedLatLng != null) {
+                          List<Placemark> placemark =
+                              await placemarkFromCoordinates(
+                                  selectedLatLng.latitude,
+                                  selectedLatLng.longitude);
                           setState(() {
+                            address = placemark[0].subLocality! +
+                                " " +
+                                placemark[0].locality! +
+                                " " +
+                                placemark[0].country!;
                             selectedLocation = selectedLatLng;
                           });
                         }
@@ -422,14 +419,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                               : Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Text(
-                                      'Latitude: ${selectedLocation!.latitude}',
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    Text(
-                                      'Longitude: ${selectedLocation!.longitude}',
-                                      textAlign: TextAlign.center,
-                                    ),
+                                    Text(address!, textAlign: TextAlign.center)
                                   ],
                                 ),
                         ),
@@ -440,7 +430,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                   isLoading
                       ? const CustomProgressIndicator()
                       : Center(
-                        child: CustomElevatedButton(
+                          child: CustomElevatedButton(
                             text: "Post",
                             onPressed: () async {
                               if (_formKey.currentState!.validate()) {
@@ -455,13 +445,13 @@ class _NewPostScreenState extends State<NewPostScreen> {
                                   );
                                   return;
                                 }
-                      
+
                                 FocusScopeNode currentfocus =
                                     FocusScope.of(context);
                                 if (!currentfocus.hasPrimaryFocus) {
                                   currentfocus.unfocus();
                                 }
-                      
+
                                 setState(() {
                                   isLoading = true;
                                 });
@@ -479,7 +469,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                                   seatCapacity: selectedSeatCapacity!,
                                   modelYear: modelYearController.text,
                                   amount: amountController.text,
-                                  location: locationController.text,
+                                  location: address!,
                                   isAvailable: true,
                                 );
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -496,7 +486,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                               }
                             },
                           ),
-                      )
+                        )
                 ],
               ),
             ),

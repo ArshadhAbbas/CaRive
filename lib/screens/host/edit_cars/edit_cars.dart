@@ -9,6 +9,7 @@ import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:carive/shared/custom_scaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -54,10 +55,9 @@ class _EditCarScreenState extends State<EditCarScreen> {
 
   TextEditingController modelYearController = TextEditingController();
   TextEditingController amountController = TextEditingController();
-  TextEditingController locationController = TextEditingController();
-  TextEditingController addInfoController = TextEditingController();
   String? photo;
   late LatLng selectedLocation;
+  String? address;
 
   AuthService auth = AuthService();
   final CarService carService = CarService();
@@ -67,8 +67,8 @@ class _EditCarScreenState extends State<EditCarScreen> {
     super.initState();
     modelYearController.text = widget.modelYear;
     amountController.text = widget.amount;
-    locationController.text = widget.location;
     photo = null;
+    address = widget.location;
     selectedLocation = LatLng(
         widget.latitude,
         widget
@@ -80,8 +80,6 @@ class _EditCarScreenState extends State<EditCarScreen> {
     carService.dispose();
     modelYearController.dispose();
     amountController.dispose();
-    locationController.dispose();
-    addInfoController.dispose();
     super.dispose();
   }
 
@@ -422,18 +420,6 @@ class _EditCarScreenState extends State<EditCarScreen> {
                   ),
                   hSizedBox20,
                   Text(
-                    "Location Name",
-                    style: TextStyle(
-                      color: themeColorblueGrey,
-                      fontSize: 18,
-                    ),
-                  ),
-                  hSizedBox10,
-                  CustomTextFormField(
-                    controller: locationController,
-                  ),
-                  hSizedBox20,
-                  Text(
                     "Location",
                     style: TextStyle(
                       color: themeColorblueGrey,
@@ -463,7 +449,16 @@ class _EditCarScreenState extends State<EditCarScreen> {
                         );
 
                         if (selectedLatLng != null) {
+                          List<Placemark> placemark =
+                              await placemarkFromCoordinates(
+                                  selectedLatLng.latitude,
+                                  selectedLatLng.longitude);
                           setState(() {
+                            address = placemark[0].subLocality! +
+                                " " +
+                                placemark[0].locality! +
+                                " " +
+                                placemark[0].country!;
                             selectedLocation = LatLng(
                               selectedLatLng.latitude,
                               selectedLatLng.longitude,
@@ -479,11 +474,7 @@ class _EditCarScreenState extends State<EditCarScreen> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                'Latitude: ${selectedLocation.latitude}',
-                                textAlign: TextAlign.center,
-                              ),
-                              Text(
-                                'Longitude: ${selectedLocation.longitude}',
+                                address!,
                                 textAlign: TextAlign.center,
                               ),
                             ],
@@ -517,7 +508,7 @@ class _EditCarScreenState extends State<EditCarScreen> {
                                 seatCapacity: widget.selectedSeatCapacity,
                                 modelYear: modelYearController.text,
                                 amount: amountController.text,
-                                location: locationController.text,
+                                location: address!,
                                 latitude: selectedLocation.latitude,
                                 longitude: selectedLocation.longitude,
                               );
