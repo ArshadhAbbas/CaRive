@@ -3,9 +3,10 @@ import 'package:carive/screens/chat/screen/chat_screen.dart';
 import 'package:carive/screens/home/home.dart';
 import 'package:carive/screens/host/host_screen.dart';
 import 'package:carive/screens/notification/screen/notification_screen.dart';
-import 'package:carive/screens/settings/screen/screen.dart';
+import 'package:carive/screens/settings/screen/settings_screen.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_elevated_button.dart';
+import 'package:carive/shared/custom_scaffold.dart';
 import 'package:carive/shared/logo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
@@ -67,98 +68,100 @@ class _BottomNavBarState extends State<BottomNavBar> {
           }
         }
 
-        return Scaffold(
-          appBar: AppBar(
-            centerTitle: false,
-            title: Row(
-              children: [
-                const LogoWidget(30, 30),
-                wSizedBox10,
-                Text(
-                  myUser?.name ?? "Carive",
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            actions: [
-              Row(
+        return CustomScaffold(
+          child: Scaffold(
+            appBar: AppBar(
+              centerTitle: false,
+              title: Row(
                 children: [
+                  const LogoWidget(30, 30),
+                  wSizedBox10,
                   Text(
-                    guestOrHost,
-                    style: const TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                  Switch(
-                    activeTrackColor: themeColorGrey,
-                    activeColor: themeColorGreen,
-                    inactiveThumbColor: Colors.grey,
-                    inactiveTrackColor: Colors.white,
-                    value: isHost,
-                    onChanged: (value) {
-                      if (myUser?.name != null || !value) {
-                        setState(() {
-                          isHost = value;
-                          guestOrHost = value ? "Host" : "Guest";
-                        });
-                      } else {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              backgroundColor: themeColorGrey,
-                              title: const Text(
-                                'Create Profile',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              content: const Text(
-                                'Please create a profile before switching to host mode.',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              actions: [
-                                CustomElevatedButton(
-                                  text: "OK",
-                                  paddingHorizontal: 3,
-                                  paddingVertical: 3,
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      }
-                    },
+                    myUser?.name ?? "Carive",
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ],
-              )
-            ],
-          ),
-          body: isHost
-              ? const HostScreen()
-              : widgetOptions.elementAt(selectedIndex),
-          bottomNavigationBar: Visibility(
-            visible: !isHost,
-            child: CurvedNavigationBar(
-              height: 60,
-              color: themeColorGreen,
-              animationCurve: Curves.ease,
-              buttonBackgroundColor: themeColorblueGrey,
+              ),
+              elevation: 0,
               backgroundColor: Colors.transparent,
-              items: const [
-                Icon(Icons.message),
-                Icon(Icons.settings),
-                Icon(Icons.home),
-                Icon(Icons.notifications),
-                Icon(Icons.person),
+              actions: [
+                Row(
+                  children: [
+                    Text(
+                      guestOrHost,
+                      style: const TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                    Switch(
+                      activeTrackColor: themeColorGrey,
+                      activeColor: themeColorGreen,
+                      inactiveThumbColor: Colors.grey,
+                      inactiveTrackColor: Colors.white,
+                      value: isHost,
+                      onChanged: (value) {
+                        if (myUser?.name != null || !value) {
+                          setState(() {
+                            isHost = value;
+                            guestOrHost = value ? "Host" : "Guest";
+                          });
+                        } else {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                backgroundColor: themeColorGrey,
+                                title: const Text(
+                                  'Create Profile',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                content: const Text(
+                                  'Please create a profile before switching to host mode.',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                actions: [
+                                  CustomElevatedButton(
+                                    text: "OK",
+                                    paddingHorizontal: 3,
+                                    paddingVertical: 3,
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                )
               ],
-              index: selectedIndex,
-              onTap: (value) {
-                setState(() {
-                  selectedIndex = value;
-                });
-              },
+            ),
+            body: isHost
+                ? const HostScreen()
+                : widgetOptions.elementAt(selectedIndex),
+            bottomNavigationBar: Visibility(
+              visible: !isHost,
+              child: CurvedNavigationBar(
+                height: 60,
+                color: themeColorGreen,
+                animationCurve: Curves.ease,
+                buttonBackgroundColor: themeColorblueGrey,
+                backgroundColor: Colors.transparent,
+                items: const [
+                  Icon(Icons.message),
+                  Icon(Icons.settings),
+                  Icon(Icons.home),
+                  Icon(Icons.notifications),
+                  Icon(Icons.person),
+                ],
+                index: selectedIndex,
+                onTap: (value) {
+                  setState(() {
+                    selectedIndex = value;
+                  });
+                },
+              ),
             ),
           ),
         );

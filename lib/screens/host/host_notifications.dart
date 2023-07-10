@@ -26,7 +26,7 @@ class _HostNotificationsState extends State<HostNotifications> {
   }
 
   Future<void> sendApprovalNotification(
-      String customerId, String carModel, String amount) async {
+      String customerId, String carModel, int amount) async {
     try {
       final notificationService = NotificationService();
       final customerFcmToken = await getCustomerFCMToken(customerId);
@@ -163,7 +163,7 @@ class _HostNotificationsState extends State<HostNotifications> {
                                   await sendApprovalNotification(
                                     notification['customerId'] as String,
                                     notification['car'] as String,
-                                    notification['amount'] as String
+                                    notification['amount']
                                   );
                                   final notificationId =
                                       notification['notificationId'] as String;

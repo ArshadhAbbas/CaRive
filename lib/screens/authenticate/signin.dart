@@ -27,22 +27,21 @@ class _SignInState extends State<SignIn> {
   Widget build(BuildContext context) {
     return CustomScaffold(
       child: Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-        ),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Sign In",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 50,
-                      fontWeight: FontWeight.bold),
+                const Padding(
+                  padding: EdgeInsets.only(top:90.0),
+                  child: Text(
+                    "Sign In",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 50,
+                        fontWeight: FontWeight.bold),
+                  ),
                 ),
                 Opacity(
                   opacity: 0.5,
@@ -108,8 +107,8 @@ class _SignInState extends State<SignIn> {
                               isScrollControlled: true,
                               context: context,
                               builder: (context) {
-                                return Wrap(
-                                  children: const [
+                                return const Wrap(
+                                  children: [
                                     Register(),
                                   ],
                                 );
@@ -140,7 +139,7 @@ class _SignInState extends State<SignIn> {
                   ),
                 ),
                 hSizedBox20,
-                Row(
+                const Row(
                   children: [
                     Expanded(
                       child: Divider(
@@ -191,13 +190,6 @@ class _SignInState extends State<SignIn> {
   void _signInButtonPressed() async {
     dismissKeyboard(context);
     if (formkey.currentState?.validate() ?? false) {
-      FocusScopeNode currentfocus =
-          FocusScope.of(context); //get the currnet focus node
-      if (!currentfocus.hasPrimaryFocus) {
-        //prevent Flutter from throwing an exception
-        currentfocus
-            .unfocus(); //unfocust from current focust, so that keyboard will dismiss
-      }
       setState(() {
         isLoading = true;
       });
