@@ -8,7 +8,7 @@ class CarModel {
   final String fuelType;
   final String seatCapacity;
   final String modelYear;
-  final String amount;
+  final int amount;
   final String location;
   final String imageUrl;
   final bool isAvailable;

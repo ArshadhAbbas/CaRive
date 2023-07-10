@@ -1,14 +1,15 @@
-import 'package:carive/screens/host/edit_cars/edit_cars.dart';
-import 'package:carive/services/user_database_service.dart';
-import 'package:carive/shared/constants.dart';
-import 'package:carive/shared/custom_elevated_button.dart';
-import 'package:carive/shared/custom_scaffold.dart';
+import 'package:carive/services/wishlist_service.dart';
 import 'package:custom_date_range_picker/custom_date_range_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:map_launcher/map_launcher.dart' as launcher;
+
+import 'package:carive/services/user_database_service.dart';
+import 'package:carive/shared/constants.dart';
+import 'package:carive/shared/custom_elevated_button.dart';
+import 'package:carive/shared/custom_scaffold.dart';
 
 import '../../../services/notification_service.dart';
 import '../../../shared/circular_progress_indicator.dart';
@@ -34,7 +35,7 @@ class CarDetails extends StatefulWidget {
   String carId;
   String brand;
   String model;
-  String price;
+  int price;
   String location;
   String image;
   String fuelType;
@@ -57,6 +58,7 @@ class _CarDetailsState extends State<CarDetails> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final notificationService = NotificationService();
   final userDatabaseService = UserDatabaseService();
+  final wishListService = WishListService();
 
   _mapLauncher(location) async {
     final availableMaps = await launcher.MapLauncher.installedMaps;
@@ -110,6 +112,28 @@ class _CarDetailsState extends State<CarDetails> {
                   ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: IconButton(
+                    tooltip: "Add to wishlist",
+                    icon: const CircleAvatar(
+                      radius: 16,
+                      backgroundColor: Color(0xFF3E515F),
+                      child: Icon(Icons.post_add_rounded, color: Colors.white),
+                    ),
+                    onPressed: () async {
+                      await wishListService.addToWishList(
+                          _auth.currentUser!.uid, widget.carId);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Car added to Wishlist.'),
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+                    },
+                  ),
+                ),
                 DraggableScrollableSheet(
                   initialChildSize: 0.6,
                   maxChildSize: 0.8,
@@ -120,7 +144,7 @@ class _CarDetailsState extends State<CarDetails> {
                       child: Container(
                         decoration: BoxDecoration(
                             color: themeColorGrey,
-                            borderRadius: BorderRadius.only(
+                            borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(20),
                                 topRight: Radius.circular(20))),
                         clipBehavior: Clip.hardEdge,
@@ -223,7 +247,7 @@ class _CarDetailsState extends State<CarDetails> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.center,
                                         children: [
-                                          Container(
+                                          SizedBox(
                                             width: 80,
                                             height: 80,
                                             child: ClipRRect(
@@ -308,7 +332,7 @@ class _CarDetailsState extends State<CarDetails> {
                                 ],
                               ),
                               hSizedBox10,
-                              Container(
+                              SizedBox(
                                 width: double.infinity,
                                 child: ElevatedButton(
                                   onPressed: () async {
@@ -327,7 +351,8 @@ class _CarDetailsState extends State<CarDetails> {
                                         ? MaterialStateProperty.all(
                                             const Color(0xFF198396))
                                         : MaterialStateProperty.all(
-                                            Color.fromARGB(255, 110, 128, 131)),
+                                            const Color.fromARGB(
+                                                255, 110, 128, 131)),
                                   ),
                                   child: Text(
                                     "Book Now",
@@ -416,6 +441,7 @@ class _CarDetailsState extends State<CarDetails> {
                           final currentUserId = _auth.currentUser!.uid;
                           final currentUserName = await userDatabaseService
                               .getCurrentUserName(currentUserId);
+                          // ignore: use_build_context_synchronously
                           Navigator.of(context).pop(); // Close the dialog
 
                           if (currentUserName == '') {
@@ -447,22 +473,29 @@ class _CarDetailsState extends State<CarDetails> {
                               },
                             );
                           } else {
+                            Duration difference =
+                                widget.end!.difference(widget.start!);
+                            int numberOfDays = difference.inDays;
+                            final amount = widget.price * numberOfDays;
                             final carModel = '${widget.brand} ${widget.model}';
                             await notificationService.sendNotificationToOwner(
-                                currentUserId,
-                                widget.ownerFcmToken,
-                                currentUserName,
-                                widget.ownerId,
-                                carModel,
-                                widget.price,
-                                widget.start!,
-                                widget.end!);
+                              currentUserId,
+                              widget.ownerFcmToken,
+                              currentUserName,
+                              widget.ownerId,
+                              carModel,
+                              amount,
+                              widget.start!,
+                              widget.end!,
+                            );
+
                             showSnackbar(
                                 "Booking request has sent to the owner, Please wait for the response");
                           }
                         } catch (e) {
                           showSnackbar(
                               "Could not send request. Try after some time");
+                          // ignore: avoid_print
                           print(e.toString());
                         }
                       }

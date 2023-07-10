@@ -1,7 +1,6 @@
 import 'package:carive/services/auth.dart';
 import 'package:carive/services/notification_service.dart';
 import 'package:carive/shared/constants.dart';
-import 'package:carive/shared/custom_scaffold.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -32,105 +31,118 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScaffold(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Scaffold(
-          body: StreamBuilder(
-            stream: FirebaseFirestore.instance
-                .collection('users')
-                .doc(userId)
-                .collection('customerNotifications')
-                .orderBy('timestamp', descending: true)
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                final notifications = snapshot.data!.docs;
-                if (notifications.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      'No notifications available.',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  );
-                }
-
-                return ListView.separated(
-                  separatorBuilder: (context, index) =>
-                      Divider(color: themeColorGreen),
-                  itemCount: notifications.length,
-                  itemBuilder: (context, index) {
-                    final notification = notifications[index].data();
-                    final notifcationTimestampString =
-                        notification['timestamp'] as String;
-                    final notifcationTimestamp =
-                        DateTime.parse(notifcationTimestampString);
-                    final notifcationFormattedDate =
-                        DateFormat('dd/MM hh:mm').format(notifcationTimestamp);
-                    return ListTile(
-                      title: Text(
-                        "${notification['message']}",
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      subtitle: Text(
-                        notifcationFormattedDate,
-                        style: TextStyle(color: themeColorblueGrey),
-                      ),
-                      trailing: Visibility(
-                          visible: !notification['didPay'],
-                          child: ElevatedButton(
-                              onPressed: () {
-                                try {
-                                  int amount = int.parse(
-                                      notification['amount'].toString());
-                                  int amountInPaise = amount * 100;
-                                  String amountString =
-                                      amountInPaise.toString();
-
-                                  Razorpay razorpay = Razorpay();
-                                  var options = {
-                                    'key': razorPayKey,
-                                    'amount': amountString,
-                                    'name': 'Name',
-                                    'description': 'For car',
-                                    'retry': {'enabled': true, 'max_count': 1},
-                                    'send_sms_hash': true,
-                                    'prefill': {
-                                      'contact': '9633760600',
-                                      'email': 'arshadhp98@gmail.com'
-                                    },
-                                    'external': {
-                                      'wallets': ['paytm']
-                                    }
-                                  };
-                                  razorpay.on(Razorpay.EVENT_PAYMENT_ERROR,
-                                      handlePaymentErrorResponse);
-                                  razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS,
-                                      handlePaymentSuccessResponse);
-                                  razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET,
-                                      handleExternalWalletSelected);
-                                  razorpay.open(options);
-                                } catch (e) {
-                                  showAlertDialog(
-                                      context, 'Error', 'Invalid input');
-                                }
-                              },
-                              child: Text("Pay ₹${notification['amount']}"))),
-                    );
-                  },
-                );
-              } else if (snapshot.hasError) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Scaffold(
+        body: StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .collection('customerNotifications')
+              .orderBy('timestamp', descending: true)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final notifications = snapshot.data!.docs;
+              if (notifications.isEmpty) {
                 return const Center(
                   child: Text(
-                    'Error fetching Notification.',
+                    'No notifications available.',
                     style: TextStyle(color: Colors.white),
                   ),
                 );
-              } else {
-                return const CustomProgressIndicator();
               }
-            },
-          ),
+
+              return ListView.separated(
+                separatorBuilder: (context, index) =>
+                    Divider(color: themeColorGreen),
+                itemCount: notifications.length,
+                itemBuilder: (context, index) {
+                  final notification = notifications[index].data();
+                  final notifcationTimestampString =
+                      notification['timestamp'] as String;
+                  final notifcationTimestamp =
+                      DateTime.parse(notifcationTimestampString);
+                  final notifcationFormattedDate =
+                      DateFormat('dd/MM hh:mm').format(notifcationTimestamp);
+
+                  return ListTile(
+                    title: Text(
+                      "${notification['message']}",
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    subtitle: Text(
+                      notifcationFormattedDate,
+                      style: TextStyle(color: themeColorblueGrey),
+                    ),
+                    trailing: Visibility(
+                        visible: !notification['didPay'],
+                        child: ElevatedButton(
+                            onPressed: () async {
+                              try {
+                                int amount = int.parse(
+                                    notification['amount'].toString());
+                                int amountInPaise = amount * 100;
+                                String amountString = amountInPaise.toString();
+                                final ownerSnapshot = await FirebaseFirestore
+                                    .instance
+                                    .collection('users')
+                                    .doc(notification['ownerId'])
+                                    .get();
+                                final String ownerName = ownerSnapshot['name'];
+                                final customerSnapshot = await FirebaseFirestore
+                                    .instance
+                                    .collection('users')
+                                    .doc(userId)
+                                    .get();
+                                final String customerPhonenumber =
+                                    customerSnapshot['phone_number'];
+                                final String customerMailId =
+                                    customerSnapshot['email'];
+
+                                Razorpay razorpay = Razorpay();
+                                var options = {
+                                  'key': razorPayKey,
+                                  'amount': amountString,
+                                  'name': ownerName,
+                                  'description': 'For car',
+                                  'retry': {'enabled': true, 'max_count': 1},
+                                  'send_sms_hash': true,
+                                  'prefill': {
+                                    'contact': customerPhonenumber,
+                                    'email': customerMailId,
+                                  },
+                                  'external': {
+                                    'wallets': ['paytm']
+                                  }
+                                };
+                                razorpay.on(Razorpay.EVENT_PAYMENT_ERROR,
+                                    handlePaymentErrorResponse);
+                                razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS,
+                                    handlePaymentSuccessResponse);
+                                razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET,
+                                    handleExternalWalletSelected);
+                                razorpay.open(options);
+                              } catch (e) {
+                                showAlertDialog(
+                                    context, 'Error', 'Invalid input');
+                              }
+                            },
+                            child: Text("Pay ₹${notification['amount']}"))),
+                  );
+                },
+              );
+            } else if (snapshot.hasError) {
+              return const Center(
+                child: Text(
+                  'Error fetching Notification.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              );
+            } else {
+              return const CustomProgressIndicator();
+            }
+          },
         ),
       ),
     );

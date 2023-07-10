@@ -1,10 +1,11 @@
 import 'dart:ui';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+
 import 'package:carive/screens/home/car_details/car_details.dart';
 import 'package:carive/screens/host/edit_cars/edit_cars.dart';
 import 'package:carive/shared/constants.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class TransluscentCard extends StatelessWidget {
@@ -27,7 +28,7 @@ class TransluscentCard extends StatelessWidget {
   String carId;
   String brand;
   String model;
-  String price;
+  int price;
   String location;
   String image;
   String fuelType;
@@ -59,7 +60,7 @@ class TransluscentCard extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                Container(
+                SizedBox(
                   height: 130,
                   width: 170,
                   child: ClipRRect(
@@ -76,22 +77,25 @@ class TransluscentCard extends StatelessWidget {
                     Text(
                       model,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.bold),
                     ),
                     Row(
                       children: [
-                        Container(
+                        SizedBox(
                             width: 10,
                             child: CircleAvatar(
                               backgroundColor:
                                   isAvailable ? Colors.green : Colors.red,
                             )),
+                        const SizedBox(
+                          width: 5,
+                        ),
                         Text(
                           isAvailable ? "Available" : "Unavailable",
-                          style: TextStyle(fontSize: 12, color: Colors.white),
+                          style: const TextStyle(fontSize: 12, color: Colors.white),
                         ),
                       ],
                     )
@@ -109,7 +113,7 @@ class TransluscentCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           location,
-                          style: TextStyle(color: Colors.white, fontSize: 15),
+                          style: const TextStyle(color: Colors.white, fontSize: 15),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),
@@ -125,7 +129,7 @@ class TransluscentCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Text(
-                            "₹${price}",
+                            "₹$price",
                             style: TextStyle(color: themeColorGreen),
                           ),
                           const Text(
@@ -146,7 +150,7 @@ class TransluscentCard extends StatelessWidget {
                                 backgroundColor: MaterialStateProperty.all(
                                     const Color(0xFF198396)),
                               ),
-                              child: Text("Explore"),
+                              child: const Text("Explore"),
                               onPressed: () {
                                 Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) => CarDetails(
@@ -178,7 +182,7 @@ class TransluscentCard extends StatelessWidget {
                                 backgroundColor: MaterialStateProperty.all(
                                     const Color(0xFF198396)),
                               ),
-                              child: Text("Edit"),
+                              child: const Text("Edit"),
                               onPressed: () {
                                 Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) => EditCarScreen(

@@ -16,7 +16,7 @@ class NotificationService {
     String userName,
     String ownerId,
     String carModel,
-    String amount,
+    int amount,
     DateTime startDate,
     DateTime endDate,
   ) async {
@@ -149,7 +149,7 @@ class NotificationService {
     String customerId,
     String ownerId,
     String carModel,
-    String price,
+    int price,
   ) async {
     try {
       final url = Uri.parse('https://fcm.googleapis.com/fcm/send');

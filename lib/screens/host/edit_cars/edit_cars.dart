@@ -24,7 +24,7 @@ class EditCarScreen extends StatefulWidget {
   String selectedFuel;
   String selectedSeatCapacity;
   final String modelYear;
-  final String amount;
+  final int amount;
   final String location;
   final String image;
   final double latitude;
@@ -67,7 +67,7 @@ class _EditCarScreenState extends State<EditCarScreen> {
   void initState() {
     super.initState();
     modelYearController.text = widget.modelYear;
-    amountController.text = widget.amount;
+    amountController.text = widget.amount.toString();
     photo = null;
     address = widget.location;
     selectedLocation = LatLng(
@@ -548,7 +548,7 @@ class _EditCarScreenState extends State<EditCarScreen> {
                                     fuelType: widget.selectedFuel,
                                     seatCapacity: widget.selectedSeatCapacity,
                                     modelYear: modelYearController.text,
-                                    amount: amountController.text,
+                                    amount: int.parse(amountController.text),
                                     location: address!,
                                     latitude: selectedLocation.latitude,
                                     longitude: selectedLocation.longitude,

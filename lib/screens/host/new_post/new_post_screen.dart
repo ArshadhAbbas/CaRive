@@ -49,7 +49,6 @@ class _NewPostScreenState extends State<NewPostScreen> {
   }
 
   onCarModelChanged(String? value) {
-    // Don't change the second dropdown if the first item didn't change
     if (value != selectedMake) selectedCarModel = null;
     setState(() {
       selectedMake = value;
@@ -137,7 +136,8 @@ class _NewPostScreenState extends State<NewPostScreen> {
                                     image: FileImage(selectedImage),
                                     fit: BoxFit.cover,
                                   ),
-                                ));
+                                ),
+                              );
                       },
                     ),
                   ),
@@ -399,11 +399,8 @@ class _NewPostScreenState extends State<NewPostScreen> {
                                   selectedLatLng.latitude,
                                   selectedLatLng.longitude);
                           setState(() {
-                            address = placemark[0].subLocality! +
-                                " " +
-                                placemark[0].locality! +
-                                " " +
-                                placemark[0].country!;
+                            address =
+                                "${placemark[0].subLocality!} ${placemark[0].locality!} ${placemark[0].country!}";
                             selectedLocation = selectedLatLng;
                           });
                         }
@@ -468,7 +465,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                                   fuelType: selectedFuel!,
                                   seatCapacity: selectedSeatCapacity!,
                                   modelYear: modelYearController.text,
-                                  amount: amountController.text,
+                                  amount: int.parse(amountController.text),
                                   location: address!,
                                   isAvailable: true,
                                 );
