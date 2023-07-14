@@ -21,7 +21,22 @@ class WishListService {
       });
     } catch (e) {
       print("An error occurred while removing the post: $e");
-      throw e;
+      rethrow;
     }
   }
+
+  Stream<List<String>> getWishListStream(String uid) {
+    return userCollectionReference.doc(uid).snapshots().map((snapshot) {
+      final data = snapshot.data();
+      if (data != null && data is Map<String, dynamic>) {
+        final wishlistedCars = data['wishlistedCars'];
+        if (wishlistedCars != null && wishlistedCars is List<dynamic>) {
+          return wishlistedCars.cast<String>();
+        }
+      }
+      return [];
+    });
+  }
 }
+
+

@@ -1,4 +1,3 @@
-import 'package:carive/screens/host/host_history.dart';
 import 'package:carive/screens/host/host_notifications.dart';
 import 'package:carive/screens/host/host_your_cars.dart';
 import 'package:carive/screens/host/new_post/new_post_screen.dart';
@@ -14,7 +13,7 @@ class HostScreen extends StatelessWidget {
     return CustomScaffold(
       child: Scaffold(
         body: DefaultTabController(
-          length: 3,
+          length: 2,
           child: Column(
             children: [
               Padding(
@@ -36,9 +35,6 @@ class HostScreen extends StatelessWidget {
                       Tab(
                         text: "Notifications",
                       ),
-                      Tab(
-                        text: "History",
-                      ),
                     ],
                   ),
                 ),
@@ -46,12 +42,11 @@ class HostScreen extends StatelessWidget {
               const SizedBox(
                 height: 10,
               ),
-               Expanded(
+              Expanded(
                 child: TabBarView(
                   children: <Widget>[
                     HostYourCars(),
                     HostNotifications(),
-                    HostHistory(),
                   ],
                 ),
               ),

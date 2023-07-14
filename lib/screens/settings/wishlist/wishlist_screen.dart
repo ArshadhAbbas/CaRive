@@ -1,5 +1,4 @@
 import 'package:carive/screens/home/car_details/car_details.dart';
-import 'package:carive/services/auth.dart';
 import 'package:carive/services/wishlist_service.dart';
 import 'package:carive/shared/circular_progress_indicator.dart';
 import 'package:carive/shared/constants.dart';
@@ -18,15 +17,14 @@ class WishListScreen extends StatefulWidget {
 }
 
 class _WishListScreenState extends State<WishListScreen> {
-  AuthService auth = AuthService();
   final wishListService = WishListService();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
   late String userId;
+
   @override
   void initState() {
     super.initState();
-    userId = auth.auth.currentUser?.uid ?? '';
+    userId = _auth.currentUser?.uid ?? '';
   }
 
   @override
@@ -43,10 +41,31 @@ class _WishListScreenState extends State<WishListScreen> {
               List<String>.from(user['wishlistedCars'] ?? []);
 
           if (wishListedCarsIds.isEmpty) {
-            return const Center(
-              child: Text(
-                'No cars in the wishlist.',
-                style: TextStyle(color: Colors.white),
+            return CustomScaffold(
+              child: Scaffold(
+                appBar: AppBar(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  leading: IconButton(
+                    icon: const CircleAvatar(
+                      radius: 16,
+                      backgroundColor: Color(0xFF3E515F),
+                      child: Icon(
+                        Icons.arrow_back_ios_rounded,
+                        color: Colors.white,
+                      ),
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  title: const Text("WishList"),
+                  centerTitle: false,
+                ),
+                body: const Center(
+                  child: Text(
+                    'No cars in the wishlist.',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
               ),
             );
           }
@@ -60,10 +79,31 @@ class _WishListScreenState extends State<WishListScreen> {
               if (snapshot.hasData) {
                 final cars = snapshot.data!.docs;
                 if (cars.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      'Your wishList is Empty',
-                      style: TextStyle(color: Colors.white),
+                  return CustomScaffold(
+                    child: Scaffold(
+                      appBar: AppBar(
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                        leading: IconButton(
+                          icon: const CircleAvatar(
+                            radius: 16,
+                            backgroundColor: Color(0xFF3E515F),
+                            child: Icon(
+                              Icons.arrow_back_ios_rounded,
+                              color: Colors.white,
+                            ),
+                          ),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                        title: const Text("WishList"),
+                        centerTitle: false,
+                      ),
+                      body: Center(
+                        child: Text(
+                          'Your wishList is Empty',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
                     ),
                   );
                 }

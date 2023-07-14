@@ -27,12 +27,20 @@ class _SearchScreenState extends State<SearchScreen> {
   late String query;
   late TextEditingController searchController;
 
-  @override
-  void initState() {
-    query = '';
-    searchController = TextEditingController();
-    super.initState();
-  }
+ @override
+void initState() {
+  query = '';
+  searchController = TextEditingController();
+  final searchScreenStateVariables =
+      Provider.of<SearchScreenState>(context, listen: false);
+  searchScreenStateVariables.selectedFuel = null;
+  searchScreenStateVariables.selectedSeatCapacity = null;
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    searchScreenStateVariables.updatePriceRange(const RangeValues(1000, 10000));
+  });
+  
+  super.initState();
+}
 
   @override
   void dispose() {
@@ -40,15 +48,7 @@ class _SearchScreenState extends State<SearchScreen> {
     super.dispose();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final searchScreenStateVariables =
-        Provider.of<SearchScreenState>(context, listen: false);
-    searchScreenStateVariables.selectedFuel = null;
-    searchScreenStateVariables.selectedSeatCapacity = null;
-    searchScreenStateVariables.updatePriceRange(const RangeValues(1000, 10000));
-  }
+
 
   @override
   Widget build(BuildContext context) {

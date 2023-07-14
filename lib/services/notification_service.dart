@@ -17,6 +17,7 @@ class NotificationService {
     String ownerId,
     String carModel,
     int amount,
+    String carId,
     DateTime startDate,
     DateTime endDate,
   ) async {
@@ -74,6 +75,7 @@ class NotificationService {
           'didReply': false,
           'car': carModel,
           'amount': amount,
+          'carId': carId,
         });
       }
     } catch (e) {
@@ -88,6 +90,7 @@ class NotificationService {
     required String ownerId,
     required String carModel,
     required String amount,
+    required String carId,
   }) async {
     try {
       final url = Uri.parse('https://fcm.googleapis.com/fcm/send');
@@ -136,6 +139,7 @@ class NotificationService {
           'customerId': userId,
           'car': carModel,
           'amount': amount,
+          'carId': carId,
           'didReply': true
         });
       }
@@ -150,6 +154,9 @@ class NotificationService {
     String ownerId,
     String carModel,
     int price,
+    String carId,
+    String startDate,
+    String endDate,
   ) async {
     try {
       final url = Uri.parse('https://fcm.googleapis.com/fcm/send');
@@ -198,6 +205,9 @@ class NotificationService {
           'car': carModel,
           'amount': price,
           'didPay': false,
+          'carId': carId,
+          'startDate': startDate,
+          'endDate': endDate,
         });
 
         print('Approval notification sent successfully');
