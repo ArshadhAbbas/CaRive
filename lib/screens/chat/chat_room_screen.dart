@@ -28,6 +28,20 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   final chatService = ChatService();
   final auth = AuthService();
   final messageController = TextEditingController();
+   final CollectionReference userCollectionReference =
+      FirebaseFirestore.instance.collection("users");
+
+  @override
+  void initState() {
+    super.initState();
+    // Set the last message as read for the receiver
+    String currentUserId = AuthService().auth.currentUser!.uid;
+    userCollectionReference
+        .doc(currentUserId)
+        .collection('chats')
+        .doc(widget.userId)
+        .update({'lastMessageRead': true});
+  }
 
   @override
   Widget build(BuildContext context) {

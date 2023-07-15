@@ -1,14 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
 import 'package:carive/models/user_model.dart';
 import 'package:carive/screens/chat/chat_room_screen.dart';
 import 'package:carive/services/auth.dart';
-import 'package:carive/services/chat_service.dart';
 import 'package:carive/shared/constants.dart';
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 
 class ChatScreen extends StatefulWidget {
-  ChatScreen({Key? key}) : super(key: key);
+  const ChatScreen({Key? key}) : super(key: key);
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -34,7 +34,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       child: Scaffold(
         body: StreamBuilder<QuerySnapshot>(
           stream: chatsStream,
@@ -44,17 +44,14 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: Text('Error: ${snapshot.error}'),
               );
             }
-
             if (!snapshot.hasData) {
-              return Center(
+              return const Center(
                 child: CircularProgressIndicator(),
               );
             }
-
             List<DocumentSnapshot> chatDocuments = snapshot.data!.docs;
-
             if (chatDocuments.isEmpty) {
-              return Center(
+              return const Center(
                 child: Text(
                   'No chats found.',
                   style: TextStyle(color: Colors.white),
@@ -76,11 +73,13 @@ class _ChatScreenState extends State<ChatScreen> {
                     }
 
                     if (!snapshot.hasData) {
-                      return CircularProgressIndicator();
+                      return const CircularProgressIndicator();
                     }
 
                     UserModel chatUser =
                         UserModel.fromDocumentSnapshot(snapshot.data!);
+                    bool isLastMessageRead =
+                        chatDocument.get('lastMessageRead') ?? false;
 
                     Timestamp? timeSent =
                         chatDocument.get('timeSent') as Timestamp?;
@@ -113,7 +112,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                       title: Text(
                         chatUser.name,
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(
+                            color: isLastMessageRead
+                                ? Colors.white
+                                : Colors.green),
                       ),
                       subtitle: Text(
                         lastMessage,
@@ -121,14 +123,12 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                       trailing: Text(
                         timeSentText,
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(
+                            color: isLastMessageRead
+                                ? Colors.white
+                                : Colors.green),
                       ),
-                      onTap: () async {
-                        await ChatService().markChatAsRead(
-                          auth.auth.currentUser!.uid,
-                          contactId,
-                        );
-
+                      onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => ChatRoomScreen(
                             userImage: chatUser.image,

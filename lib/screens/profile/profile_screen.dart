@@ -9,7 +9,6 @@ import 'package:carive/services/auth.dart';
 import 'package:carive/services/user_database_service.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_elevated_button.dart';
-import 'package:carive/shared/custom_scaffold.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 

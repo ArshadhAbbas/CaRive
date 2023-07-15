@@ -1,6 +1,5 @@
 import 'package:carive/models/chat_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 class ChatService {
   final CollectionReference userCollectionReference =
       FirebaseFirestore.instance.collection("users");
@@ -19,7 +18,7 @@ class ChatService {
         'contactId': receiverId,
         'timeSent': DateTime.now(),
         'lastMessage': message,
-        'didRead': true
+        'lastMessageRead': true,
       },
     );
     final senderMessagesReference =
@@ -45,7 +44,7 @@ class ChatService {
         'contactId': senderId,
         'timeSent': DateTime.now(),
         'lastMessage': message,
-        'didRead': false,
+        'lastMessageRead': false,
       },
     );
     final receiverMessagesReference =
@@ -62,18 +61,5 @@ class ChatService {
 
     await receiverMessageDocumentReference
         .set(receiverChatMessage.toSnapshot());
-  }
-
-  Future<void> markChatAsRead(String senderId, String receiverId) async {
-    final receiverChatCollectionReference =
-        userCollectionReference.doc(receiverId).collection("chats");
-    final receiverChatDocumentReference =
-        receiverChatCollectionReference.doc(senderId);
-
-    await receiverChatDocumentReference.update({'didRead': true}).then((value) {
-      print('Chat marked as read successfully');
-    }).catchError((error) {
-      print('Error marking chat as read: $error');
-    });
   }
 }
