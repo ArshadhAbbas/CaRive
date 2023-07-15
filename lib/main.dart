@@ -30,12 +30,13 @@ class MyApp extends StatelessWidget {
         return null;
       },
       child: ChangeNotifierProvider(
-        create: (_) => SearchScreenState(),
+        create:(context)  => SearchScreenState(),
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',
           theme: ThemeData(
             scaffoldBackgroundColor: Colors.transparent,
+            bottomSheetTheme: BottomSheetThemeData(backgroundColor: Colors.transparent)
           ),
           home: SpalshScreen(),
           routes: {

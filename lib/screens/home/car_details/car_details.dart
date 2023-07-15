@@ -13,6 +13,7 @@ import 'package:carive/shared/custom_scaffold.dart';
 
 import '../../../services/notification_service.dart';
 import '../../../shared/circular_progress_indicator.dart';
+import '../../chat/chat_room_screen.dart';
 
 // ignore: must_be_immutable
 class CarDetails extends StatefulWidget {
@@ -115,24 +116,55 @@ class _CarDetailsState extends State<CarDetails> {
                 Positioned(
                   right: 0,
                   top: 0,
-                  child: IconButton(
-                    tooltip: "Add to wishlist",
-                    icon: const CircleAvatar(
-                      radius: 16,
-                      backgroundColor: Color(0xFF3E515F),
-                      child: Icon(Icons.post_add_rounded, color: Colors.white),
-                    ),
-                    onPressed: () async {
-                      await wishListService.addToWishList(
-                          _auth.currentUser!.uid, widget.carId);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Car added to Wishlist.'),
-                          duration: Duration(seconds: 3),
-                        ),
-                      );
-                    },
-                  ),
+                  child: StreamBuilder<List<String>>(
+                      stream: wishListService
+                          .getWishListStream(_auth.currentUser!.uid),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        }
+                        final wishList = snapshot.data ?? [];
+                        final isInWishList = wishList.contains(widget.carId);
+                        return IconButton(
+                          tooltip: isInWishList
+                              ? "Remove from wishlist"
+                              : "Add to wishlist",
+                          icon: CircleAvatar(
+                              radius: 16,
+                              backgroundColor: themeColorGrey,
+                              child: isInWishList
+                                  ? Image.asset(
+                                      'assets/favorited.png',
+                                      color: themeColorGreen,
+                                    )
+                                  : Image.asset(
+                                      'assets/non-favorite.png',
+                                      color: Colors.white,
+                                    )),
+                          onPressed: () async {
+                            if (isInWishList) {
+                              await wishListService.removeFromWishList(
+                                  _auth.currentUser!.uid, widget.carId);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Car removed from Wishlist.'),
+                                  duration: Duration(seconds: 1),
+                                ),
+                              );
+                            } else {
+                              await wishListService.addToWishList(
+                                  _auth.currentUser!.uid, widget.carId);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Car added to Wishlist.'),
+                                  duration: Duration(seconds: 1),
+                                ),
+                              );
+                            }
+                          },
+                        );
+                      }),
                 ),
                 DraggableScrollableSheet(
                   initialChildSize: 0.6,
@@ -285,11 +317,27 @@ class _CarDetailsState extends State<CarDetails> {
                                             ],
                                           ),
                                           const Spacer(),
-                                          const Icon(
-                                            Icons.message_rounded,
-                                            color: Colors.white,
-                                            size: 60,
-                                          )
+                                          IconButton(
+                                              onPressed: () {
+                                                Navigator.of(context).push(
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            ChatRoomScreen(
+                                                              userImage:
+                                                                  userData[
+                                                                      'image'],
+                                                              userName:
+                                                                  userData[
+                                                                      'name'],
+                                                              userId: userData[
+                                                                  'id'],
+                                                            )));
+                                              },
+                                              icon: Icon(
+                                                Icons.message,
+                                                color: Colors.white,
+                                                size: 30,
+                                              ))
                                         ],
                                       ),
                                     ),
@@ -485,6 +533,7 @@ class _CarDetailsState extends State<CarDetails> {
                               widget.ownerId,
                               carModel,
                               amount,
+                              widget.carId,
                               widget.start!,
                               widget.end!,
                             );

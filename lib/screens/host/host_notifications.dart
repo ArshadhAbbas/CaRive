@@ -26,17 +26,25 @@ class _HostNotificationsState extends State<HostNotifications> {
   }
 
   Future<void> sendApprovalNotification(
-      String customerId, String carModel, int amount) async {
+    String customerId,
+    String carModel,
+    int amount,
+    String carId,
+    String startDate,
+    String endDate,
+  ) async {
     try {
       final notificationService = NotificationService();
       final customerFcmToken = await getCustomerFCMToken(customerId);
       await notificationService.sendApprovalNotificationToCustomer(
-        customerFcmToken,
-        customerId,
-        userId,
-        carModel,
-        amount,
-      );
+          customerFcmToken,
+          customerId,
+          userId,
+          carModel,
+          amount,
+          carId,
+          startDate,
+          endDate);
     } catch (e) {
       print('Error sending approval notification: $e');
     }
@@ -153,7 +161,6 @@ class _HostNotificationsState extends State<HostNotifications> {
                                   }
                                 },
                               ),
-                              
                               IconButton(
                                 icon: Icon(
                                   Icons.check_circle_outline,
@@ -163,7 +170,10 @@ class _HostNotificationsState extends State<HostNotifications> {
                                   await sendApprovalNotification(
                                     notification['customerId'] as String,
                                     notification['car'] as String,
-                                    notification['amount']
+                                    notification['amount'],
+                                    notification['carId'] as String,
+                                    notification['startDate'],
+                                    notification['endDate'],
                                   );
                                   final notificationId =
                                       notification['notificationId'] as String;

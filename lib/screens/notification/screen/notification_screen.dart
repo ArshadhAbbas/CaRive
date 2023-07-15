@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:carive/services/auth.dart';
 import 'package:carive/services/notification_service.dart';
 import 'package:carive/shared/constants.dart';
@@ -7,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 import '../../../keys/keys.dart';
+import '../../../services/order_history_service.dart';
 import '../../../shared/circular_progress_indicator.dart';
 import '../../../shared/custom_elevated_button.dart';
 
@@ -20,6 +23,7 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   AuthService auth = AuthService();
+  OrdersHistoryService ordersHistoryService = OrdersHistoryService();
 
   late String userId;
 
@@ -175,6 +179,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
       final String ownerId = documentSnapshot['ownerId'];
       final String carModel = documentSnapshot['car'];
       final String amount = documentSnapshot['amount'].toString();
+      final String carId = documentSnapshot['carId'];
+      final String startDate = documentSnapshot['startDate'];
+      final String endDate = documentSnapshot['endDate'];
 
       final NotificationService notificationService = NotificationService();
       final userSnapshot = await FirebaseFirestore.instance
@@ -189,6 +196,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       final String ownerFCMToken = ownerSnapshot['fcmToken'];
 
       await notificationService.sendPaidNotificationToOwner(
+          carId: carId,
           userId: userId,
           ownerFCMToken: ownerFCMToken,
           userName: userName,
@@ -198,6 +206,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
       showAlertDialog(
           context, "Payment Successful", "Payment ID: ${response.paymentId}");
+      ordersHistoryService.addToMyHistory(
+        ownerId,
+        userId,
+        carId,
+        int.parse(amount),
+        startDate,
+        endDate,
+      );
     } catch (e) {
       showAlertDialog(context, "Error", "Failed to update payment status.");
     }

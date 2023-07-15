@@ -1,10 +1,11 @@
-import 'package:carive/screens/settings/wishlist/wishlsit_screen.dart';
+import 'package:carive/screens/settings/wishlist/wishlist_screen.dart';
 import 'package:carive/services/auth.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_scaffold.dart';
 import 'package:flutter/material.dart';
 
 import '../../../shared/custom_elevated_button.dart';
+import '../my_order_history/my_order_history.dart';
 
 // ignore: must_be_immutable
 class SettingsScreen extends StatelessWidget {
@@ -27,6 +28,20 @@ class SettingsScreen extends StatelessWidget {
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => WishListScreen(),
+                      ));
+                    },
+                    paddingHorizontal: 10,
+                    paddingVertical: 15,
+                  ),
+                ),
+                hSizedBox30,
+                SizedBox(
+                  width: double.infinity,
+                  child: CustomElevatedButton(
+                    text: "My Orders",
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const MyOrdersHistory(),
                       ));
                     },
                     paddingHorizontal: 10,
