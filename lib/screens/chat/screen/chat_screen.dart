@@ -121,13 +121,13 @@ class _ChatScreenState extends State<ChatScreen> {
                         lastMessage,
                         style: TextStyle(color: themeColorblueGrey),
                       ),
-                      trailing: Text(
-                        timeSentText,
-                        style: TextStyle(
-                            color: isLastMessageRead
-                                ? Colors.white
-                                : Colors.green),
-                      ),
+                      // trailing: Text(
+                      //   timeSentText,
+                      //   style: TextStyle(
+                      //       color: isLastMessageRead
+                      //           ? Colors.white
+                      //           : Colors.green),
+                      // ),
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => ChatRoomScreen(
