@@ -2,8 +2,10 @@ import 'package:carive/screens/settings/wishlist/wishlist_screen.dart';
 import 'package:carive/services/auth.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_scaffold.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../../services/user_database_service.dart';
 import '../../../shared/custom_elevated_button.dart';
 import '../my_order_history/my_order_history.dart';
 
@@ -11,6 +13,8 @@ import '../my_order_history/my_order_history.dart';
 class SettingsScreen extends StatelessWidget {
   SettingsScreen({super.key});
   AuthService auth = AuthService();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  UserDatabaseService userDatabaseService = UserDatabaseService();
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +47,56 @@ class SettingsScreen extends StatelessWidget {
                       Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => const MyOrdersHistory(),
                       ));
+                    },
+                    paddingHorizontal: 10,
+                    paddingVertical: 15,
+                  ),
+                ),
+                hSizedBox30,
+                SizedBox(
+                  width: double.infinity,
+                  child: CustomElevatedButton(
+                    text: "Delete my profile",
+                    onPressed: () async {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            titleTextStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            contentTextStyle:
+                                const TextStyle(color: Colors.white),
+                            backgroundColor: const Color(0xFF1E1E1E),
+                            title: const Text('Delete !?'),
+                            content: const Text(
+                                'All your posts will be deleted.This action cannot be undone'),
+                            actions: [
+                              TextButton(
+                                child: const Text(
+                                  'Cancel',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              CustomElevatedButton(
+                                text: "Ok",
+                                onPressed: () {
+                                  userDatabaseService
+                                      .deleteUser(_auth.currentUser!.uid);
+                                  Navigator.pop(context);
+                                },
+                                paddingHorizontal: 8,
+                                paddingVertical: 8,
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     },
                     paddingHorizontal: 10,
                     paddingVertical: 15,
@@ -97,56 +151,6 @@ class SettingsScreen extends StatelessWidget {
                     paddingVertical: 15,
                   ),
                 )
-                // ElevatedButton(
-                //   style: ButtonStyle(
-                //     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                //       RoundedRectangleBorder(
-                //         borderRadius: BorderRadius.circular(20),
-                //       ),
-                //     ),
-                //     backgroundColor:
-                //         MaterialStateProperty.all(const Color(0xFF198396)),
-                //   ),
-                //   onPressed: () async {
-                //     showDialog(
-                //       context: context,
-                //       builder: (BuildContext context) {
-                //         return AlertDialog(
-                //           titleTextStyle: const TextStyle(
-                //             color: Colors.white,
-                //             fontSize: 20,
-                //             fontWeight: FontWeight.bold,
-                //           ),
-                //           contentTextStyle: const TextStyle(color: Colors.white),
-                //           backgroundColor: const Color(0xFF1E1E1E),
-                //           title: const Text('Sign Out ?'),
-                //           content: const Text('Are you sure you want to sign out?'),
-                //           actions: [
-                //             TextButton(
-                //               child: const Text(
-                //                 'Cancel',
-                //                 style: TextStyle(color: Colors.white),
-                //               ),
-                //               onPressed: () {
-                //                 Navigator.of(context).pop();
-                //               },
-                //             ),
-                //             CustomElevatedButton(
-                //               text: "Ok",
-                //               onPressed: () {
-                //                 auth.signout();
-                //                 Navigator.of(context).pop();
-                //               },
-                //               paddingHorizontal: 8,
-                //               paddingVertical: 8,
-                //             ),
-                //           ],
-                //         );
-                //       },
-                //     );
-                //   },
-                //   child: const Text('Sign Out'),
-                // ),
               ],
             ),
           ),

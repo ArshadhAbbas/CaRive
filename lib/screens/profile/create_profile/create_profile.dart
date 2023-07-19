@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -27,7 +26,6 @@ class _CreateProfileState extends State<CreateProfile> {
   final TextEditingController numberController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController mailController = TextEditingController();
-  bool isLoading = false;
 
   AuthService auth = AuthService();
   UserDatabaseService userDatabaseService = UserDatabaseService();
@@ -144,16 +142,16 @@ class _CreateProfileState extends State<CreateProfile> {
                       ),
                       hSizedBox10,
                       CustomTextFormField(
+                        length: 10,
                         controller: numberController,
+                        keyBoardType: TextInputType.phone,
                         validator: (value) {
                           if (value!.isEmpty) {
                             return 'Please enter a phone number';
                           }
-                          // Add more validation logic if needed
                           return null;
                         },
                       ),
-                      hSizedBox20,
                       Text(
                         "Email",
                         style:
@@ -161,6 +159,7 @@ class _CreateProfileState extends State<CreateProfile> {
                       ),
                       hSizedBox10,
                       CustomTextFormField(
+                        keyBoardType: TextInputType.emailAddress,
                         controller: mailController,
                         validator: (value) {
                           if (value!.isEmpty) {
@@ -191,76 +190,63 @@ class _CreateProfileState extends State<CreateProfile> {
                       hSizedBox20,
                       hSizedBox30,
                       Center(
-                        child: isLoading
-                            ? const CustomProgressIndicator()
-                            : CustomElevatedButton(
-                                text: "Save",
-                                onPressed: () async {
-                                  dismissKeyboard(context);
-                                  if (_formKey.currentState!.validate()) {
-                                    setState(() {
-                                      isLoading = true;
-                                    });
+                        child:
+                        
+                            CustomElevatedButton(
+                          text: "Save",
+                          onPressed: () async {
+                            dismissKeyboard(context);
+                            if (_formKey.currentState!.validate()) {
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) => Center(
+                                  child: CustomProgressIndicator(),
+                                ),
+                              );
 
-                                    final userUID = auth.auth.currentUser?.uid;
+                              final userUID = auth.auth.currentUser?.uid;
 
-                                    if (userUID != null) {
-                                      final name = nameController.text;
-                                      final address = addressController.text;
-                                      final number = numberController.text;
-                                      final email = mailController.text;
+                              if (userUID != null) {
+                                final name = nameController.text;
+                                final address = addressController.text;
+                                final number = numberController.text;
+                                final email = mailController.text;
 
-                                      try {
-                                        if (userDatabaseService.selectedImage ==
-                                            null) {
-                                          throw ('Image cannot be empty');
-                                        }
-                                        final fcmToken = await FirebaseMessaging
-                                            .instance
-                                            .getToken();
-
-                                        await userDatabaseService.addUser(
-                                          userUID,
-                                          name,
-                                          address,
-                                          number,
-                                          email,
-                                          fcmToken!
-                                        );
-                                        // final fcmToken = await FirebaseMessaging
-                                        //     .instance
-                                        //     .getToken();
-
-                                        // userDatabaseService.addFcmToken(
-                                        //     userUID, fcmToken);
-
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Center(
-                                                child: Text('Profile created')),
-                                            duration: Duration(seconds: 3),
-                                          ),
-                                        );
-                                        Navigator.of(context).pop();
-                                      } catch (e) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Center(
-                                                child: Text(e.toString())),
-                                            duration: Duration(seconds: 3),
-                                          ),
-                                        );
-                                      }
-                                    }
-
-                                    setState(() {
-                                      isLoading = false;
-                                    });
+                                try {
+                                  if (userDatabaseService.selectedImage ==
+                                      null) {
+                                    throw ('Image cannot be empty');
                                   }
-                                },
-                              ),
+                                  final fcmToken = await FirebaseMessaging
+                                      .instance
+                                      .getToken();
+
+                                  await userDatabaseService.addUser(userUID,
+                                      name, address, number, email, fcmToken!);
+                                  Navigator.of(context).pop();
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Center(
+                                          child: Text('Profile created')),
+                                      duration: Duration(seconds: 3),
+                                    ),
+                                  );
+                                  Navigator.of(context).pop();
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content:
+                                          Center(child: Text(e.toString())),
+                                      duration: Duration(seconds: 3),
+                                    ),
+                                  );
+                                }
+                              }
+                            }
+                          },
+                        ),
                       ),
                     ],
                   ),

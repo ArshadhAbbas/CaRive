@@ -1,3 +1,6 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:carive/models/user_model.dart';
 import 'package:carive/services/wishlist_service.dart';
 import 'package:custom_date_range_picker/custom_date_range_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -60,6 +63,7 @@ class _CarDetailsState extends State<CarDetails> {
   final notificationService = NotificationService();
   final userDatabaseService = UserDatabaseService();
   final wishListService = WishListService();
+  UserModel? userData;
 
   _mapLauncher(location) async {
     final availableMaps = await launcher.MapLauncher.installedMaps;
@@ -90,7 +94,7 @@ class _CarDetailsState extends State<CarDetails> {
           );
         }
 
-        final userData = snapshot.data!.data() as Map<String, dynamic>;
+        userData = UserModel.fromDocumentSnapshot(snapshot.data!);
 
         return CustomScaffold(
           child: SafeArea(
@@ -286,7 +290,7 @@ class _CarDetailsState extends State<CarDetails> {
                                               borderRadius:
                                                   BorderRadius.circular(10),
                                               child: Image.network(
-                                                "${userData['image']}",
+                                                "${userData!.image}",
                                                 fit: BoxFit.cover,
                                               ),
                                             ),
@@ -297,20 +301,20 @@ class _CarDetailsState extends State<CarDetails> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                "${userData['name']}",
+                                                "${userData!.name}",
                                                 style: const TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 22),
                                               ),
                                               const Spacer(),
                                               Text(
-                                                "${userData['address']}",
+                                                "${userData!.address}",
                                                 style: const TextStyle(
                                                     color: Colors.white),
                                               ),
                                               const Spacer(),
                                               Text(
-                                                "${userData['phone_number']}",
+                                                "${userData!.phoneNumber}",
                                                 style: const TextStyle(
                                                     color: Colors.white),
                                               ),
@@ -318,22 +322,29 @@ class _CarDetailsState extends State<CarDetails> {
                                           ),
                                           const Spacer(),
                                           IconButton(
-                                              onPressed: () {
-                                                Navigator.of(context).push(
+                                              onPressed: () async {
+                                                if (await isProfileCreated()) {
+                                                  Navigator.of(context).push(
                                                     MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ChatRoomScreen(
-                                                              userImage:
-                                                                  userData[
-                                                                      'image'],
-                                                              userName:
-                                                                  userData[
-                                                                      'name'],
-                                                              userId: userData[
-                                                                  'id'],
-                                                            )));
+                                                      builder: (context) =>
+                                                          ChatRoomScreen(
+                                                        userImage:
+                                                            userData!.image,
+                                                        userName:
+                                                            userData!.name,
+                                                        userId: userData!.id,
+                                                        fcmToken:
+                                                            userData!.fcmToken,
+                                                      ),
+                                                    ),
+                                                  );
+                                                } else {
+                                                  showCreateProfileDialogue(
+                                                      context,
+                                                      'Please create a profile to chat with the owner.');
+                                                }
                                               },
-                                              icon: Icon(
+                                              icon: const Icon(
                                                 Icons.message,
                                                 color: Colors.white,
                                                 size: 30,
@@ -489,38 +500,8 @@ class _CarDetailsState extends State<CarDetails> {
                           final currentUserId = _auth.currentUser!.uid;
                           final currentUserName = await userDatabaseService
                               .getCurrentUserName(currentUserId);
-                          // ignore: use_build_context_synchronously
-                          Navigator.of(context).pop(); // Close the dialog
-
-                          if (currentUserName == '') {
-                            // ignore: use_build_context_synchronously
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  backgroundColor: themeColorGrey,
-                                  title: const Text(
-                                    'Create Profile',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  content: const Text(
-                                    'Please create a profile to create a booking.',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  actions: [
-                                    CustomElevatedButton(
-                                      text: "OK",
-                                      paddingHorizontal: 3,
-                                      paddingVertical: 3,
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          } else {
+                          Navigator.of(context).pop();
+                          if (await isProfileCreated()) {
                             Duration difference =
                                 widget.end!.difference(widget.start!);
                             int numberOfDays = difference.inDays;
@@ -540,6 +521,9 @@ class _CarDetailsState extends State<CarDetails> {
 
                             showSnackbar(
                                 "Booking request has sent to the owner, Please wait for the response");
+                          } else {
+                            showCreateProfileDialogue(context,
+                                'Please create a profile to create a booking.');
                           }
                         } catch (e) {
                           showSnackbar(
@@ -559,6 +543,20 @@ class _CarDetailsState extends State<CarDetails> {
         });
       },
     );
+  }
+
+  Future<bool> isProfileCreated() async {
+    final currentUser = _auth.currentUser;
+    if (currentUser != null) {
+      final userData = await userDatabaseService.getUserData(currentUser.uid);
+      final data = userData.data() as Map<String, dynamic>?;
+
+      if (data != null) {
+        final name = data['name'] as String?;
+        return name != null && name.isNotEmpty;
+      }
+    }
+    return false;
   }
 
   void customDateRangePicker(BuildContext context, StateSetter setState) {

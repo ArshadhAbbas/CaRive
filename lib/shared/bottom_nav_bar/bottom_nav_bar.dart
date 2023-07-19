@@ -46,11 +46,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
       stream: UserDatabaseService().users,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // Display a loading indicator if data is still loading
           const CustomProgressIndicator();
         }
         if (snapshot.hasError) {
-          // Display an error message if there's an error in fetching the data
           return const Center(
             child: Text('Error retrieving user data'),
           );

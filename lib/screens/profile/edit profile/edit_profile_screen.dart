@@ -1,7 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -40,8 +41,6 @@ class _EditProfileState extends State<EditProfile> {
   TextEditingController addressController = TextEditingController();
   TextEditingController mailController = TextEditingController();
   String? photo;
-  bool isLoading = false;
-
   AuthService auth = AuthService();
   UserDatabaseService userDatabaseService = UserDatabaseService();
 
@@ -140,7 +139,7 @@ class _EditProfileState extends State<EditProfile> {
                                         ImageSource.gallery,
                                       );
                                     },
-                                    icon: Icon(Icons.edit),
+                                    icon: const Icon(Icons.edit),
                                   ),
                                 ),
                               ),
@@ -176,7 +175,9 @@ class _EditProfileState extends State<EditProfile> {
                       ),
                       hSizedBox10,
                       CustomTextFormField(
+                        length: 10,
                         controller: numberController,
+                        keyBoardType: TextInputType.phone,
                         validator: (value) {
                           if (value!.isEmpty) {
                             return 'Please enter a phone number';
@@ -184,7 +185,6 @@ class _EditProfileState extends State<EditProfile> {
                           return null;
                         },
                       ),
-                      hSizedBox20,
                       Text(
                         "Email",
                         style: TextStyle(
@@ -194,6 +194,7 @@ class _EditProfileState extends State<EditProfile> {
                       ),
                       hSizedBox10,
                       CustomTextFormField(
+                        keyBoardType: TextInputType.emailAddress,
                         controller: mailController,
                         validator: (value) {
                           if (value!.isEmpty) {
@@ -222,37 +223,38 @@ class _EditProfileState extends State<EditProfile> {
                       ),
                       hSizedBox30,
                       Center(
-                        child: isLoading
-                            ? const CustomProgressIndicator()
-                            : CustomElevatedButton(
-                                text: "Save",
-                                onPressed: () async {
-                                  if (_formKey.currentState!.validate()) {
-                                    setState(() {
-                                      isLoading = true;
-                                    });
-                                    await userDatabaseService.updateUserData(
-                                      auth.auth.currentUser!.uid,
-                                      nameController.text,
-                                      addressController.text,
-                                      numberController.text,
-                                      mailController.text,
-                                    );
-                                    setState(() {
-                                      isLoading = false;
-                                    });
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Center(
-                                          child: Text('Profile Data Updated'),
-                                        ),
-                                        duration: Duration(seconds: 3),
-                                      ),
-                                    );
-                                    Navigator.of(context).pop();
-                                  }
-                                },
-                              ),
+                        child: CustomElevatedButton(
+                          text: "Save",
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) => const Center(
+                                  child: CustomProgressIndicator(),
+                                ),
+                              );
+                              await userDatabaseService.updateUserData(
+                                auth.auth.currentUser!.uid,
+                                nameController.text,
+                                addressController.text,
+                                numberController.text,
+                                mailController.text,
+                              );
+                              Navigator.of(context).pop();
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Center(
+                                    child: Text('Profile Data Updated'),
+                                  ),
+                                  duration: Duration(seconds: 3),
+                                ),
+                              );
+                              Navigator.of(context).pop();
+                            }
+                          },
+                        ),
                       ),
                     ],
                   ),

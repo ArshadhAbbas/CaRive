@@ -1,3 +1,4 @@
+import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:flutter/material.dart';
 
 SizedBox hSizedBox60 = const SizedBox(height: 60);
@@ -18,3 +19,33 @@ void dismissKeyboard(BuildContext context) {
     currentfocus.unfocus();
   }
 }
+
+
+ void showCreateProfileDialogue(BuildContext context ,String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: themeColorGrey,
+          title: const Text(
+            'Create Profile',
+            style: TextStyle(color: Colors.white),
+          ),
+          content: Text(
+            message,
+            style: TextStyle(color: Colors.white),
+          ),
+          actions: [
+            CustomElevatedButton(
+              text: "OK",
+              paddingHorizontal: 3,
+              paddingVertical: 3,
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }

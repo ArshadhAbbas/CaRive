@@ -154,6 +154,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   void handlePaymentErrorResponse(PaymentFailureResponse response) {
     showAlertDialog(context, "Payment Failed", "${response.message}");
+    print("${response.message}");
   }
 
   void handlePaymentSuccessResponse(PaymentSuccessResponse response) async {
@@ -178,7 +179,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
       final String ownerId = documentSnapshot['ownerId'];
       final String carModel = documentSnapshot['car'];
-      final String amount = documentSnapshot['amount'].toString();
+      final int amount = documentSnapshot['amount'];
       final String carId = documentSnapshot['carId'];
       final String startDate = documentSnapshot['startDate'];
       final String endDate = documentSnapshot['endDate'];
@@ -210,12 +211,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
         ownerId,
         userId,
         carId,
-        int.parse(amount),
+        amount,
         startDate,
         endDate,
       );
     } catch (e) {
-      showAlertDialog(context, "Error", "Failed to update payment status.");
+      showAlertDialog(context, "Error", "Failed to update payment status:$e");
     }
   }
 

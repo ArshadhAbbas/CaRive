@@ -1,6 +1,7 @@
 import 'package:carive/models/chat_model.dart';
 import 'package:carive/services/auth.dart';
 import 'package:carive/services/chat_service.dart';
+import 'package:carive/services/user_database_service.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_scaffold.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,11 +15,13 @@ class ChatRoomScreen extends StatefulWidget {
     required this.userImage,
     required this.userName,
     required this.userId,
+    required this.fcmToken,
   });
 
   final String userImage;
   final String userName;
   final String userId;
+  final fcmToken;
 
   @override
   State<ChatRoomScreen> createState() => _ChatRoomScreenState();
@@ -28,8 +31,10 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   final chatService = ChatService();
   final auth = AuthService();
   final messageController = TextEditingController();
-   final CollectionReference userCollectionReference =
+  final CollectionReference userCollectionReference =
       FirebaseFirestore.instance.collection("users");
+  UserDatabaseService userDatabaseService = UserDatabaseService();
+  final currentUser = AuthService().auth.currentUser;
 
   @override
   void initState() {
@@ -89,7 +94,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 }
 
                 final messages = snapshot.data!.docs
-                    .map((doc) => ChatMessage.fromSnapshot(doc))
+                    .map((doc) => ChatMessageModel.fromSnapshot(doc))
                     .toList();
 
                 // Group the messages by date
@@ -178,12 +183,18 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                   radius: 25,
                   backgroundColor: themeColorGreen,
                   child: IconButton(
-                    onPressed: () {
-                      chatService.sendTextMessage(
-                        auth.auth.currentUser!.uid,
-                        widget.userId,
-                        messageController.text.trim(),
-                      );
+                    onPressed: () async {
+                      if (await isProfileCreated()) {
+                        chatService.sendTextMessage(
+                          auth.auth.currentUser!.uid,
+                          widget.userId,
+                          messageController.text.trim(),
+                          widget.fcmToken,
+                        );
+                      } else {
+                        showCreateProfileDialogue(
+                            context, "Create profie to chat");
+                      }
                       messageController.clear();
                     },
                     icon: Icon(
@@ -243,5 +254,18 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         ),
       ),
     );
+  }
+
+  Future<bool> isProfileCreated() async {
+    if (currentUser != null) {
+      final userData = await userDatabaseService.getUserData(currentUser!.uid);
+      final data = userData.data() as Map<String, dynamic>?;
+
+      if (data != null) {
+        final name = data['name'] as String?;
+        return name != null && name.isNotEmpty;
+      }
+    }
+    return false;
   }
 }

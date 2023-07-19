@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:carive/keys/keys.dart';
 import 'package:carive/main.dart';
 import 'package:carive/screens/host/host_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:http/http.dart' as http;
 
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
   print("Title:${message.notification!.title}");
@@ -74,10 +76,39 @@ class FirebaseApi {
     );
   }
 
-  Future<void> initNotfications() async {
+  Future<void> initNotifications() async {
     await _firebaseMessaging.requestPermission();
     FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
     initPushNotifications();
     initLocalNotifications();
+  }
+
+  Future<http.Response> sendNotification({
+    required String FCMToken,
+    required String message,
+    String? title,
+  }) async {
+    final url = Uri.parse('https://fcm.googleapis.com/fcm/send');
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $fcmServiceKey',
+    };
+
+    final body = {
+      'to': FCMToken,
+      'notification': {'body': message, 'title': title ?? 'caRive'}, 
+      "data": {
+        "title": "Push Notification",
+        "message": "Test Push Notification",
+        "redirect": "product"
+      }
+    };
+
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: json.encode(body),
+    );
+    return response;
   }
 }

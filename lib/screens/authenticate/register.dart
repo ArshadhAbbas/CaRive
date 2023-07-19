@@ -22,7 +22,6 @@ class _RegisterState extends State<Register> {
   TextEditingController passwordController = TextEditingController();
 
   AuthService auth = AuthService();
-  bool isLoading = false; // Add a isLoading state variable
 
   @override
   Widget build(BuildContext context) {
@@ -70,15 +69,14 @@ class _RegisterState extends State<Register> {
                 validator: (value) {
                   if (value!.isEmpty) {
                     return "Please Enter Password";
+                  } else if (value.length < 6) {
+                    return "Weak password,Must be 6 characters";
                   }
                   return null;
                 },
               ),
-              hSizedBox30,
-              isLoading
-                  ? const CustomProgressIndicator()
-                  : CustomElevatedButton(
-                      text: "Register Now", onPressed: _registerButtonPressed),
+              CustomElevatedButton(
+                  text: "Register Now", onPressed: _registerButtonPressed),
               hSizedBox20,
               Text(
                 error,
@@ -93,47 +91,29 @@ class _RegisterState extends State<Register> {
 
   void _registerButtonPressed() async {
     if (formkey.currentState?.validate() ?? false) {
-      FocusScopeNode currentfocus =
-          FocusScope.of(context); //get the currnet focus node
-      if (!currentfocus.hasPrimaryFocus) {
-        //prevent Flutter from throwing an exception
-        currentfocus
-            .unfocus(); //unfocust from current focust, so that keyboard will dismiss
-      }
-      setState(() {
-        isLoading =
-            true; // Set isLoading to true when the registration process starts
-      });
-
+      dismissKeyboard(context);
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Center(
+          child: CustomProgressIndicator(),
+        ),
+      );
       dynamic result = await auth.registerWithEmailAndPAssword(
         emailController.text.trim(),
         passwordController.text.trim(),
       );
+      Navigator.of(context).pop();
 
       if (result == null) {
         setState(() {
           error = 'Invalid email';
-          isLoading = false; // Set isLoading to false if registration fails
         });
       } else if (result == 'email-already-in-use') {
         setState(() {
           error = 'User already exists, Please sign In ';
-          isLoading = false; // Set isLoading to false if registration fails
         });
       } else {
-        try {
-          // final fcmToken = await FirebaseMessaging.instance.getToken();
-          // await FirebaseFirestore.instance
-          //     .collection('FCMTokens')
-          //     .doc(result
-          //         .uid) // Assuming 'result.uid' is the user's unique ID after registration
-          //     .set({'fcmToken': fcmToken, 'UserId': result.uid});
-          // print("fcm:$fcmToken");
-        } catch (e) {
-          print(e.toString());
-        }
-
-        // print('Registered');
         Navigator.pop(context);
       }
     }

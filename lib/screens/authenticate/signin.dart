@@ -20,7 +20,6 @@ class _SignInState extends State<SignIn> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   AuthService auth = AuthService();
-  bool isLoading = false;
   final formkey = GlobalKey<FormState>();
 
   @override
@@ -34,7 +33,7 @@ class _SignInState extends State<SignIn> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Padding(
-                  padding: EdgeInsets.only(top:90.0),
+                  padding: EdgeInsets.only(top: 90.0),
                   child: Text(
                     "Sign In",
                     style: TextStyle(
@@ -90,9 +89,8 @@ class _SignInState extends State<SignIn> {
                           },
                         ),
                         hSizedBox20,
-                        isLoading
-                            ? const CustomProgressIndicator()
-                            : CustomElevatedButton(
+                      
+                             CustomElevatedButton(
                                 text: "Sign In",
                                 onPressed: _signInButtonPressed),
                         hSizedBox20,
@@ -188,30 +186,36 @@ class _SignInState extends State<SignIn> {
   }
 
   void _signInButtonPressed() async {
-    dismissKeyboard(context);
-    if (formkey.currentState?.validate() ?? false) {
-      setState(() {
-        isLoading = true;
-      });
+  dismissKeyboard(context);
+  if (formkey.currentState?.validate() ?? false) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(
+        child: CustomProgressIndicator(),
+      ),
+    );
 
-      dynamic result = await auth.sigINWithEmailAndPassword(
-        emailController.text.trim(),
-        passwordController.text.trim(),
-      );
+    dynamic result = await auth.sigINWithEmailAndPassword(
+      emailController.text.trim(),
+      passwordController.text.trim(),
+    );
+
+    // Check if the widget is still mounted before continuing
+    if (mounted) {
+      Navigator.of(context).pop();
 
       if (result == null) {
-        _showErrorDialog("Sign In Failed !", "Incorrect username or password.");
+        _showErrorDialog("Sign In Failed!", "Incorrect username or password.");
       } else if (result == 'user-not-found') {
         _showErrorDialog("Sign In Failed", "User not found.");
       } else {
-        print("Signed In");
+        // If the result is successful, you can proceed with any necessary actions here
       }
-
-      setState(() {
-        isLoading = false;
-      });
     }
   }
+}
+
 
   void _showErrorDialog(String title, String message) {
     showDialog(

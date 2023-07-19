@@ -52,7 +52,6 @@ class EditCarScreen extends StatefulWidget {
 }
 
 class _EditCarScreenState extends State<EditCarScreen> {
-  bool isLoading = false;
   final _formKey = GlobalKey<FormState>();
 
   TextEditingController modelYearController = TextEditingController();
@@ -114,12 +113,27 @@ class _EditCarScreenState extends State<EditCarScreen> {
             centerTitle: false,
             actions: [
               IconButton(
-                  onPressed: () {
-                    carService.deleteCar(
+                onPressed: () async {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return Center(
+                        child: CustomProgressIndicator(),
+                      );
+                    },
+                  );
+                  try {
+                    await carService.deleteCar(
                         widget.carId, auth.auth.currentUser!.uid);
                     Navigator.of(context).pop();
-                  },
-                  icon: Icon(Icons.delete))
+                    Navigator.of(context).pop();
+                  } catch (e) {
+                    print(e.toString());
+                  }
+                },
+                icon: Icon(Icons.delete),
+              ),
             ],
           ),
           body: SingleChildScrollView(
@@ -174,7 +188,8 @@ class _EditCarScreenState extends State<EditCarScreen> {
                             Positioned(
                               bottom: 0,
                               right: 0,
-                              child: ClipRRect(borderRadius: BorderRadius.circular(20),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
                                 child: Container(
                                   color: themeColorGreen,
                                   child: IconButton(
@@ -183,7 +198,10 @@ class _EditCarScreenState extends State<EditCarScreen> {
                                         ImageSource.gallery,
                                       );
                                     },
-                                    icon: Icon(Icons.edit,color: Colors.white,),
+                                    icon: Icon(
+                                      Icons.edit,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -209,27 +227,31 @@ class _EditCarScreenState extends State<EditCarScreen> {
                     ),
                     child: SizedBox(
                       width: double.infinity,
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButtonFormField<String?>(
-                          validator: (value) =>
-                              value == null ? "Field required" : null,
-                          borderRadius: BorderRadius.circular(20),
-                          isExpanded: true,
-                          icon: Visibility(
-                            visible: false,
-                            child: Icon(Icons.arrow_downward),
-                          ),
-                          dropdownColor: themeColorGrey,
-                          style: TextStyle(color: Colors.white),
-                          value: widget.selectedMake,
-                          items: carDataset.keys.map((e) {
-                            return DropdownMenuItem<String?>(
-                              value: e,
-                              child: Center(child: Text(e)),
-                            );
-                          }).toList(),
-                          onChanged: onCarModelChanged,
+                      child: DropdownButtonFormField<String?>(
+                        decoration: const InputDecoration(
+                          enabledBorder:
+                              UnderlineInputBorder(borderSide: BorderSide.none),
+                          focusedBorder:
+                              UnderlineInputBorder(borderSide: BorderSide.none),
                         ),
+                        validator: (value) =>
+                            value == null ? "Field required" : null,
+                        borderRadius: BorderRadius.circular(20),
+                        isExpanded: true,
+                        icon: Visibility(
+                          visible: false,
+                          child: Icon(Icons.arrow_downward),
+                        ),
+                        dropdownColor: themeColorGrey,
+                        style: TextStyle(color: Colors.white),
+                        value: widget.selectedMake,
+                        items: carDataset.keys.map((e) {
+                          return DropdownMenuItem<String?>(
+                            value: e,
+                            child: Center(child: Text(e)),
+                          );
+                        }).toList(),
+                        onChanged: onCarModelChanged,
                       ),
                     ),
                   ),
@@ -249,34 +271,37 @@ class _EditCarScreenState extends State<EditCarScreen> {
                     ),
                     child: SizedBox(
                       width: double.infinity,
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButtonFormField<String?>(
-                          validator: (value) =>
-                              value == null ? "Field required" : null,
-                          borderRadius: BorderRadius.circular(20),
-                          isExpanded: true,
-                          icon: Visibility(
-                            visible: false,
-                            child: Icon(Icons.arrow_downward),
-                          ),
-                          dropdownColor: themeColorGrey,
-                          style: TextStyle(color: Colors.white),
-                          value: widget.selectedCarModel != null
-                              ? widget.selectedCarModel
-                              : null,
-                          items:
-                              (carDataset[widget.selectedMake] ?? []).map((e) {
-                            return DropdownMenuItem<String?>(
-                              value: e,
-                              child: Center(child: Text('$e')),
-                            );
-                          }).toList(),
-                          onChanged: (val) {
-                            setState(() {
-                              widget.selectedCarModel = val!;
-                            });
-                          },
+                      child: DropdownButtonFormField<String?>(
+                        decoration: const InputDecoration(
+                          enabledBorder:
+                              UnderlineInputBorder(borderSide: BorderSide.none),
+                          focusedBorder:
+                              UnderlineInputBorder(borderSide: BorderSide.none),
                         ),
+                        validator: (value) =>
+                            value == null ? "Field required" : null,
+                        borderRadius: BorderRadius.circular(20),
+                        isExpanded: true,
+                        icon: Visibility(
+                          visible: false,
+                          child: Icon(Icons.arrow_downward),
+                        ),
+                        dropdownColor: themeColorGrey,
+                        style: TextStyle(color: Colors.white),
+                        value: widget.selectedCarModel != null
+                            ? widget.selectedCarModel
+                            : null,
+                        items: (carDataset[widget.selectedMake] ?? []).map((e) {
+                          return DropdownMenuItem<String?>(
+                            value: e,
+                            child: Center(child: Text('$e')),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          setState(() {
+                            widget.selectedCarModel = val!;
+                          });
+                        },
                       ),
                     ),
                   ),
@@ -296,37 +321,41 @@ class _EditCarScreenState extends State<EditCarScreen> {
                     ),
                     child: SizedBox(
                       width: double.infinity,
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButtonFormField<String?>(
-                          validator: (value) =>
-                              value == null ? "Field required" : null,
-                          borderRadius: BorderRadius.circular(20),
-                          isExpanded: true,
-                          icon: Visibility(
-                            visible: false,
-                            child: Icon(Icons.arrow_downward),
-                          ),
-                          dropdownColor: themeColorGrey,
-                          style: TextStyle(color: Colors.white),
-                          value: widget.selectedFuel,
-                          hint: Center(
-                            child: Text(
-                              'Select Fuel type',
-                              style: TextStyle(color: themeColorblueGrey),
-                            ),
-                          ),
-                          items: fuelType.map((e) {
-                            return DropdownMenuItem<String?>(
-                              value: e,
-                              child: Center(child: Text('$e')),
-                            );
-                          }).toList(),
-                          onChanged: (val) {
-                            setState(() {
-                              widget.selectedFuel = val!;
-                            });
-                          },
+                      child: DropdownButtonFormField<String?>(
+                        decoration: const InputDecoration(
+                          enabledBorder:
+                              UnderlineInputBorder(borderSide: BorderSide.none),
+                          focusedBorder:
+                              UnderlineInputBorder(borderSide: BorderSide.none),
                         ),
+                        validator: (value) =>
+                            value == null ? "Field required" : null,
+                        borderRadius: BorderRadius.circular(20),
+                        isExpanded: true,
+                        icon: Visibility(
+                          visible: false,
+                          child: Icon(Icons.arrow_downward),
+                        ),
+                        dropdownColor: themeColorGrey,
+                        style: TextStyle(color: Colors.white),
+                        value: widget.selectedFuel,
+                        hint: Center(
+                          child: Text(
+                            'Select Fuel type',
+                            style: TextStyle(color: themeColorblueGrey),
+                          ),
+                        ),
+                        items: fuelType.map((e) {
+                          return DropdownMenuItem<String?>(
+                            value: e,
+                            child: Center(child: Text('$e')),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          setState(() {
+                            widget.selectedFuel = val!;
+                          });
+                        },
                       ),
                     ),
                   ),
@@ -346,37 +375,41 @@ class _EditCarScreenState extends State<EditCarScreen> {
                     ),
                     child: SizedBox(
                       width: double.infinity,
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButtonFormField<String?>(
-                          validator: (value) =>
-                              value == null ? "Field required" : null,
-                          borderRadius: BorderRadius.circular(20),
-                          isExpanded: true,
-                          icon: Visibility(
-                            visible: false,
-                            child: Icon(Icons.arrow_downward),
-                          ),
-                          dropdownColor: themeColorGrey,
-                          style: TextStyle(color: Colors.white),
-                          value: widget.selectedSeatCapacity,
-                          items: seatCapacity.map((e) {
-                            return DropdownMenuItem<String?>(
-                              value: e,
-                              child: Center(child: Text('$e')),
-                            );
-                          }).toList(),
-                          onChanged: (val) {
-                            setState(() {
-                              widget.selectedSeatCapacity = val!;
-                            });
-                          },
+                      child: DropdownButtonFormField<String?>(
+                        decoration: const InputDecoration(
+                          enabledBorder:
+                              UnderlineInputBorder(borderSide: BorderSide.none),
+                          focusedBorder:
+                              UnderlineInputBorder(borderSide: BorderSide.none),
                         ),
+                        validator: (value) =>
+                            value == null ? "Field required" : null,
+                        borderRadius: BorderRadius.circular(20),
+                        isExpanded: true,
+                        icon: Visibility(
+                          visible: false,
+                          child: Icon(Icons.arrow_downward),
+                        ),
+                        dropdownColor: themeColorGrey,
+                        style: TextStyle(color: Colors.white),
+                        value: widget.selectedSeatCapacity,
+                        items: seatCapacity.map((e) {
+                          return DropdownMenuItem<String?>(
+                            value: e,
+                            child: Center(child: Text('$e')),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          setState(() {
+                            widget.selectedSeatCapacity = val!;
+                          });
+                        },
                       ),
                     ),
                   ),
                   hSizedBox20,
                   Text(
-                    "Model Year",
+                    "Make Year",
                     style: TextStyle(
                       color: themeColorblueGrey,
                       fontSize: 18,
@@ -384,11 +417,12 @@ class _EditCarScreenState extends State<EditCarScreen> {
                   ),
                   hSizedBox10,
                   CustomTextFormField(
+                    keyBoardType: TextInputType.number,
                     controller: modelYearController,
                     validator: (value) =>
                         value == null ? "Enter Model Year" : null,
+                    length: 4,
                   ),
-                  hSizedBox20,
                   Text(
                     "Amount Per Day",
                     style: TextStyle(
@@ -397,32 +431,20 @@ class _EditCarScreenState extends State<EditCarScreen> {
                     ),
                   ),
                   hSizedBox10,
-                  TextFormField(
+                  CustomTextFormField(
+                    keyBoardType: TextInputType.number,
+                    length: 4,
+                    controller: amountController,
                     validator: (value) => value == null ? "Enter amount" : null,
-                    style: TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      hintText: "Enter amount",
-                      hintStyle: TextStyle(color: themeColorblueGrey),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide(color: themeColorGreen),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide(color: themeColorGreen),
-                      ),
-                      suffixIcon: Padding(
-                        padding: const EdgeInsets.all(18.0),
-                        child: Text(
-                          '₹/Day',
-                          style: TextStyle(
-                              color: themeColorblueGrey, fontSize: 20),
-                        ),
+                    suffixIcon: Padding(
+                      padding: const EdgeInsets.all(18.0),
+                      child: Text(
+                        '₹/Day',
+                        style:
+                            TextStyle(color: themeColorblueGrey, fontSize: 12),
                       ),
                     ),
-                    controller: amountController,
                   ),
-                  hSizedBox20,
                   Text(
                     "Location",
                     style: TextStyle(
@@ -433,7 +455,7 @@ class _EditCarScreenState extends State<EditCarScreen> {
                   hSizedBox10,
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: themeColorGreen),
                     ),
                     child: ElevatedButton(
@@ -471,7 +493,7 @@ class _EditCarScreenState extends State<EditCarScreen> {
                         }
                       },
                       child: Padding(
-                        padding: const EdgeInsets.all(18.0),
+                        padding: const EdgeInsets.all(16.0),
                         child: FractionallySizedBox(
                           widthFactor: 1.0,
                           child: Column(
@@ -487,6 +509,7 @@ class _EditCarScreenState extends State<EditCarScreen> {
                       ),
                     ),
                   ),
+                  hSizedBox10,
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -524,44 +547,38 @@ class _EditCarScreenState extends State<EditCarScreen> {
                     ],
                   ),
                   hSizedBox20,
-                  isLoading
-                      ? const CustomProgressIndicator()
-                      : Center(
-                          child: CustomElevatedButton(
-                            text: "Update details",
-                            onPressed: () async {
-                              if (_formKey.currentState!.validate()) {
-                                FocusScopeNode currentfocus =
-                                    FocusScope.of(context);
-                                if (!currentfocus.hasPrimaryFocus) {
-                                  currentfocus.unfocus();
-                                }
-                                setState(() {
-                                  isLoading = true;
-                                });
+                  Center(
+                    child: CustomElevatedButton(
+                      text: "Update details",
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          dismissKeyboard(context);
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) => Center(
+                              child: CustomProgressIndicator(),
+                            ),
+                          );
 
-                                await carService.updateCarDetails(
-                                    carId: widget
-                                        .carId, // Pass the car ID of the car being edited
-                                    carModel: widget.selectedCarModel!,
-                                    make: widget.selectedMake,
-                                    fuelType: widget.selectedFuel,
-                                    seatCapacity: widget.selectedSeatCapacity,
-                                    modelYear: modelYearController.text,
-                                    amount: int.parse(amountController.text),
-                                    location: address!,
-                                    latitude: selectedLocation.latitude,
-                                    longitude: selectedLocation.longitude,
-                                    isAvailable: widget.isAvailable);
-
-                                Navigator.of(context).pop();
-                                setState(() {
-                                  isLoading = false;
-                                });
-                              }
-                            },
-                          ),
-                        )
+                          await carService.updateCarDetails(
+                              carId: widget.carId,
+                              carModel: widget.selectedCarModel!,
+                              make: widget.selectedMake,
+                              fuelType: widget.selectedFuel,
+                              seatCapacity: widget.selectedSeatCapacity,
+                              modelYear: modelYearController.text,
+                              amount: int.parse(amountController.text),
+                              location: address!,
+                              latitude: selectedLocation.latitude,
+                              longitude: selectedLocation.longitude,
+                              isAvailable: widget.isAvailable);
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    ),
+                  )
                 ],
               ),
             ),

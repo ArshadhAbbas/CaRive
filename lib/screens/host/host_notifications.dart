@@ -1,3 +1,4 @@
+import 'package:carive/models/notifcation_model.dart';
 import 'package:carive/services/notification_service.dart';
 import 'package:carive/shared/circular_progress_indicator.dart';
 import 'package:carive/shared/constants.dart';
@@ -90,16 +91,14 @@ class _HostNotificationsState extends State<HostNotifications> {
                     Divider(color: themeColorGreen),
                 itemCount: notifications.length,
                 itemBuilder: (context, index) {
-                  final notification =
-                      notifications[index].data() as Map<String, dynamic>;
-                  final notifcationTimestampString =
-                      notification['timestamp'] as String;
+                  final notificationData = OwnerNotificationsModel.fromJson(
+                      notifications[index].data() as Map<String, dynamic>);
                   final notifcationTimestamp =
-                      DateTime.parse(notifcationTimestampString);
+                      DateTime.parse(notificationData.timestamp);
                   final notifcationFormattedDate =
                       DateFormat('dd/MM hh:mm').format(notifcationTimestamp);
 
-                  final customerId = notification['customerId'] as String;
+                  final customerId = notificationData.customerId;
 
                   return FutureBuilder<Map<String, dynamic>?>(
                     future: getCustomerData(customerId),
@@ -122,7 +121,7 @@ class _HostNotificationsState extends State<HostNotifications> {
                                   as ImageProvider<Object>,
                         ),
                         title: Text(
-                          "${notification['message']}",
+                          notificationData.message,
                           style: const TextStyle(color: Colors.white),
                         ),
                         subtitle: Text(
@@ -130,7 +129,7 @@ class _HostNotificationsState extends State<HostNotifications> {
                           style: TextStyle(color: themeColorblueGrey),
                         ),
                         trailing: Visibility(
-                          visible: !notification['didReply'],
+                          visible: !notificationData.didReply,
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -141,11 +140,11 @@ class _HostNotificationsState extends State<HostNotifications> {
                                 ),
                                 onPressed: () async {
                                   await sendRejectionNotification(
-                                    notification['customerId'] as String,
-                                    notification['car'] as String,
+                                    notificationData.customerId,
+                                    notificationData.car,
                                   );
                                   final notificationId =
-                                      notification['notificationId'] as String;
+                                      notificationData.notificationId;
                                   final ownerNotificationRef = FirebaseFirestore
                                       .instance
                                       .collection('users')
@@ -168,15 +167,15 @@ class _HostNotificationsState extends State<HostNotifications> {
                                 ),
                                 onPressed: () async {
                                   await sendApprovalNotification(
-                                    notification['customerId'] as String,
-                                    notification['car'] as String,
-                                    notification['amount'],
-                                    notification['carId'] as String,
-                                    notification['startDate'],
-                                    notification['endDate'],
+                                    notificationData.customerId,
+                                    notificationData.car,
+                                    notificationData.amount,
+                                    notificationData.carId,
+                                    notificationData.startDate ?? '',
+                                    notificationData.endDate ?? '',
                                   );
                                   final notificationId =
-                                      notification['notificationId'] as String;
+                                      notificationData.notificationId;
                                   final ownerNotificationRef = FirebaseFirestore
                                       .instance
                                       .collection('users')

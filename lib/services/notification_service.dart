@@ -1,5 +1,5 @@
-import 'dart:convert';
-import 'package:carive/keys/keys.dart';
+import 'package:carive/models/notifcation_model.dart';
+import 'package:carive/services/firebase__notification_api.dart';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:carive/services/user_database_service.dart';
@@ -22,34 +22,25 @@ class NotificationService {
     DateTime endDate,
   ) async {
     try {
-      final url = Uri.parse('https://fcm.googleapis.com/fcm/send');
-      final headers = {
-        'Content-Type': 'application/json',
-        'Authorization':
-            'Bearer $fcmServiceKey', // Replace with your server key
-      };
       final dateFormatter = DateFormat('dd/MM');
       final formattedStartDate = dateFormatter.format(startDate);
       final formattedEndDate = dateFormatter.format(endDate);
-
-      final body = {
-        'to': ownerFCMToken,
-        'notification': {
-          'body':
-              '$userName requested for your $carModel from $formattedStartDate to $formattedEndDate .',
-          'title': 'caRive'
-        },
-        "data": {
-          "title": "Push Notification",
-          "message": "Test Push Notification",
-          "redirect": "product"
-        }
-      };
-
-      final response = await http.post(
-        url,
-        headers: headers,
-        body: json.encode(body),
+      final notificationData = OwnerNotificationsModel(
+        amount: amount,
+        car: carModel,
+        carId: carId,
+        customerId: userId,
+        didReply: false,
+        message:
+            '$userName requested for your $carModel from $formattedStartDate to $formattedEndDate ',
+        notificationId: '',
+        timestamp: DateTime.now().toIso8601String(),
+        startDate: startDate.toIso8601String(),
+        endDate: endDate.toIso8601String(),
+      );
+      http.Response response = await FirebaseApi().sendNotification(
+        FCMToken: ownerFCMToken,
+        message: notificationData.message,
       );
 
       if (response.statusCode == 200) {
@@ -66,16 +57,15 @@ class NotificationService {
         // Save the notification data
         await ownerNotificationRef.set({
           'notificationId': notificationId,
-          'message':
-              '$userName requested for your $carModel from $formattedStartDate to $formattedEndDate ',
+          'message': notificationData.message,
           'timestamp': timestamp.toIso8601String(),
-          'startDate': startDate.toIso8601String(),
-          'endDate': endDate.toIso8601String(),
-          'customerId': userId,
-          'didReply': false,
-          'car': carModel,
-          'amount': amount,
-          'carId': carId,
+          'startDate': notificationData.startDate,
+          'endDate': notificationData.endDate,
+          'customerId': notificationData.customerId,
+          'didReply': notificationData.didReply,
+          'car': notificationData.car,
+          'amount': notificationData.amount,
+          'carId': notificationData.carId,
         });
       }
     } catch (e) {
@@ -89,36 +79,14 @@ class NotificationService {
     required String userName,
     required String ownerId,
     required String carModel,
-    required String amount,
+    required int amount,
     required String carId,
   }) async {
     try {
-      final url = Uri.parse('https://fcm.googleapis.com/fcm/send');
-      final headers = {
-        'Content-Type': 'application/json',
-        'Authorization':
-            'Bearer $fcmServiceKey', // Replace with your server key
-      };
-
-      final body = {
-        'to': ownerFCMToken,
-        'notification': {
-          'body': '$userName has paid you an amount of $amount for $carModel.',
-          'title': 'caRive'
-        },
-        "data": {
-          "title": "Push Notification",
-          "message": "Test Push Notification",
-          "redirect": "product"
-        }
-      };
-
-      final response = await http.post(
-        url,
-        headers: headers,
-        body: json.encode(body),
+      http.Response response = await FirebaseApi().sendNotification(
+        FCMToken: ownerFCMToken,
+        message: '$userName has paid you an amount of $amount for $carModel.',
       );
-
       if (response.statusCode == 200) {
         final timestamp = DateTime.now();
 
@@ -159,30 +127,9 @@ class NotificationService {
     String endDate,
   ) async {
     try {
-      final url = Uri.parse('https://fcm.googleapis.com/fcm/send');
-      final headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $fcmServiceKey',
-      };
-
-      final body = {
-        'to': customerFcmToken,
-        'notification': {
-          'body': 'Your request for $carModel has been approved.',
-          'title': 'caRive'
-        },
-        'data': {
-          'title': 'Push Notification',
-          'message': 'Request Approved',
-          'redirect': 'product'
-        }
-      };
-
-      final response = await http.post(
-        url,
-        headers: headers,
-        body: json.encode(body),
-      );
+      http.Response response = await FirebaseApi().sendNotification(
+          FCMToken: customerFcmToken,
+          message: 'Your request for $carModel has been approved.');
 
       if (response.statusCode == 200) {
         final timestamp = DateTime.now();
@@ -227,30 +174,9 @@ class NotificationService {
     String carModel,
   ) async {
     try {
-      final url = Uri.parse('https://fcm.googleapis.com/fcm/send');
-      final headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $fcmServiceKey',
-      };
-
-      final body = {
-        'to': customerFcmToken,
-        'notification': {
-          'body': 'Your request for $carModel has been rejected.',
-          'title': 'caRive'
-        },
-        'data': {
-          'title': 'Push Notification',
-          'message': 'Request Rejected',
-          'redirect': 'product'
-        }
-      };
-
-      final response = await http.post(
-        url,
-        headers: headers,
-        body: json.encode(body),
-      );
+      http.Response response = await FirebaseApi().sendNotification(
+          FCMToken: customerFcmToken,
+          message: 'Your request for $carModel has been rejected.');
 
       if (response.statusCode == 200) {
         final timestamp = DateTime.now();
@@ -283,4 +209,6 @@ class NotificationService {
       print('Error sending rejection notification: $e');
     }
   }
+
+ 
 }

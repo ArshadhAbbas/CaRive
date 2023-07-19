@@ -23,8 +23,6 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
   Set<Marker> markers = {}; // Set to hold the selected marker
   LatLng? selectedLatLng; // Variable to store the selected LatLng
   bool isCurrentLocationSelected = false;
-  bool isLoading = false;
-
   @override
   void dispose() {
     googleMapController.dispose();
@@ -50,8 +48,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
           position: latLng,
         ),
       );
-    }
-    );
+    });
   }
 
   Future<LatLng> getCurrentLocation() async {
@@ -65,11 +62,18 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
     PermissionStatus permissionStatus = await Permission.location.request();
 
     if (permissionStatus.isGranted) {
-      setState(() {
-        isLoading = true; // Set loading state to true
-      });
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Center(
+          child: CustomProgressIndicator(),
+        ),
+      );
+
 
       LatLng currentLocation = await getCurrentLocation();
+      Navigator.of(context).pop();
+
       getAddress(currentLocation);
 
       setState(() {
@@ -83,8 +87,6 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
           ),
         );
         isCurrentLocationSelected = true;
-        isLoading =
-            false; // Set loading state to false after retrieving the current location
       });
 
       // Animate the camera to the current location
@@ -185,9 +187,6 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                   paddingVertical: 3,
                 )),
           ),
-
-          if (isLoading)
-            const CustomProgressIndicator(), // Show circular progress indicator while loading
         ],
       ),
       floatingActionButton: FloatingActionButton(

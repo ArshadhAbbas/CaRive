@@ -1,20 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-class ChatMessage {
+class ChatMessageModel {
   final String messageId;
   final String senderId;
   final String textMessage;
   final Timestamp time;
 
-  ChatMessage({
+  ChatMessageModel({
     required this.messageId,
     required this.senderId,
     required this.textMessage,
     required this.time,
   });
 
-  factory ChatMessage.fromSnapshot(QueryDocumentSnapshot snapshot) {
+  factory ChatMessageModel.fromSnapshot(QueryDocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
-    return ChatMessage(
+    return ChatMessageModel(
       messageId: data['messageId'],
       senderId: data['senderId'],
       textMessage: data['textMessage'],

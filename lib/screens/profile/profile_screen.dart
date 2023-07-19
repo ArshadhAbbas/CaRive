@@ -8,14 +8,13 @@ import 'package:carive/screens/profile/edit%20profile/edit_profile_screen.dart';
 import 'package:carive/services/auth.dart';
 import 'package:carive/services/user_database_service.dart';
 import 'package:carive/shared/constants.dart';
-import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 // ignore: must_be_immutable
 class ProfileScreen extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  UserDatabaseService userDatabaseService = UserDatabaseService();
+  // UserDatabaseService userDatabaseService = UserDatabaseService();
   AuthService auth = AuthService();
 
   @override
@@ -25,7 +24,7 @@ class ProfileScreen extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Display a loading indicator if data is still loading
-         const CustomProgressIndicator();
+          const CustomProgressIndicator();
         }
         if (snapshot.hasError) {
           // Display an error message if there's an error in fetching the data
@@ -34,7 +33,7 @@ class ProfileScreen extends StatelessWidget {
           );
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-           return Scaffold(
+          return Scaffold(
             extendBodyBehindAppBar: true,
             floatingActionButton: Center(
               child: FloatingActionButton.extended(
@@ -171,58 +170,6 @@ class ProfileScreen extends StatelessWidget {
                               ),
                             ),
                           ],
-                        ),
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: IconButton(
-                            onPressed: () async {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    titleTextStyle: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    contentTextStyle:
-                                        const TextStyle(color: Colors.white),
-                                    backgroundColor: const Color(0xFF1E1E1E),
-                                    title: const Text('Delete !?'),
-                                    content: const Text(
-                                        'All your posts will be deleted.This action cannot be undone'),
-                                    actions: [
-                                      TextButton(
-                                        child: const Text(
-                                          'Cancel',
-                                          style:
-                                              TextStyle(color: Colors.white),
-                                        ),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                      CustomElevatedButton(
-                                        text: "Ok",
-                                        onPressed: () {
-                                          userDatabaseService.deleteUser(
-                                              auth.auth.currentUser!.uid);
-                                          Navigator.pop(context);
-                                        },
-                                        paddingHorizontal: 8,
-                                        paddingVertical: 8,
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                            icon: const Icon(
-                              Icons.delete,
-                              color: Colors.white,
-                            ),
-                            tooltip: "Delete Account",
-                          ),
                         ),
                       ],
                     ),

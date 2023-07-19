@@ -7,6 +7,7 @@ class UserModel {
   final String phoneNumber;
   final String image;
   final String address;
+  final String? fcmToken;
 
   UserModel({
     required this.id,
@@ -15,6 +16,7 @@ class UserModel {
     required this.phoneNumber,
     required this.image,
     required this.address,
+    this.fcmToken,
   });
 
   factory UserModel.fromDocumentSnapshot(DocumentSnapshot snapshot) {
@@ -27,10 +29,11 @@ class UserModel {
       phoneNumber: data?['phone_number'] ?? '',
       image: data?['image'] ?? '',
       address: data?['address'] ?? '',
+      fcmToken: data?['fcmToken'] ?? '',
     );
   }
 
-   Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap() {
     return {
       'id': id,
       'name': name,
@@ -38,7 +41,6 @@ class UserModel {
       'phone_number': phoneNumber,
       'image': image,
       'address': address,
-
     };
   }
 }

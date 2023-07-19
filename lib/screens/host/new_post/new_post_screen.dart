@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:carive/screens/host/new_post/location__selection_screen.dart';
@@ -29,7 +31,6 @@ class _NewPostScreenState extends State<NewPostScreen> {
   String? selectedFuel;
   String? selectedSeatCapacity;
 
-  bool isLoading = false;
   final _formKey = GlobalKey<FormState>();
 
   TextEditingController modelYearController = TextEditingController();
@@ -37,6 +38,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
   TextEditingController addInfoController = TextEditingController();
   LatLng? selectedLocation;
   String? address;
+  bool hasSelectedImage = false;
 
   AuthService auth = AuthService();
   final CarService carService = CarService();
@@ -86,6 +88,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                       stream: carService.selectedImageStream,
                       builder: (context, snapshot) {
                         final File? selectedImage = snapshot.data;
+                        hasSelectedImage = selectedImage != null;
                         return selectedImage == null
                             ? GestureDetector(
                                 onTap: () async {
@@ -118,23 +121,13 @@ class _NewPostScreenState extends State<NewPostScreen> {
                                   await carService
                                       .getImage(ImageSource.gallery);
                                 },
-                                child: Container(
-                                  height: 200,
-                                  width: 200,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Colors.white60.withOpacity(0.13),
-                                        Colors.white10,
-                                      ],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomCenter,
-                                    ),
-                                  ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
                                   child: Image(
                                     image: FileImage(selectedImage),
                                     fit: BoxFit.cover,
+                                    height: 200,
+                                    width: 200,
                                   ),
                                 ),
                               );
@@ -157,27 +150,31 @@ class _NewPostScreenState extends State<NewPostScreen> {
                     ),
                     child: SizedBox(
                       width: double.infinity,
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButtonFormField<String?>(
-                          validator: (value) =>
-                              value == null ? "Field required" : null,
-                          borderRadius: BorderRadius.circular(20),
-                          isExpanded: true,
-                          icon: const Visibility(
-                            visible: false,
-                            child: Icon(Icons.arrow_downward),
-                          ),
-                          dropdownColor: themeColorGrey,
-                          style: const TextStyle(color: Colors.white),
-                          value: selectedMake,
-                          items: carDataset.keys.map((e) {
-                            return DropdownMenuItem<String?>(
-                              value: e,
-                              child: Center(child: Text(e)),
-                            );
-                          }).toList(),
-                          onChanged: onCarModelChanged,
+                      child: DropdownButtonFormField<String?>(
+                        decoration: const InputDecoration(
+                          enabledBorder:
+                              UnderlineInputBorder(borderSide: BorderSide.none),
+                          focusedBorder:
+                              UnderlineInputBorder(borderSide: BorderSide.none),
                         ),
+                        validator: (value) =>
+                            value == null ? "Field required" : null,
+                        borderRadius: BorderRadius.circular(20),
+                        isExpanded: true,
+                        icon: const Visibility(
+                          visible: false,
+                          child: Icon(Icons.arrow_downward),
+                        ),
+                        dropdownColor: themeColorGrey,
+                        style: const TextStyle(color: Colors.white),
+                        value: selectedMake,
+                        items: carDataset.keys.map((e) {
+                          return DropdownMenuItem<String?>(
+                            value: e,
+                            child: Center(child: Text(e)),
+                          );
+                        }).toList(),
+                        onChanged: onCarModelChanged,
                       ),
                     ),
                   ),
@@ -197,31 +194,35 @@ class _NewPostScreenState extends State<NewPostScreen> {
                     ),
                     child: SizedBox(
                       width: double.infinity,
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButtonFormField<String?>(
-                          validator: (value) =>
-                              value == null ? "Field required" : null,
-                          borderRadius: BorderRadius.circular(20),
-                          isExpanded: true,
-                          icon: const Visibility(
-                            visible: false,
-                            child: Icon(Icons.arrow_downward),
-                          ),
-                          dropdownColor: themeColorGrey,
-                          style: const TextStyle(color: Colors.white),
-                          value: selectedCarModel,
-                          items: (carDataset[selectedMake] ?? []).map((e) {
-                            return DropdownMenuItem<String?>(
-                              value: e,
-                              child: Center(child: Text('$e')),
-                            );
-                          }).toList(),
-                          onChanged: (val) {
-                            setState(() {
-                              selectedCarModel = val!;
-                            });
-                          },
+                      child: DropdownButtonFormField<String?>(
+                        decoration: const InputDecoration(
+                          enabledBorder:
+                              UnderlineInputBorder(borderSide: BorderSide.none),
+                          focusedBorder:
+                              UnderlineInputBorder(borderSide: BorderSide.none),
                         ),
+                        validator: (value) =>
+                            value == null ? "Field required" : null,
+                        borderRadius: BorderRadius.circular(20),
+                        isExpanded: true,
+                        icon: const Visibility(
+                          visible: false,
+                          child: Icon(Icons.arrow_downward),
+                        ),
+                        dropdownColor: themeColorGrey,
+                        style: const TextStyle(color: Colors.white),
+                        value: selectedCarModel,
+                        items: (carDataset[selectedMake] ?? []).map((e) {
+                          return DropdownMenuItem<String?>(
+                            value: e,
+                            child: Center(child: Text(e)),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          setState(() {
+                            selectedCarModel = val!;
+                          });
+                        },
                       ),
                     ),
                   ),
@@ -241,31 +242,35 @@ class _NewPostScreenState extends State<NewPostScreen> {
                     ),
                     child: SizedBox(
                       width: double.infinity,
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButtonFormField<String?>(
-                          validator: (value) =>
-                              value == null ? "Field required" : null,
-                          borderRadius: BorderRadius.circular(20),
-                          isExpanded: true,
-                          icon: const Visibility(
-                            visible: false,
-                            child: Icon(Icons.arrow_downward),
-                          ),
-                          dropdownColor: themeColorGrey,
-                          style: const TextStyle(color: Colors.white),
-                          value: selectedFuel,
-                          items: fuelType.map((e) {
-                            return DropdownMenuItem<String?>(
-                              value: e,
-                              child: Center(child: Text('$e')),
-                            );
-                          }).toList(),
-                          onChanged: (val) {
-                            setState(() {
-                              selectedFuel = val!;
-                            });
-                          },
+                      child: DropdownButtonFormField<String?>(
+                        decoration: const InputDecoration(
+                          enabledBorder:
+                              UnderlineInputBorder(borderSide: BorderSide.none),
+                          focusedBorder:
+                              UnderlineInputBorder(borderSide: BorderSide.none),
                         ),
+                        validator: (value) =>
+                            value == null ? "Field required" : null,
+                        borderRadius: BorderRadius.circular(20),
+                        isExpanded: true,
+                        icon: const Visibility(
+                          visible: false,
+                          child: Icon(Icons.arrow_downward),
+                        ),
+                        dropdownColor: themeColorGrey,
+                        style: const TextStyle(color: Colors.white),
+                        value: selectedFuel,
+                        items: fuelType.map((e) {
+                          return DropdownMenuItem<String?>(
+                            value: e,
+                            child: Center(child: Text(e)),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          setState(() {
+                            selectedFuel = val!;
+                          });
+                        },
                       ),
                     ),
                   ),
@@ -285,31 +290,35 @@ class _NewPostScreenState extends State<NewPostScreen> {
                     ),
                     child: SizedBox(
                       width: double.infinity,
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButtonFormField<String?>(
-                          validator: (value) =>
-                              value == null ? "Field required" : null,
-                          borderRadius: BorderRadius.circular(20),
-                          isExpanded: true,
-                          icon: const Visibility(
-                            visible: false,
-                            child: Icon(Icons.arrow_downward),
-                          ),
-                          dropdownColor: themeColorGrey,
-                          style: const TextStyle(color: Colors.white),
-                          value: selectedSeatCapacity,
-                          items: seatCapacity.map((e) {
-                            return DropdownMenuItem<String?>(
-                              value: e,
-                              child: Center(child: Text('$e')),
-                            );
-                          }).toList(),
-                          onChanged: (val) {
-                            setState(() {
-                              selectedSeatCapacity = val!;
-                            });
-                          },
+                      child: DropdownButtonFormField<String?>(
+                        decoration: const InputDecoration(
+                          enabledBorder:
+                              UnderlineInputBorder(borderSide: BorderSide.none),
+                          focusedBorder:
+                              UnderlineInputBorder(borderSide: BorderSide.none),
                         ),
+                        validator: (value) =>
+                            value == null ? "Field required" : null,
+                        borderRadius: BorderRadius.circular(20),
+                        isExpanded: true,
+                        icon: const Visibility(
+                          visible: false,
+                          child: Icon(Icons.arrow_downward),
+                        ),
+                        dropdownColor: themeColorGrey,
+                        style: const TextStyle(color: Colors.white),
+                        value: selectedSeatCapacity,
+                        items: seatCapacity.map((e) {
+                          return DropdownMenuItem<String?>(
+                            value: e,
+                            child: Center(child: Text(e)),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          setState(() {
+                            selectedSeatCapacity = val!;
+                          });
+                        },
                       ),
                     ),
                   ),
@@ -323,11 +332,12 @@ class _NewPostScreenState extends State<NewPostScreen> {
                   ),
                   hSizedBox10,
                   CustomTextFormField(
+                    keyBoardType: TextInputType.number,
                     controller: modelYearController,
                     validator: (value) =>
                         value == null ? "Enter Model Year" : null,
+                    length: 4,
                   ),
-                  hSizedBox20,
                   Text(
                     "Amount Per Day",
                     style: TextStyle(
@@ -336,30 +346,20 @@ class _NewPostScreenState extends State<NewPostScreen> {
                     ),
                   ),
                   hSizedBox10,
-                  TextFormField(
+                  CustomTextFormField(
+                    keyBoardType: TextInputType.number,
+                    length: 4,
+                    controller: amountController,
                     validator: (value) => value == null ? "Enter amount" : null,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide(color: themeColorGreen),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide(color: themeColorGreen),
-                      ),
-                      suffixIcon: Padding(
-                        padding: const EdgeInsets.all(18.0),
-                        child: Text(
-                          '₹/Day',
-                          style: TextStyle(
-                              color: themeColorblueGrey, fontSize: 20),
-                        ),
+                    suffixIcon: Padding(
+                      padding: const EdgeInsets.all(18.0),
+                      child: Text(
+                        '₹/Day',
+                        style:
+                            TextStyle(color: themeColorblueGrey, fontSize: 12),
                       ),
                     ),
-                    controller: amountController,
                   ),
-                  hSizedBox20,
                   Text(
                     "Location",
                     style: TextStyle(
@@ -370,7 +370,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                   hSizedBox10,
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: themeColorGreen),
                     ),
                     child: ElevatedButton(
@@ -378,10 +378,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                         backgroundColor: Colors.transparent,
                       ),
                       onPressed: () async {
-                        FocusScopeNode currentfocus = FocusScope.of(context);
-                        if (!currentfocus.hasPrimaryFocus) {
-                          currentfocus.unfocus();
-                        }
+                        dismissKeyboard(context);
                         final selectedLatLng = await Navigator.push<LatLng>(
                           context,
                           MaterialPageRoute(
@@ -406,7 +403,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                         }
                       },
                       child: Padding(
-                        padding: const EdgeInsets.all(18.0),
+                        padding: const EdgeInsets.all(16.0),
                         child: FractionallySizedBox(
                           widthFactor: 1.0,
                           child: selectedLocation == null
@@ -424,66 +421,72 @@ class _NewPostScreenState extends State<NewPostScreen> {
                     ),
                   ),
                   hSizedBox20,
-                  isLoading
-                      ? const CustomProgressIndicator()
-                      : Center(
-                          child: CustomElevatedButton(
-                            text: "Post",
-                            onPressed: () async {
-                              if (_formKey.currentState!.validate()) {
-                                if (selectedLocation == null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Center(
-                                          child:
-                                              Text('Please select a location')),
-                                      duration: Duration(seconds: 3),
-                                    ),
-                                  );
-                                  return;
-                                }
+                  Center(
+                    child: CustomElevatedButton(
+                      text: "Post",
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          if (!hasSelectedImage) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Center(
+                                    child: Text('Please select an image')),
+                                duration: Duration(seconds: 3),
+                              ),
+                            );
+                            return;
+                          }
 
-                                FocusScopeNode currentfocus =
-                                    FocusScope.of(context);
-                                if (!currentfocus.hasPrimaryFocus) {
-                                  currentfocus.unfocus();
-                                }
+                          if (selectedLocation == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Center(
+                                    child: Text('Please select a location')),
+                                duration: Duration(seconds: 3),
+                              ),
+                            );
+                            return;
+                          }
 
-                                setState(() {
-                                  isLoading = true;
-                                });
-                                final fcmToken =
-                                    await FirebaseMessaging.instance.getToken();
-                                print("FCM:$fcmToken");
-                                await carService.postNewCar(
-                                  latitude: selectedLocation!.latitude,
-                                  longitude: selectedLocation!.longitude,
-                                  ownerFcmToken: fcmToken!,
-                                  uid: auth.auth.currentUser!.uid,
-                                  carModel: selectedCarModel!,
-                                  make: selectedMake!,
-                                  fuelType: selectedFuel!,
-                                  seatCapacity: selectedSeatCapacity!,
-                                  modelYear: modelYearController.text,
-                                  amount: int.parse(amountController.text),
-                                  location: address!,
-                                  isAvailable: true,
-                                );
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Center(
-                                        child: Text('New car has been posted')),
-                                    duration: Duration(seconds: 3),
-                                  ),
-                                );
-                                Navigator.of(context).pop();
-                                setState(() {
-                                  isLoading = false;
-                                });
-                              }
-                            },
-                          ),
-                        )
+                          dismissKeyboard(context);
+
+                          final fcmToken =
+                              await FirebaseMessaging.instance.getToken();
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) => Center(
+                              child: CustomProgressIndicator(),
+                            ),
+                          );
+                          await carService.postNewCar(
+                            latitude: selectedLocation!.latitude,
+                            longitude: selectedLocation!.longitude,
+                            ownerFcmToken: fcmToken!,
+                            uid: auth.auth.currentUser!.uid,
+                            carModel: selectedCarModel!,
+                            make: selectedMake!,
+                            fuelType: selectedFuel!,
+                            seatCapacity: selectedSeatCapacity!,
+                            modelYear: modelYearController.text,
+                            amount: int.parse(amountController.text),
+                            location: address!,
+                            isAvailable: true,
+                          );
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Center(
+                                  child: Text('New car has been posted')),
+                              duration: Duration(seconds: 3),
+                            ),
+                          );
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    ),
+                  )
                 ],
               ),
             ),

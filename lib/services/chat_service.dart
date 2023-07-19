@@ -1,5 +1,7 @@
 import 'package:carive/models/chat_model.dart';
+import 'package:carive/services/firebase__notification_api.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ChatService {
   final CollectionReference userCollectionReference =
       FirebaseFirestore.instance.collection("users");
@@ -8,6 +10,7 @@ class ChatService {
     String senderId,
     String receiverId,
     String message,
+    String FCMToken,
   ) async {
     final senderChatCollectionReference =
         userCollectionReference.doc(senderId).collection("chats");
@@ -26,7 +29,7 @@ class ChatService {
     final senderMessageDocumentReference = senderMessagesReference.doc();
     final senderMessageId = senderMessageDocumentReference.id;
 
-    final senderChatMessage = ChatMessage(
+    final senderChatMessage = ChatMessageModel(
       messageId: senderMessageId,
       senderId: senderId,
       textMessage: message,
@@ -52,7 +55,7 @@ class ChatService {
     final receiverMessageDocumentReference = receiverMessagesReference.doc();
     final receiverMessageId = receiverMessageDocumentReference.id;
 
-    final receiverChatMessage = ChatMessage(
+    final receiverChatMessage = ChatMessageModel(
       messageId: receiverMessageId,
       senderId: senderId,
       textMessage: message,
@@ -61,5 +64,12 @@ class ChatService {
 
     await receiverMessageDocumentReference
         .set(receiverChatMessage.toSnapshot());
+
+        
+    final String senderName =
+        (await userCollectionReference.doc(senderId).get()).get('name');
+
+    FirebaseApi().sendNotification(
+        FCMToken: FCMToken, message: message, title: senderName);
   }
 }

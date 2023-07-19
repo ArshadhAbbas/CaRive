@@ -71,6 +71,13 @@ class _ChatScreenState extends State<ChatScreen> {
                     if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     }
+                    if (!snapshot.hasData || !snapshot.data!.exists) {
+                      // User not found, hide the chat tile
+                      return Visibility(
+                        visible: false,
+                        child: Container(),
+                      );
+                    }
 
                     if (!snapshot.hasData) {
                       return const CircularProgressIndicator();
@@ -134,6 +141,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             userImage: chatUser.image,
                             userName: chatUser.name,
                             userId: chatUser.id,
+                            fcmToken: chatUser.fcmToken,
                           ),
                         ));
                       },
