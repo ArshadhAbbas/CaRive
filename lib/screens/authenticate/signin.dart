@@ -64,6 +64,7 @@ class _SignInState extends State<SignIn> {
                     child: Column(
                       children: [
                         CustomTextFormField(
+                          keyBoardType: TextInputType.emailAddress,
                           hintText: 'Email',
                           labelText: 'Email',
                           controller: emailController,
@@ -89,10 +90,8 @@ class _SignInState extends State<SignIn> {
                           },
                         ),
                         hSizedBox20,
-                      
-                             CustomElevatedButton(
-                                text: "Sign In",
-                                onPressed: _signInButtonPressed),
+                        CustomElevatedButton(
+                            text: "Sign In", onPressed: _signInButtonPressed),
                         hSizedBox20,
                         GestureDetector(
                           onTap: () {
@@ -101,11 +100,11 @@ class _SignInState extends State<SignIn> {
                                 borderRadius: BorderRadius.vertical(
                                     top: Radius.circular(25)),
                               ),
-                              backgroundColor: const Color(0xFF1E1E1E),
+                              backgroundColor: themeColorGrey,
                               isScrollControlled: true,
                               context: context,
                               builder: (context) {
-                                return const Wrap(
+                                return Wrap(
                                   children: [
                                     Register(),
                                   ],
@@ -186,36 +185,36 @@ class _SignInState extends State<SignIn> {
   }
 
   void _signInButtonPressed() async {
-  dismissKeyboard(context);
-  if (formkey.currentState?.validate() ?? false) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Center(
-        child: CustomProgressIndicator(),
-      ),
-    );
+    dismissKeyboard(context);
+    if (formkey.currentState?.validate() ?? false) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Center(
+          child: CustomProgressIndicator(),
+        ),
+      );
 
-    dynamic result = await auth.sigINWithEmailAndPassword(
-      emailController.text.trim(),
-      passwordController.text.trim(),
-    );
+      dynamic result = await auth.sigINWithEmailAndPassword(
+        emailController.text.trim(),
+        passwordController.text.trim(),
+      );
 
-    // Check if the widget is still mounted before continuing
-    if (mounted) {
-      Navigator.of(context).pop();
+      // Check if the widget is still mounted before continuing
+      if (mounted) {
+        Navigator.of(context).pop();
 
-      if (result == null) {
-        _showErrorDialog("Sign In Failed!", "Incorrect username or password.");
-      } else if (result == 'user-not-found') {
-        _showErrorDialog("Sign In Failed", "User not found.");
-      } else {
-        // If the result is successful, you can proceed with any necessary actions here
+        if (result == null) {
+          _showErrorDialog(
+              "Sign In Failed!", "Incorrect username or password.");
+        } else if (result == 'user-not-found') {
+          _showErrorDialog("Sign In Failed", "User not found.");
+        } else {
+          // If the result is successful, you can proceed with any necessary actions here
+        }
       }
     }
   }
-}
-
 
   void _showErrorDialog(String title, String message) {
     showDialog(

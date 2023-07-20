@@ -4,92 +4,111 @@ import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:carive/shared/custom_text_form_field.dart';
 import 'package:carive/shared/logo.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../services/auth.dart';
+import '../../providers/register_screen_provider.dart'; // Import the RegisterScreenProvider
 
 class Register extends StatefulWidget {
-  const Register({super.key});
+  const Register({Key? key});
 
   @override
   State<Register> createState() => _RegisterState();
 }
 
 class _RegisterState extends State<Register> {
-  String error = '';
   final formkey = GlobalKey<FormState>();
-
   TextEditingController emailController = TextEditingController();
-
   TextEditingController passwordController = TextEditingController();
 
-  AuthService auth = AuthService();
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<RegisterScreenProvider>(context, listen: false).error = '';
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding:
-          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: formkey,
-          child: Column(
-            children: [
-              Row(
+    return Consumer<RegisterScreenProvider>(
+      builder: (context, registerScreenProvider, _) {
+        return Container(
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            child: Form(
+              key: formkey,
+              child: Column(
                 children: [
-                  const LogoWidget(30, 30),
-                  wSizedBox20,
-                  const Text(
-                    "Register",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold),
+                  Row(
+                    children: [
+                      const LogoWidget(30, 30),
+                      wSizedBox20,
+                      const Text(
+                        "Register",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  hSizedBox30,
+                  CustomTextFormField(
+                    hintText: 'Email',
+                    labelText: 'Email',
+                    controller: emailController,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return "Please Enter Email";
+                      }
+                      return null;
+                    },
+                  ),
+                  hSizedBox30,
+                  CustomTextFormField(
+                    hintText: 'Password',
+                    labelText: 'Password',
+                    controller: passwordController,
+                    obscureText: true,
+                    isEye: true,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return "Please Enter Password";
+                      } else if (value.length < 6) {
+                        return "Weak password, Must be 6 characters";
+                      }
+                      return null;
+                    },
+                  ),
+                  hSizedBox30,
+                  CustomElevatedButton(
+                    text: "Register Now",
+                    onPressed: () => _registerButtonPressed(
+                      context,
+                      emailController.text,
+                      passwordController.text,
+                    ),
+                  ),
+                  hSizedBox20,
+                  Text(
+                    registerScreenProvider.error,
+                    style: const TextStyle(color: Colors.red),
                   ),
                 ],
               ),
-              hSizedBox30,
-              CustomTextFormField(
-                hintText: 'Email',
-                labelText: 'Email',
-                controller: emailController,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "Please Enter Email";
-                  }
-                  return null;
-                },
-              ),
-              hSizedBox30,
-              CustomTextFormField(
-                hintText: 'Password',
-                labelText: 'Password',
-                controller: passwordController,
-                obscureText: true,
-                isEye: true,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "Please Enter Password";
-                  } else if (value.length < 6) {
-                    return "Weak password,Must be 6 characters";
-                  }
-                  return null;
-                },
-              ),
-              CustomElevatedButton(
-                  text: "Register Now", onPressed: _registerButtonPressed),
-              hSizedBox20,
-              Text(
-                error,
-                style: const TextStyle(color: Colors.red),
-              )
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  void _registerButtonPressed() async {
+  void _registerButtonPressed(
+    BuildContext context,
+    String email,
+    String password,
+  ) async {
     if (formkey.currentState?.validate() ?? false) {
       dismissKeyboard(context);
       showDialog(
@@ -99,20 +118,19 @@ class _RegisterState extends State<Register> {
           child: CustomProgressIndicator(),
         ),
       );
+      AuthService auth = AuthService();
       dynamic result = await auth.registerWithEmailAndPAssword(
-        emailController.text.trim(),
-        passwordController.text.trim(),
+        email.trim(),
+        password.trim(),
       );
       Navigator.of(context).pop();
 
+      final registerScreenProvider =
+          Provider.of<RegisterScreenProvider>(context, listen: false);
       if (result == null) {
-        setState(() {
-          error = 'Invalid email';
-        });
+        registerScreenProvider.setError('Invalid email');
       } else if (result == 'email-already-in-use') {
-        setState(() {
-          error = 'User already exists, Please sign In ';
-        });
+        registerScreenProvider.setError('User already exists, Please sign In');
       } else {
         Navigator.pop(context);
       }

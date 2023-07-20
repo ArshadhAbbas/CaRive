@@ -40,6 +40,9 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      textCapitalization: widget.keyBoardType == TextInputType.text
+          ? TextCapitalization.words
+          : TextCapitalization.none,
       maxLength: widget.length,
       keyboardType: widget.keyBoardType,
       validator: widget.validator,
@@ -75,7 +78,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(color: themeColorGreen),
         ),
-        contentPadding: EdgeInsets.symmetric(vertical: 16,horizontal: 10),
+        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 10),
       ),
     );
   }

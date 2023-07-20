@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:carive/models/user_model.dart';
+import 'package:carive/providers/booking_dateRange_provider.dart';
 import 'package:carive/services/wishlist_service.dart';
 import 'package:custom_date_range_picker/custom_date_range_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,6 +14,7 @@ import 'package:carive/services/user_database_service.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:carive/shared/custom_scaffold.dart';
+import 'package:provider/provider.dart';
 
 import '../../../services/notification_service.dart';
 import '../../../shared/circular_progress_indicator.dart';
@@ -51,9 +53,6 @@ class CarDetails extends StatefulWidget {
   double latitude;
   double longitude;
 
-  DateTime? start;
-  DateTime? end;
-
   @override
   State<CarDetails> createState() => _CarDetailsState();
 }
@@ -72,6 +71,13 @@ class _CarDetailsState extends State<CarDetails> {
       coords: launcher.Coords(location.latitude, location.longitude),
       title: "Car Location",
     );
+  }
+
+  @override
+  void initState() {
+    context.read<BookingDateRangeProvider>().startDate = null;
+    context.read<BookingDateRangeProvider>().endDate = null;
+    super.initState();
   }
 
   @override
@@ -396,7 +402,7 @@ class _CarDetailsState extends State<CarDetails> {
                                 child: ElevatedButton(
                                   onPressed: () async {
                                     widget.isAvailable
-                                        ? bookingDialogueBox()
+                                        ? bookingDialogueBox(context)
                                         : null;
                                   },
                                   style: ButtonStyle(
@@ -445,102 +451,107 @@ class _CarDetailsState extends State<CarDetails> {
 //
 //
 
-  Future<dynamic> bookingDialogueBox() {
-    widget.start = null;
-    widget.end = null;
+  Future<dynamic> bookingDialogueBox(BuildContext context) {
+    final dateRangeProvider =
+        Provider.of<BookingDateRangeProvider>(context, listen: false);
+    context.read<BookingDateRangeProvider>().startDate = null;
+    context.read<BookingDateRangeProvider>().endDate = null;
     return showDialog(
       context: context,
       builder: (context1) {
-        return StatefulBuilder(builder: (context1, setState) {
-          return AlertDialog(
-            titleTextStyle: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+        return AlertDialog(
+          titleTextStyle: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+          contentTextStyle: const TextStyle(color: Colors.white),
+          backgroundColor: themeColorGrey,
+          content: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: themeColorGreen),
             ),
-            contentTextStyle: const TextStyle(color: Colors.white),
-            backgroundColor: themeColorGrey,
-            content: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: themeColorGreen),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
               ),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                ),
-                onPressed: () {
-                  customDateRangePicker(context, setState);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(18.0),
-                  child: widget.start == null
-                      ? const Text("Select Date Range")
-                      : Text(
-                          '${widget.start != null ? DateFormat("dd/MMM/yyyy").format(widget.start!) : '-'} - ${widget.end != null ? DateFormat("dd/MMM/yyyy").format(widget.end!) : '-'}',
-                        ),
+              onPressed: () {
+                customDateRangePicker(context);
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(18.0),
+                child: Consumer<BookingDateRangeProvider>(
+                  builder: (context, dateRangeProvider, _) {
+                    return dateRangeProvider.startDate == null
+                        ? const Text("Select Date Range")
+                        : Text(
+                            '${dateRangeProvider.startDate != null ? DateFormat("dd/MMM/yyyy").format(dateRangeProvider.startDate!) : '-'} - ${dateRangeProvider.endDate != null ? DateFormat("dd/MMM/yyyy").format(dateRangeProvider.endDate!) : '-'}',
+                          );
+                  },
                 ),
               ),
             ),
-            actions: [
-              TextButton(
-                child: const Text(
-                  'Cancel',
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+          ),
+          actions: [
+            TextButton(
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white),
               ),
-              CustomElevatedButton(
-                text: "Book Now",
-                onPressed: widget.start != null
-                    ? () async {
-                        try {
-                          final currentUserId = _auth.currentUser!.uid;
-                          final currentUserName = await userDatabaseService
-                              .getCurrentUserName(currentUserId);
-                          Navigator.of(context).pop();
-                          if (await isProfileCreated()) {
-                            Duration difference =
-                                widget.end!.difference(widget.start!);
-                            int numberOfDays = difference.inDays;
-                            final amount = widget.price * numberOfDays;
-                            final carModel = '${widget.brand} ${widget.model}';
-                            await notificationService.sendNotificationToOwner(
-                              currentUserId,
-                              widget.ownerFcmToken,
-                              currentUserName,
-                              widget.ownerId,
-                              carModel,
-                              amount,
-                              widget.carId,
-                              widget.start!,
-                              widget.end!,
-                            );
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            CustomElevatedButton(
+              text: "Book Now",
+              onPressed: dateRangeProvider.startDate != null &&
+                      dateRangeProvider.endDate != null
+                  ? () async {
+                      try {
+                        final currentUserId = _auth.currentUser!.uid;
+                        final currentUserName = await userDatabaseService
+                            .getCurrentUserName(currentUserId);
+                        Navigator.of(context).pop();
+                        if (await isProfileCreated()) {
+                          Duration difference = dateRangeProvider.endDate!
+                              .difference(dateRangeProvider.startDate!);
+                          int numberOfDays = difference.inDays;
+                          final amount = widget.price * numberOfDays;
+                          final carModel = '${widget.brand} ${widget.model}';
+                          await notificationService.sendNotificationToOwner(
+                            currentUserId,
+                            widget.ownerFcmToken,
+                            currentUserName,
+                            widget.ownerId,
+                            carModel,
+                            amount,
+                            widget.carId,
+                            dateRangeProvider.startDate!,
+                            dateRangeProvider.endDate!,
+                          );
 
-                            showSnackbar(
-                                "Booking request has sent to the owner, Please wait for the response");
-                          } else {
-                            showCreateProfileDialogue(context,
-                                'Please create a profile to create a booking.');
-                          }
-                        } catch (e) {
                           showSnackbar(
-                              "Could not send request. Try after some time");
-                          // ignore: avoid_print
-                          print(e.toString());
+                              "Booking request has been sent to the owner. Please wait for the response");
+                        } else {
+                          showCreateProfileDialogue(context,
+                              'Please create a profile to create a booking.');
                         }
+                      } catch (e) {
+                        showSnackbar(
+                            "Could not send request. Please try again later.");
+                        // ignore: avoid_print
+                        print(e.toString());
                       }
-                    : () {
-                        showSnackbar("Select Date range");
-                      },
-                paddingHorizontal: 8,
-                paddingVertical: 8,
-              ),
-            ],
-          );
-        });
+                    }
+                  : () {
+                      showSnackbar("Select Date range");
+                    },
+              paddingHorizontal: 8,
+              paddingVertical: 8,
+            ),
+          ],
+        );
       },
     );
   }
@@ -559,21 +570,27 @@ class _CarDetailsState extends State<CarDetails> {
     return false;
   }
 
-  void customDateRangePicker(BuildContext context, StateSetter setState) {
-    return showCustomDateRangePicker(context,
-        dismissible: true,
-        minimumDate: DateTime.now(),
-        maximumDate: DateTime(2030),
-        backgroundColor: themeColorGrey,
-        startDate: widget.start,
-        endDate: widget.end, onApplyClick: (startDate, endDate) {
-      setState(() {
-        widget.start = startDate;
-        widget.end = endDate;
-      });
-    }, onCancelClick: () {
-      Navigator.pop(context);
-    }, primaryColor: Colors.blue);
+  void customDateRangePicker(BuildContext context) {
+    final dateRangeProvider =
+        Provider.of<BookingDateRangeProvider>(context, listen: false);
+    context.read<BookingDateRangeProvider>().startDate = null;
+    context.read<BookingDateRangeProvider>().endDate = null;
+    return showCustomDateRangePicker(
+      context,
+      dismissible: true,
+      minimumDate: DateTime.now(),
+      maximumDate: DateTime(2030),
+      backgroundColor: themeColorGrey,
+      onApplyClick: (startDate, endDate) {
+        // Update the startDate and endDate inside the provider.
+        dateRangeProvider.dateRangePicker(startDate, endDate);
+      },
+      onCancelClick: () {
+        dateRangeProvider.cancelDateRange();
+        Navigator.pop(context);
+      },
+      primaryColor: Colors.blue,
+    );
   }
 
   void showSnackbar(String message) {

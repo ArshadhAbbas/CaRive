@@ -1,13 +1,15 @@
 import 'package:carive/models/custom_user.dart';
+import 'package:carive/providers/register_screen_provider.dart';
 import 'package:carive/providers/search_screen_provider.dart';
 import 'package:carive/screens/host/host_notifications.dart';
+import 'package:carive/screens/splash/splash_screen.dart';
 import 'package:carive/services/auth.dart';
 import 'package:carive/services/firebase__notification_api.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'screens/splash/splash_screen.dart';
+import 'providers/booking_dateRange_provider.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
@@ -18,31 +20,41 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key});
 
   @override
   Widget build(BuildContext context) {
-    return StreamProvider<CustomUser?>.value(
-      value: AuthService().user,
-      initialData: null,
-      catchError: (context, error) {
-        print("StreamProvider Error: $error");
-        return null;
-      },
-      child: ChangeNotifierProvider(
-        create:(context)  => SearchScreenState(),
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Flutter Demo',
-          theme: ThemeData(
-            scaffoldBackgroundColor: Colors.transparent,
-            bottomSheetTheme: BottomSheetThemeData(backgroundColor: Colors.transparent)
-          ),
-          home: SpalshScreen(),
-          routes: {
-            HostNotifications.route: (context) => HostNotifications(),
+    return MultiProvider(
+      providers: [
+        StreamProvider<CustomUser?>.value(
+          value: AuthService().user,
+          initialData: null,
+          catchError: (context, error) {
+            print("StreamProvider Error: $error");
+            return null;
           },
         ),
+        ChangeNotifierProvider<SearchScreenState>(
+            create: (context) => SearchScreenState()),
+        ChangeNotifierProvider<RegisterScreenProvider>(
+            create: (context) => RegisterScreenProvider()),
+        ChangeNotifierProvider<BookingDateRangeProvider>(
+          create: (context) => BookingDateRangeProvider(),
+        ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          scaffoldBackgroundColor: Colors.transparent,
+          bottomSheetTheme:
+              BottomSheetThemeData(backgroundColor: Colors.transparent),
+        ),
+        home: SpalshScreen(),
+        routes: {
+          HostNotifications.route: (context) => HostNotifications(),
+          // Add other routes here if needed.
+        },
       ),
     );
   }

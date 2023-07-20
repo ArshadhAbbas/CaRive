@@ -1,9 +1,13 @@
-import 'package:carive/screens/settings/wishlist/wishlist_screen.dart';
-import 'package:carive/services/auth.dart';
-import 'package:carive/shared/constants.dart';
-import 'package:carive/shared/custom_scaffold.dart';
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import 'package:carive/screens/settings/wishlist/wishlist_screen.dart';
+import 'package:carive/services/auth.dart';
+import 'package:carive/shared/circular_progress_indicator.dart';
+import 'package:carive/shared/constants.dart';
+import 'package:carive/shared/custom_scaffold.dart';
 
 import '../../../services/user_database_service.dart';
 import '../../../shared/custom_elevated_button.dart';
@@ -85,9 +89,17 @@ class SettingsScreen extends StatelessWidget {
                               ),
                               CustomElevatedButton(
                                 text: "Ok",
-                                onPressed: () {
-                                  userDatabaseService
+                                onPressed: () async {
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (context) => const Center(
+                                      child: CustomProgressIndicator(),
+                                    ),
+                                  );
+                                  await userDatabaseService
                                       .deleteUser(_auth.currentUser!.uid);
+                                  Navigator.pop(context);
                                   Navigator.pop(context);
                                 },
                                 paddingHorizontal: 8,

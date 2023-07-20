@@ -41,11 +41,19 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     super.initState();
     // Set the last message as read for the receiver
     String currentUserId = AuthService().auth.currentUser!.uid;
-    userCollectionReference
+    DocumentReference chatReference = userCollectionReference
         .doc(currentUserId)
         .collection('chats')
-        .doc(widget.userId)
-        .update({'lastMessageRead': true});
+        .doc(widget.userId);
+
+    // Check if the chat document exists before updating
+    chatReference.get().then((chatSnapshot) {
+      if (chatSnapshot.exists) {
+        chatReference.update({'lastMessageRead': true});
+      }
+    }).catchError((error) {
+      print('Error updating last message as read: $error');
+    });
   }
 
   @override
@@ -166,11 +174,11 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       filled: true,
                       fillColor: themeColorGrey,
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(30),
                         borderSide: BorderSide(color: themeColorGreen),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(30),
                         borderSide: BorderSide(color: themeColorGreen),
                       ),
                       hintText: "Type message here...",
@@ -178,7 +186,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                wSizedBox10,
                 CircleAvatar(
                   radius: 25,
                   backgroundColor: themeColorGreen,

@@ -28,6 +28,7 @@ class _ChatScreenState extends State<ChatScreen> {
     chatsStream = userCollectionReference
         .doc(currentUserId)
         .collection('chats')
+        .orderBy('timeSent', descending: true) // Add the orderBy clause here
         .snapshots();
   }
 
