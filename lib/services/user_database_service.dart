@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as Path;
@@ -119,96 +120,110 @@ class UserDatabaseService {
     });
     return imageUrl;
   }
-  Future<void> deleteUser(String deleteUid) async {
-  // Delete user's profile image if available
-  final userDocSnapshot = await userCollectionReference.doc(deleteUid).get();
-  final userData = userDocSnapshot.data() as Map<String, dynamic>?;
 
-  if (userData != null) {
-    final imageUrl = userData['image'];
-    if (imageUrl != null && imageUrl.isNotEmpty) {
-      final imageRef = FirebaseStorage.instance.refFromURL(imageUrl);
-      await imageRef.delete();
-    }
+  Future<void> deleteUser(String deleteUid, User? user) async {
+     try {
+        if (user != null) {
+          // Delete the user account
+          await user.delete();
+          print('User account deleted successfully.');
+        } else {
+          print('No user is currently logged in.');
+        }
+      } catch (e) {
+        print(e.toString());
+      }
+    // Delete user's profile image if available
+    final userDocSnapshot = await userCollectionReference.doc(deleteUid).get();
+    final userData = userDocSnapshot.data() as Map<String, dynamic>?;
 
-    // Delete the user's posts
-    final posts = userData['posts'] as List<dynamic>?;
-    if (posts != null && posts.isNotEmpty) {
-      for (final postId in posts) {
-        final carDocRef = carCollectionReference.doc(postId);
-        final carDocSnapshot = await carDocRef.get();
-        if (carDocSnapshot.exists) {
-          final carData = carDocSnapshot.data() as Map<String, dynamic>?;
-          final carImageUrl = carData?['imageUrl'];
+    if (userData != null) {
+      final imageUrl = userData['image'];
+      if (imageUrl != null && imageUrl.isNotEmpty) {
+        final imageRef = FirebaseStorage.instance.refFromURL(imageUrl);
+        await imageRef.delete();
+      }
 
-          // Delete the car document
-          await carDocRef.delete();
+      // Delete the user's posts
+      final posts = userData['posts'] as List<dynamic>?;
+      if (posts != null && posts.isNotEmpty) {
+        for (final postId in posts) {
+          final carDocRef = carCollectionReference.doc(postId);
+          final carDocSnapshot = await carDocRef.get();
+          if (carDocSnapshot.exists) {
+            final carData = carDocSnapshot.data() as Map<String, dynamic>?;
+            final carImageUrl = carData?['imageUrl'];
 
-          // Delete the car's image from Firebase Storage (if applicable)
-          if (carImageUrl != null && carImageUrl.isNotEmpty) {
-            final carImageRef = FirebaseStorage.instance.refFromURL(carImageUrl);
-            await carImageRef.delete();
+            // Delete the car document
+            await carDocRef.delete();
+
+            // Delete the car's image from Firebase Storage (if applicable)
+            if (carImageUrl != null && carImageUrl.isNotEmpty) {
+              final carImageRef =
+                  FirebaseStorage.instance.refFromURL(carImageUrl);
+              await carImageRef.delete();
+            }
           }
         }
       }
+
+      // Delete chat documents for the user with other users
+      await deleteChatDocumentsForUser(deleteUid);
+
+      // Delete the user document itself
+      await userCollectionReference.doc(deleteUid).delete();
+     
+    }
+  }
+
+  Future<void> deleteChatDocumentsForUser(String userId) async {
+    final QuerySnapshot chatsSnapshot =
+        await userCollectionReference.doc(userId).collection('chats').get();
+    final chats = chatsSnapshot.docs;
+
+    // Delete chat documents for the current user with other users
+    for (final chat in chats) {
+      await deleteChatDocuments(userId, chat.id);
+    }
+  }
+
+  Future<void> deleteChatDocuments(String user1Id, String user2Id) async {
+    // Delete chat document for user1 with user2
+    await userCollectionReference
+        .doc(user1Id)
+        .collection("chats")
+        .doc(user2Id)
+        .delete();
+
+    // Delete all messages for user1 with user2
+    final user1MessagesRef = userCollectionReference
+        .doc(user1Id)
+        .collection("chats")
+        .doc(user2Id)
+        .collection("messages");
+    final user1MessagesSnapshot = await user1MessagesRef.get();
+    for (final messageDoc in user1MessagesSnapshot.docs) {
+      await messageDoc.reference.delete();
     }
 
-    // Delete chat documents for the user with other users
-    await deleteChatDocumentsForUser(deleteUid);
+    // Delete chat document for user2 with user1
+    await userCollectionReference
+        .doc(user2Id)
+        .collection("chats")
+        .doc(user1Id)
+        .delete();
 
-    // Delete the user document itself
-    await userCollectionReference.doc(deleteUid).delete();
+    // Delete all messages for user2 with user1
+    final user2MessagesRef = userCollectionReference
+        .doc(user2Id)
+        .collection("chats")
+        .doc(user1Id)
+        .collection("messages");
+    final user2MessagesSnapshot = await user2MessagesRef.get();
+    for (final messageDoc in user2MessagesSnapshot.docs) {
+      await messageDoc.reference.delete();
+    }
   }
-}
-
-Future<void> deleteChatDocumentsForUser(String userId) async {
-  final QuerySnapshot chatsSnapshot =
-      await userCollectionReference.doc(userId).collection('chats').get();
-  final chats = chatsSnapshot.docs;
-
-  // Delete chat documents for the current user with other users
-  for (final chat in chats) {
-    await deleteChatDocuments(userId, chat.id);
-  }
-}
-
-Future<void> deleteChatDocuments(String user1Id, String user2Id) async {
-  // Delete chat document for user1 with user2
-  await userCollectionReference
-      .doc(user1Id)
-      .collection("chats")
-      .doc(user2Id)
-      .delete();
-
-  // Delete all messages for user1 with user2
-  final user1MessagesRef = userCollectionReference
-      .doc(user1Id)
-      .collection("chats")
-      .doc(user2Id)
-      .collection("messages");
-  final user1MessagesSnapshot = await user1MessagesRef.get();
-  for (final messageDoc in user1MessagesSnapshot.docs) {
-    await messageDoc.reference.delete();
-  }
-
-  // Delete chat document for user2 with user1
-  await userCollectionReference
-      .doc(user2Id)
-      .collection("chats")
-      .doc(user1Id)
-      .delete();
-
-  // Delete all messages for user2 with user1
-  final user2MessagesRef = userCollectionReference
-      .doc(user2Id)
-      .collection("chats")
-      .doc(user1Id)
-      .collection("messages");
-  final user2MessagesSnapshot = await user2MessagesRef.get();
-  for (final messageDoc in user2MessagesSnapshot.docs) {
-    await messageDoc.reference.delete();
-  }
-}
 
   Future<void> addFcmToken(String uid, String? fcmToken) async {
     try {

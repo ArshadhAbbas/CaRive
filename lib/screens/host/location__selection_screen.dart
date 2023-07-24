@@ -1,3 +1,6 @@
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
+
+import 'package:carive/providers/location_selection_provider.dart';
 import 'package:carive/shared/circular_progress_indicator.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_elevated_button.dart';
@@ -6,11 +9,12 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 
 class LocationSelectionScreen extends StatefulWidget {
-  final Function(LatLng)? onLocationSelected;
   const LocationSelectionScreen({Key? key, this.onLocationSelected})
       : super(key: key);
+  final Function(LatLng)? onLocationSelected;
 
   @override
   _LocationSelectionScreenState createState() =>
@@ -18,11 +22,17 @@ class LocationSelectionScreen extends StatefulWidget {
 }
 
 class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
-  String address = "Choose Location";
   late GoogleMapController googleMapController;
-  Set<Marker> markers = {}; // Set to hold the selected marker
-  LatLng? selectedLatLng; // Variable to store the selected LatLng
-  bool isCurrentLocationSelected = false;
+
+  @override
+  void initState() {
+    context.read<LocationSelectionProvider>().address = "Choose Location";
+    context.read<LocationSelectionProvider>().markers = {};
+    context.read<LocationSelectionProvider>().selectedLatLng = null;
+    context.read<LocationSelectionProvider>().isCurrentLocationSelected = false;
+    super.initState();
+  }
+
   @override
   void dispose() {
     googleMapController.dispose();
@@ -38,17 +48,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
 
   void onMapTap(LatLng latLng) {
     getAddress(latLng);
-    setState(() {
-      markers = {}; // Clear existing markers
-      selectedLatLng = latLng; // Set selected LatLng
-      isCurrentLocationSelected = false;
-      markers.add(
-        Marker(
-          markerId: MarkerId('selected_location'),
-          position: latLng,
-        ),
-      );
-    });
+    context.read<LocationSelectionProvider>().setMarkerEmpty();
+    context.read<LocationSelectionProvider>().setLatLng(latLng);
+    context.read<LocationSelectionProvider>().setCurrentLocationFalse();
+    context.read<LocationSelectionProvider>().addMarkers(latLng);
   }
 
   Future<LatLng> getCurrentLocation() async {
@@ -65,29 +68,19 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => Center(
+        builder: (context) => const Center(
           child: CustomProgressIndicator(),
         ),
       );
-
 
       LatLng currentLocation = await getCurrentLocation();
       Navigator.of(context).pop();
 
       getAddress(currentLocation);
-
-      setState(() {
-        markers = {}; // Clear existing markers
-        selectedLatLng =
-            currentLocation; // Set selected LatLng to current location
-        markers.add(
-          Marker(
-            markerId: MarkerId('selected_location'),
-            position: currentLocation,
-          ),
-        );
-        isCurrentLocationSelected = true;
-      });
+      context.read<LocationSelectionProvider>().setMarkerEmpty();
+      context.read<LocationSelectionProvider>().setLatLng(currentLocation);
+      context.read<LocationSelectionProvider>().addMarkers(currentLocation);
+      context.read<LocationSelectionProvider>().setCurrentLocationTrue();
 
       // Animate the camera to the current location
       googleMapController.animateCamera(
@@ -109,19 +102,14 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
   getAddress(LatLng latLong) async {
     List<Placemark> placemark =
         await placemarkFromCoordinates(latLong.latitude, latLong.longitude);
-    setState(() {
-      address = placemark[0].subLocality! +
-          " " +
-          placemark[0].locality! +
-          " " +
-          placemark[0].country!;
-    });
+    context.read<LocationSelectionProvider>().setAddress(
+        "${placemark[0].subLocality!} ${placemark[0].locality!} ${placemark[0].country!}");
   }
 
   void onCheckIconPressed() {
-    if (selectedLatLng != null) {
-      LatLng selectedLocation = selectedLatLng!;
-
+    if (context.read<LocationSelectionProvider>().selectedLatLng != null) {
+      LatLng selectedLocation =
+          context.read<LocationSelectionProvider>().selectedLatLng!;
       // Call the onLocationSelected callback with the selected location
       widget.onLocationSelected?.call(selectedLocation);
     }
@@ -135,15 +123,15 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
           backgroundColor: themeColorGrey,
           title: Text(
             title,
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
           ),
           content: Text(
             content,
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('OK'),
+              child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -162,7 +150,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
         actions: [
           TextButton(
               onPressed: onCheckIconPressed,
-              child: Text(
+              child: const Text(
                 "Done",
                 style: TextStyle(color: Colors.white),
               )),
@@ -174,14 +162,14 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
             initialCameraPosition: initialCameraPosition,
             onMapCreated: onMapCreated,
             onTap: onMapTap,
-            markers: markers,
+            markers: context.watch<LocationSelectionProvider>().markers!,
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Align(
                 alignment: Alignment.topCenter,
                 child: CustomElevatedButton(
-                  text: address,
+                  text: context.watch<LocationSelectionProvider>().address!,
                   onPressed: () {},
                   paddingHorizontal: 3,
                   paddingVertical: 3,
@@ -192,10 +180,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: themeColorGrey,
         foregroundColor: Colors.white,
-        child: Icon(Icons.my_location),
         onPressed: onCurrentLocationIconPressed,
         heroTag: 'current_location',
         tooltip: "Current Location",
+        child: const Icon(Icons.my_location),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
     );

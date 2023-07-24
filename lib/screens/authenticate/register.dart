@@ -55,6 +55,7 @@ class _RegisterState extends State<Register> {
                   ),
                   hSizedBox30,
                   CustomTextFormField(
+                    keyBoardType: TextInputType.emailAddress,
                     hintText: 'Email',
                     labelText: 'Email',
                     controller: emailController,

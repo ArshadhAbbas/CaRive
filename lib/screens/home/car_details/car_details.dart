@@ -296,7 +296,7 @@ class _CarDetailsState extends State<CarDetails> {
                                               borderRadius:
                                                   BorderRadius.circular(10),
                                               child: Image.network(
-                                                "${userData!.image}",
+                                                userData!.image,
                                                 fit: BoxFit.cover,
                                               ),
                                             ),
@@ -307,20 +307,20 @@ class _CarDetailsState extends State<CarDetails> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                "${userData!.name}",
+                                                userData!.name,
                                                 style: const TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 22),
                                               ),
                                               const Spacer(),
                                               Text(
-                                                "${userData!.address}",
+                                                userData!.address,
                                                 style: const TextStyle(
                                                     color: Colors.white),
                                               ),
                                               const Spacer(),
                                               Text(
-                                                "${userData!.phoneNumber}",
+                                                userData!.phoneNumber,
                                                 style: const TextStyle(
                                                     color: Colors.white),
                                               ),
@@ -452,105 +452,105 @@ class _CarDetailsState extends State<CarDetails> {
 //
 
   Future<dynamic> bookingDialogueBox(BuildContext context) {
-    final dateRangeProvider =
-        Provider.of<BookingDateRangeProvider>(context, listen: false);
-    context.read<BookingDateRangeProvider>().startDate = null;
-    context.read<BookingDateRangeProvider>().endDate = null;
     return showDialog(
       context: context,
       builder: (context1) {
-        return AlertDialog(
-          titleTextStyle: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-          contentTextStyle: const TextStyle(color: Colors.white),
-          backgroundColor: themeColorGrey,
-          content: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: themeColorGreen),
-            ),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
+        return Consumer<BookingDateRangeProvider>(
+          builder: (context, dateRangeProvider, _) {
+            // dateRangeProvider.startDate = null;
+            // dateRangeProvider.endDate = null;
+
+            return AlertDialog(
+              titleTextStyle: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
-              onPressed: () {
-                customDateRangePicker(context);
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(18.0),
-                child: Consumer<BookingDateRangeProvider>(
-                  builder: (context, dateRangeProvider, _) {
-                    return dateRangeProvider.startDate == null
+              contentTextStyle: const TextStyle(color: Colors.white),
+              backgroundColor: themeColorGrey,
+              content: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: themeColorGreen),
+                ),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                  ),
+                  onPressed: () {
+                    customDateRangePicker(context);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(18.0),
+                    child: dateRangeProvider.startDate == null
                         ? const Text("Select Date Range")
                         : Text(
                             '${dateRangeProvider.startDate != null ? DateFormat("dd/MMM/yyyy").format(dateRangeProvider.startDate!) : '-'} - ${dateRangeProvider.endDate != null ? DateFormat("dd/MMM/yyyy").format(dateRangeProvider.endDate!) : '-'}',
-                          );
-                  },
+                          ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: const Text(
-                'Cancel',
-                style: TextStyle(color: Colors.white),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            CustomElevatedButton(
-              text: "Book Now",
-              onPressed: dateRangeProvider.startDate != null &&
-                      dateRangeProvider.endDate != null
-                  ? () async {
-                      try {
-                        final currentUserId = _auth.currentUser!.uid;
-                        final currentUserName = await userDatabaseService
-                            .getCurrentUserName(currentUserId);
-                        Navigator.of(context).pop();
-                        if (await isProfileCreated()) {
-                          Duration difference = dateRangeProvider.endDate!
-                              .difference(dateRangeProvider.startDate!);
-                          int numberOfDays = difference.inDays;
-                          final amount = widget.price * numberOfDays;
-                          final carModel = '${widget.brand} ${widget.model}';
-                          await notificationService.sendNotificationToOwner(
-                            currentUserId,
-                            widget.ownerFcmToken,
-                            currentUserName,
-                            widget.ownerId,
-                            carModel,
-                            amount,
-                            widget.carId,
-                            dateRangeProvider.startDate!,
-                            dateRangeProvider.endDate!,
-                          );
+              actions: [
+                TextButton(
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                CustomElevatedButton(
+                  text: "Book Now",
+                  onPressed: dateRangeProvider.startDate != null &&
+                          dateRangeProvider.endDate != null
+                      ? () async {
+                          try {
+                            final currentUserId = _auth.currentUser!.uid;
+                            final currentUserName = await userDatabaseService
+                                .getCurrentUserName(currentUserId);
+                            Navigator.of(context).pop();
+                            if (await isProfileCreated()) {
+                              Duration difference = dateRangeProvider.endDate!
+                                  .difference(dateRangeProvider.startDate!);
+                              int numberOfDays = difference.inDays;
+                              final amount = widget.price * numberOfDays;
+                              final carModel =
+                                  '${widget.brand} ${widget.model}';
+                              await notificationService.sendNotificationToOwner(
+                                currentUserId,
+                                widget.ownerFcmToken,
+                                currentUserName,
+                                widget.ownerId,
+                                carModel,
+                                amount,
+                                widget.carId,
+                                dateRangeProvider.startDate!,
+                                dateRangeProvider.endDate!,
+                              );
 
-                          showSnackbar(
-                              "Booking request has been sent to the owner. Please wait for the response");
-                        } else {
-                          showCreateProfileDialogue(context,
-                              'Please create a profile to create a booking.');
+                              showSnackbar(
+                                  "Booking request has been sent to the owner. Please wait for the response");
+                            } else {
+                              showCreateProfileDialogue(context,
+                                  'Please create a profile to create a booking.');
+                            }
+                          } catch (e) {
+                            showSnackbar(
+                                "Could not send request. Please try again later.");
+                            // ignore: avoid_print
+                            print(e.toString());
+                          }
                         }
-                      } catch (e) {
-                        showSnackbar(
-                            "Could not send request. Please try again later.");
-                        // ignore: avoid_print
-                        print(e.toString());
-                      }
-                    }
-                  : () {
-                      showSnackbar("Select Date range");
-                    },
-              paddingHorizontal: 8,
-              paddingVertical: 8,
-            ),
-          ],
+                      : () {
+                          showSnackbar("Select Date range");
+                        },
+                  paddingHorizontal: 8,
+                  paddingVertical: 8,
+                ),
+              ],
+            );
+          },
         );
       },
     );

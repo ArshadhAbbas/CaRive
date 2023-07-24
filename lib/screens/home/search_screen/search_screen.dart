@@ -24,31 +24,29 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   AuthService auth = AuthService();
   final CarService carService = CarService();
-  late String query;
   late TextEditingController searchController;
 
- @override
-void initState() {
-  query = '';
-  searchController = TextEditingController();
-  final searchScreenStateVariables =
-      Provider.of<SearchScreenState>(context, listen: false);
-  searchScreenStateVariables.selectedFuel = null;
-  searchScreenStateVariables.selectedSeatCapacity = null;
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    searchScreenStateVariables.updatePriceRange(const RangeValues(1000, 10000));
-  });
-  
-  super.initState();
-}
+  @override
+  void initState() {
+    searchController = TextEditingController();
+    final searchScreenStateVariables =
+        Provider.of<SearchScreenState>(context, listen: false);
+    searchScreenStateVariables.selectedFuel = null;
+    searchScreenStateVariables.selectedSeatCapacity = null;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      searchScreenStateVariables
+          .updatePriceRange(const RangeValues(1000, 10000));
+    });
+    context.read<SearchScreenState>().searchQuery = '';
+
+    super.initState();
+  }
 
   @override
   void dispose() {
     searchController.dispose();
     super.dispose();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -81,18 +79,18 @@ void initState() {
                         child: TextFormField(
                           controller: searchController,
                           onChanged: (value) {
-                            setState(() {
-                              query = value;
-                            });
+                            context
+                                .read<SearchScreenState>()
+                                .updateSearchQuery(value);
                           },
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             suffixIcon: IconButton(
                               onPressed: () {
-                                setState(() {
-                                  query = '';
-                                  searchController.clear();
-                                });
+                                context
+                                    .read<SearchScreenState>()
+                                    .updateSearchQuery('');
+                                searchController.clear();
                               },
                               icon: Icon(
                                 Icons.clear,
@@ -157,7 +155,8 @@ void initState() {
           final selectedFuel = car.fuelType;
           final carPrice = car.amount;
 
-          final searchQuery = query.toLowerCase();
+          final searchQuery =
+              context.read<SearchScreenState>().searchQuery!.toLowerCase();
           return (carModel.contains(searchQuery) ||
                   carBrand.contains(searchQuery)) &&
               (searchScreenState.selectedSeatCapacity == null ||

@@ -1,9 +1,9 @@
 import 'dart:ui';
 
+import 'package:carive/screens/host/new_or_edit_cars.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import 'package:carive/screens/host/edit_cars/edit_cars.dart';
 import 'package:carive/services/auth.dart';
 import 'package:carive/shared/constants.dart';
 
@@ -79,8 +79,7 @@ class _HostYourCarsState extends State<HostYourCars> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (context, index) {
-                        final car =
-                            cars[index].data() as Map<String, dynamic>;
+                        final car = cars[index].data() as Map<String, dynamic>;
                         final carId = car['carId'];
                         final carName = car['carModel'];
                         final carImage = car['imageUrl'];
@@ -100,7 +99,8 @@ class _HostYourCarsState extends State<HostYourCars> {
                           onTap: () {
                             Navigator.of(context)
                                 .push(MaterialPageRoute(builder: (context) {
-                              return EditCarScreen(
+                              return NewOrEditCarScreen(
+                                actionType: ActionType.editCar,
                                 isAvailable: isAvailable,
                                 latitude: latitude,
                                 longitude: longitude,
@@ -115,12 +115,26 @@ class _HostYourCarsState extends State<HostYourCars> {
                                 image: carImage,
                               );
                             }));
+                            //   return EditCarScreen(
+                            //     isAvailable: isAvailable,
+                            //     latitude: latitude,
+                            //     longitude: longitude,
+                            //     carId: carId,
+                            //     selectedCarModel: carName,
+                            //     selectedMake: carMake,
+                            //     selectedFuel: fuelType,
+                            //     selectedSeatCapacity: seatCapacity,
+                            //     modelYear: modelYear,
+                            //     amount: amount,
+                            //     location: location,
+                            //     image: carImage,
+                            //   );
+                            // }));
                           },
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(25),
                             child: BackdropFilter(
-                              filter:
-                                  ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
                               child: Container(
                                 height: 400,
                                 decoration: BoxDecoration(
@@ -158,18 +172,16 @@ class _HostYourCarsState extends State<HostYourCars> {
                                             style: const TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 16,
-                                                fontWeight:
-                                                    FontWeight.bold),
+                                                fontWeight: FontWeight.bold),
                                           ),
                                           Row(
                                             children: [
                                               SizedBox(
                                                   width: 10,
                                                   child: CircleAvatar(
-                                                    backgroundColor:
-                                                        isAvailable
-                                                            ? Colors.green
-                                                            : Colors.red,
+                                                    backgroundColor: isAvailable
+                                                        ? Colors.green
+                                                        : Colors.red,
                                                   )),
                                               const SizedBox(
                                                 width: 5,
@@ -202,8 +214,7 @@ class _HostYourCarsState extends State<HostYourCars> {
                                               style: const TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 15),
-                                              overflow:
-                                                  TextOverflow.ellipsis,
+                                              overflow: TextOverflow.ellipsis,
                                               maxLines: 1,
                                             ),
                                           )
@@ -212,8 +223,7 @@ class _HostYourCarsState extends State<HostYourCars> {
                                       Expanded(
                                         child: Row(
                                           mainAxisAlignment:
-                                              MainAxisAlignment
-                                                  .spaceBetween,
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Row(
                                               mainAxisAlignment:
@@ -222,8 +232,7 @@ class _HostYourCarsState extends State<HostYourCars> {
                                                 Text(
                                                   "₹$carPrice",
                                                   style: TextStyle(
-                                                      color:
-                                                          themeColorGreen),
+                                                      color: themeColorGreen),
                                                 ),
                                                 const Text(
                                                   "/day",

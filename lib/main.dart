@@ -1,4 +1,6 @@
 import 'package:carive/models/custom_user.dart';
+import 'package:carive/providers/bottom_navbar_provider.dart';
+import 'package:carive/providers/location_selection_provider.dart';
 import 'package:carive/providers/register_screen_provider.dart';
 import 'package:carive/providers/search_screen_provider.dart';
 import 'package:carive/screens/host/host_notifications.dart';
@@ -9,7 +11,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'providers/add_car_provider.dart';
 import 'providers/booking_dateRange_provider.dart';
+import 'providers/cusom_textfromfield_provider.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
@@ -35,12 +39,26 @@ class MyApp extends StatelessWidget {
           },
         ),
         ChangeNotifierProvider<SearchScreenState>(
-            create: (context) => SearchScreenState()),
+          create: (context) => SearchScreenState(),
+        ),
         ChangeNotifierProvider<RegisterScreenProvider>(
-            create: (context) => RegisterScreenProvider()),
+          create: (context) => RegisterScreenProvider(),
+        ),
         ChangeNotifierProvider<BookingDateRangeProvider>(
           create: (context) => BookingDateRangeProvider(),
         ),
+        ChangeNotifierProvider<AddCarProvider>(
+          create: (context) => AddCarProvider(),
+        ),
+        ChangeNotifierProvider<CustomTextFormFieldProvider>(
+          create: (context) => CustomTextFormFieldProvider(),
+        ),
+        ChangeNotifierProvider<BottomNavBarProvider>(
+          create: (context) => BottomNavBarProvider(),
+        ),
+        ChangeNotifierProvider<LocationSelectionProvider>(
+          create: (context) => LocationSelectionProvider(),
+        )
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

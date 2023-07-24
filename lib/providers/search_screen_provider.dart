@@ -7,6 +7,13 @@ class SearchScreenState extends ChangeNotifier {
   RangeLabels priceRangeLabels = const RangeLabels('1000', '10000');
   int? minPrice;
   int? maxPrice;
+  String? searchQuery;
+
+  void updateSearchQuery(String query)
+  {
+    searchQuery=query;
+    notifyListeners();
+  }
 
   void updateSelectedFuel(String? value) {
     selectedFuel = value;

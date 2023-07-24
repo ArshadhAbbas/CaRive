@@ -1,6 +1,6 @@
 import 'package:carive/screens/host/host_notifications.dart';
 import 'package:carive/screens/host/host_your_cars.dart';
-import 'package:carive/screens/host/new_post/new_post_screen.dart';
+import 'package:carive/screens/host/new_or_edit_cars.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_scaffold.dart';
 import 'package:flutter/material.dart';
@@ -56,9 +56,16 @@ class HostScreen extends StatelessWidget {
         floatingActionButton: FloatingActionButton.extended(
           backgroundColor: themeColorGreen,
           onPressed: () {
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => NewPostScreen()),
+            // );
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => NewPostScreen()),
+              MaterialPageRoute(
+                  builder: (context) => NewOrEditCarScreen(
+                        actionType: ActionType.addNewCar,
+                      )),
             );
           },
           label: Row(

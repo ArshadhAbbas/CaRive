@@ -190,9 +190,7 @@ class _CreateProfileState extends State<CreateProfile> {
                       hSizedBox20,
                       hSizedBox30,
                       Center(
-                        child:
-                        
-                            CustomElevatedButton(
+                        child: CustomElevatedButton(
                           text: "Save",
                           onPressed: () async {
                             dismissKeyboard(context);
@@ -225,7 +223,6 @@ class _CreateProfileState extends State<CreateProfile> {
                                   await userDatabaseService.addUser(userUID,
                                       name, address, number, email, fcmToken!);
                                   Navigator.of(context).pop();
-
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Center(

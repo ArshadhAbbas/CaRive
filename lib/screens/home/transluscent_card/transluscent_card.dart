@@ -1,10 +1,10 @@
 import 'dart:ui';
 
+import 'package:carive/screens/host/new_or_edit_cars.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:carive/screens/home/car_details/car_details.dart';
-import 'package:carive/screens/host/edit_cars/edit_cars.dart';
 import 'package:carive/shared/constants.dart';
 
 // ignore: must_be_immutable
@@ -95,7 +95,8 @@ class TransluscentCard extends StatelessWidget {
                         ),
                         Text(
                           isAvailable ? "Available" : "Unavailable",
-                          style: const TextStyle(fontSize: 12, color: Colors.white),
+                          style: const TextStyle(
+                              fontSize: 12, color: Colors.white),
                         ),
                       ],
                     )
@@ -113,7 +114,8 @@ class TransluscentCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           location,
-                          style: const TextStyle(color: Colors.white, fontSize: 15),
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 15),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),
@@ -184,8 +186,10 @@ class TransluscentCard extends StatelessWidget {
                               ),
                               child: const Text("Edit"),
                               onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => EditCarScreen(
+                                Navigator.of(context)
+                                    .push(MaterialPageRoute(builder: (context) {
+                                  return NewOrEditCarScreen(
+                                    actionType: ActionType.editCar,
                                     isAvailable: isAvailable,
                                     latitude: latitude,
                                     longitude: longitude,
@@ -198,8 +202,8 @@ class TransluscentCard extends StatelessWidget {
                                     modelYear: modelYear,
                                     selectedSeatCapacity: seatCapacity,
                                     selectedFuel: fuelType,
-                                  ),
-                                ));
+                                  );
+                                }));
                               },
                             )
                     ],

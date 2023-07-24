@@ -98,7 +98,7 @@ class SettingsScreen extends StatelessWidget {
                                     ),
                                   );
                                   await userDatabaseService
-                                      .deleteUser(_auth.currentUser!.uid);
+                                      .deleteUser(_auth.currentUser!.uid,_auth.currentUser);
                                   Navigator.pop(context);
                                   Navigator.pop(context);
                                 },
