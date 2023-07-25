@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'dart:ui';
 
@@ -104,7 +106,7 @@ class _CreateProfileState extends State<CreateProfile> {
                                       child: BackdropFilter(
                                         filter: ImageFilter.blur(
                                             sigmaX: 15, sigmaY: 15),
-                                        child: Container(
+                                        child: SizedBox(
                                           height: 180,
                                           width: 180,
                                           child: Image(
@@ -198,7 +200,7 @@ class _CreateProfileState extends State<CreateProfile> {
                               showDialog(
                                 context: context,
                                 barrierDismissible: false,
-                                builder: (context) => Center(
+                                builder: (context) => const Center(
                                   child: CustomProgressIndicator(),
                                 ),
                               );
@@ -236,7 +238,7 @@ class _CreateProfileState extends State<CreateProfile> {
                                     SnackBar(
                                       content:
                                           Center(child: Text(e.toString())),
-                                      duration: Duration(seconds: 3),
+                                      duration: const Duration(seconds: 3),
                                     ),
                                   );
                                 }

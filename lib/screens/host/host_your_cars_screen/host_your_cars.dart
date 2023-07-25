@@ -1,13 +1,15 @@
 import 'dart:ui';
 
-import 'package:carive/screens/host/new_or_edit_cars.dart';
+import 'package:carive/screens/host/new_or_edit_cars_screen/new_or_edit_cars.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:carive/services/auth.dart';
 import 'package:carive/shared/constants.dart';
+import 'package:lottie/lottie.dart';
 
-import '../../shared/circular_progress_indicator.dart';
+import '../../../models/car_model.dart';
+import '../../../shared/circular_progress_indicator.dart';
 
 class HostYourCars extends StatefulWidget {
   const HostYourCars({Key? key}) : super(key: key);
@@ -40,10 +42,17 @@ class _HostYourCarsState extends State<HostYourCars> {
             final List<String> postIds = List<String>.from(user['posts'] ?? []);
 
             if (postIds.isEmpty) {
-              return const Center(
-                child: Text(
-                  'No cars available.',
-                  style: TextStyle(color: Colors.white),
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Lottie.asset('assets/animation_lkgtfp7w.json',
+                        height: MediaQuery.of(context).size.height / 3),
+                    const Text(
+                      'No Cars Available.',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
                 ),
               );
             }
@@ -79,21 +88,7 @@ class _HostYourCarsState extends State<HostYourCars> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (context, index) {
-                        final car = cars[index].data() as Map<String, dynamic>;
-                        final carId = car['carId'];
-                        final carName = car['carModel'];
-                        final carImage = car['imageUrl'];
-                        final carLocation = car['location'];
-                        final carPrice = car['amount'];
-                        final carMake = car['make'];
-                        final fuelType = car['fuelType'];
-                        final seatCapacity = car['seatCapacity'];
-                        final modelYear = car['modelYear'];
-                        final location = car['location'];
-                        final amount = car['amount'];
-                        final latitude = car['latitude'];
-                        final longitude = car['longitude'];
-                        final isAvailable = car['isAvailable'];
+                        final car = CarModel.fromSnapshot(cars[index]);
 
                         return GestureDetector(
                           onTap: () {
@@ -101,35 +96,20 @@ class _HostYourCarsState extends State<HostYourCars> {
                                 .push(MaterialPageRoute(builder: (context) {
                               return NewOrEditCarScreen(
                                 actionType: ActionType.editCar,
-                                isAvailable: isAvailable,
-                                latitude: latitude,
-                                longitude: longitude,
-                                carId: carId,
-                                selectedCarModel: carName,
-                                selectedMake: carMake,
-                                selectedFuel: fuelType,
-                                selectedSeatCapacity: seatCapacity,
-                                modelYear: modelYear,
-                                amount: amount,
-                                location: location,
-                                image: carImage,
+                                isAvailable: car.isAvailable,
+                                latitude: car.latitude,
+                                longitude: car.longitude,
+                                carId: car.carId,
+                                selectedCarModel: car.carModel,
+                                selectedMake: car.make,
+                                selectedFuel: car.fuelType,
+                                selectedSeatCapacity: car.seatCapacity,
+                                modelYear: car.modelYear,
+                                amount: car.amount,
+                                location: car.location,
+                                image: car.imageUrl,
                               );
                             }));
-                            //   return EditCarScreen(
-                            //     isAvailable: isAvailable,
-                            //     latitude: latitude,
-                            //     longitude: longitude,
-                            //     carId: carId,
-                            //     selectedCarModel: carName,
-                            //     selectedMake: carMake,
-                            //     selectedFuel: fuelType,
-                            //     selectedSeatCapacity: seatCapacity,
-                            //     modelYear: modelYear,
-                            //     amount: amount,
-                            //     location: location,
-                            //     image: carImage,
-                            //   );
-                            // }));
                           },
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(25),
@@ -157,7 +137,7 @@ class _HostYourCarsState extends State<HostYourCars> {
                                           borderRadius:
                                               BorderRadius.circular(20),
                                           child: Image.network(
-                                            carImage,
+                                            car.imageUrl,
                                             fit: BoxFit.cover,
                                           ),
                                         ),
@@ -167,7 +147,7 @@ class _HostYourCarsState extends State<HostYourCars> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            carName,
+                                            car.carModel,
                                             overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(
                                                 color: Colors.white,
@@ -179,15 +159,16 @@ class _HostYourCarsState extends State<HostYourCars> {
                                               SizedBox(
                                                   width: 10,
                                                   child: CircleAvatar(
-                                                    backgroundColor: isAvailable
-                                                        ? Colors.green
-                                                        : Colors.red,
+                                                    backgroundColor:
+                                                        car.isAvailable
+                                                            ? Colors.green
+                                                            : Colors.red,
                                                   )),
                                               const SizedBox(
                                                 width: 5,
                                               ),
                                               Text(
-                                                isAvailable
+                                                car.isAvailable
                                                     ? "Available"
                                                     : "Unavailable",
                                                 style: const TextStyle(
@@ -210,7 +191,7 @@ class _HostYourCarsState extends State<HostYourCars> {
                                           wSizedBox10,
                                           Expanded(
                                             child: Text(
-                                              carLocation,
+                                              car.location,
                                               style: const TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 15),
@@ -230,7 +211,7 @@ class _HostYourCarsState extends State<HostYourCars> {
                                                   MainAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  "₹$carPrice",
+                                                  "₹${car.amount}",
                                                   style: TextStyle(
                                                       color: themeColorGreen),
                                                 ),

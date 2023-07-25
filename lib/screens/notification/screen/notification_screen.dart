@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../../keys/keys.dart';
 import '../../../services/order_history_service.dart';
@@ -15,7 +16,7 @@ import '../../../shared/custom_elevated_button.dart';
 
 // ignore: must_be_immutable
 class NotificationScreen extends StatefulWidget {
-  NotificationScreen({super.key});
+  const NotificationScreen({super.key});
 
   @override
   State<NotificationScreen> createState() => _NotificationScreenState();
@@ -49,10 +50,17 @@ class _NotificationScreenState extends State<NotificationScreen> {
             if (snapshot.hasData) {
               final notifications = snapshot.data!.docs;
               if (notifications.isEmpty) {
-                return const Center(
-                  child: Text(
-                    'No notifications available.',
-                    style: TextStyle(color: Colors.white),
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Lottie.asset('assets/animation_lkgq12zp.json',
+                          height: MediaQuery.of(context).size.height / 4),
+                      const Text(
+                        'No notifications available.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
                   ),
                 );
               }
@@ -154,7 +162,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   void handlePaymentErrorResponse(PaymentFailureResponse response) {
     showAlertDialog(context, "Payment Failed", "${response.message}");
-    print("${response.message}");
   }
 
   void handlePaymentSuccessResponse(PaymentSuccessResponse response) async {
@@ -238,9 +245,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       backgroundColor: themeColorGrey,
-      titleTextStyle: TextStyle(
+      titleTextStyle: const TextStyle(
           color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-      contentTextStyle: TextStyle(color: Colors.white),
+      contentTextStyle: const TextStyle(color: Colors.white),
       title: Text(title),
       content: Text(message),
       actions: [

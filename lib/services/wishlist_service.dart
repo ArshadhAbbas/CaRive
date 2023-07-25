@@ -9,8 +9,7 @@ class WishListService {
         "wishlistedCars": FieldValue.arrayUnion([carId]),
       });
     } catch (e) {
-      print("An error occurred while adding the car to wishList: $e");
-      throw e;
+      rethrow;
     }
   }
 
@@ -20,7 +19,6 @@ class WishListService {
         "wishlistedCars": FieldValue.arrayRemove([carId]),
       });
     } catch (e) {
-      print("An error occurred while removing the post: $e");
       rethrow;
     }
   }

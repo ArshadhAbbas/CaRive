@@ -1,6 +1,7 @@
-import 'package:carive/shared/bottom_nav_bar/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'package:carive/shared/bottom_nav_bar/bottom_nav_bar.dart';
 
 import '../models/custom_user.dart';
 import 'authenticate/signin.dart';
@@ -12,9 +13,9 @@ class Wrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = Provider.of<CustomUser?>(context);
     if (user == null) {
-      return  SignIn();
+      return  const SignIn();
     } else {
-      return  BottomNavBar();
+      return  const BottomNavBar();
     }
   }
 }

@@ -1,7 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:carive/models/user_model.dart';
-import 'package:carive/providers/booking_dateRange_provider.dart';
+import 'package:carive/providers/booking_date_range_provider.dart';
 import 'package:carive/services/wishlist_service.dart';
 import 'package:custom_date_range_picker/custom_date_range_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -103,184 +103,267 @@ class _CarDetailsState extends State<CarDetails> {
         userData = UserModel.fromDocumentSnapshot(snapshot.data!);
 
         return CustomScaffold(
-          child: SafeArea(
-            child: Stack(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  child: Image.network(
-                    widget.image,
-                    height: MediaQuery.of(context).size.height / 2,
-                    fit: BoxFit.cover,
+          child: Scaffold(
+            body: SafeArea(
+              child: Stack(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: Image.network(
+                      widget.image,
+                      height: MediaQuery.of(context).size.height / 2,
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                ),
-                IconButton(
-                  icon: const CircleAvatar(
-                    radius: 16,
-                    backgroundColor: Color(0xFF3E515F),
-                    child:
-                        Icon(Icons.arrow_back_ios_rounded, color: Colors.white),
+                  IconButton(
+                    icon: const CircleAvatar(
+                      radius: 16,
+                      backgroundColor: Color(0xFF3E515F),
+                      child: Icon(Icons.arrow_back_ios_rounded,
+                          color: Colors.white),
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  child: StreamBuilder<List<String>>(
-                      stream: wishListService
-                          .getWishListStream(_auth.currentUser!.uid),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const CircularProgressIndicator();
-                        }
-                        final wishList = snapshot.data ?? [];
-                        final isInWishList = wishList.contains(widget.carId);
-                        return IconButton(
-                          tooltip: isInWishList
-                              ? "Remove from wishlist"
-                              : "Add to wishlist",
-                          icon: CircleAvatar(
-                              radius: 16,
-                              backgroundColor: themeColorGrey,
-                              child: isInWishList
-                                  ? Image.asset(
-                                      'assets/favorited.png',
-                                      color: themeColorGreen,
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: StreamBuilder<List<String>>(
+                        stream: wishListService
+                            .getWishListStream(_auth.currentUser!.uid),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          }
+                          final wishList = snapshot.data ?? [];
+                          final isInWishList = wishList.contains(widget.carId);
+                          return IconButton(
+                            tooltip: isInWishList
+                                ? "Remove from wishlist"
+                                : "Add to wishlist",
+                            icon: CircleAvatar(
+                                radius: 16,
+                                backgroundColor: themeColorGrey,
+                                child: isInWishList
+                                    ? Image.asset(
+                                        'assets/favorited.png',
+                                        color: themeColorGreen,
+                                      )
+                                    : Image.asset(
+                                        'assets/non-favorite.png',
+                                        color: Colors.white,
+                                      )),
+                            onPressed: () async {
+                              if (isInWishList) {
+                                await wishListService.removeFromWishList(
+                                    _auth.currentUser!.uid, widget.carId);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Car removed from Wishlist.'),
+                                    duration: Duration(seconds: 1),
+                                  ),
+                                );
+                              } else {
+                                await wishListService.addToWishList(
+                                    _auth.currentUser!.uid, widget.carId);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Car added to Wishlist.'),
+                                    duration: Duration(seconds: 1),
+                                  ),
+                                );
+                              }
+                            },
+                          );
+                        }),
+                  ),
+                  DraggableScrollableSheet(
+                    initialChildSize: 0.6,
+                    maxChildSize: 0.8,
+                    minChildSize: 0.6,
+                    builder: (context, scrollController) {
+                      return SingleChildScrollView(
+                        controller: scrollController,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: themeColorGrey,
+                              borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  topRight: Radius.circular(20))),
+                          clipBehavior: Clip.hardEdge,
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Center(
+                                  child: Container(
+                                    width: 60,
+                                    height: 4,
+                                    decoration: BoxDecoration(
+                                        color: const Color.fromARGB(
+                                            255, 66, 66, 66),
+                                        borderRadius:
+                                            BorderRadius.circular(30)),
+                                  ),
+                                ),
+                                hSizedBox10,
+                                Text(
+                                  "${widget.brand} ${widget.model}",
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 30),
+                                ),
+                                hSizedBox10,
+                                Text(
+                                  "₹${widget.price}/Day",
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 30),
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        hSizedBox10,
+                                        Text(
+                                          widget.location,
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                        hSizedBox10,
+                                        Text(
+                                          widget.isAvailable
+                                              ? "Available"
+                                              : "Unavailable",
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                      ],
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Seat Capacity : ${widget.seatCapacity}",
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                        hSizedBox10,
+                                        Text(
+                                          "Fuel Type : ${widget.fuelType}",
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                        hSizedBox10,
+                                        Text(
+                                          "Model Year : ${widget.modelYear}",
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                      ],
                                     )
-                                  : Image.asset(
-                                      'assets/non-favorite.png',
-                                      color: Colors.white,
-                                    )),
-                          onPressed: () async {
-                            if (isInWishList) {
-                              await wishListService.removeFromWishList(
-                                  _auth.currentUser!.uid, widget.carId);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Car removed from Wishlist.'),
-                                  duration: Duration(seconds: 1),
+                                  ],
                                 ),
-                              );
-                            } else {
-                              await wishListService.addToWishList(
-                                  _auth.currentUser!.uid, widget.carId);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Car added to Wishlist.'),
-                                  duration: Duration(seconds: 1),
+                                hSizedBox20,
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "Owner Info",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 22),
+                                    ),
+                                    hSizedBox10,
+                                    buildOwnerData(context),
+                                    hSizedBox20,
+                                    GestureDetector(
+                                      onTap: () async {
+                                        _mapLauncher(LatLng(
+                                            widget.latitude, widget.longitude));
+                                      },
+                                      child: Container(
+                                        height:
+                                            MediaQuery.of(context).size.height /
+                                                3,
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: themeColorGreen),
+                                            borderRadius:
+                                                BorderRadius.circular(20)),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          child: GoogleMap(
+                                              markers: {
+                                                Marker(
+                                                  markerId: const MarkerId(
+                                                      'carLocation'),
+                                                  position: LatLng(
+                                                      widget.latitude,
+                                                      widget.longitude),
+                                                ),
+                                              },
+                                              initialCameraPosition:
+                                                  CameraPosition(
+                                                      target: LatLng(
+                                                          widget.latitude,
+                                                          widget.longitude),
+                                                      zoom: 8)),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              );
-                            }
-                          },
-                        );
-                      }),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                ],
+              ),
+            ),
+            bottomSheet: Padding(
+              padding: const EdgeInsets.only(top: 60),
+              child: SizedBox(
+                height: 60,
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    widget.isAvailable ? bookingDialogueBox(context) : null;
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: widget.isAvailable
+                        ? MaterialStateProperty.all(const Color(0xFF198396))
+                        : MaterialStateProperty.all(
+                            const Color.fromARGB(255, 110, 128, 131)),
+                  ),
+                  child: Text(
+                    "Book Now",
+                    style: TextStyle(
+                        color: widget.isAvailable ? Colors.white : Colors.grey),
+                  ),
                 ),
-                DraggableScrollableSheet(
-                  initialChildSize: 0.6,
-                  maxChildSize: 0.8,
-                  minChildSize: 0.6,
-                  builder: (context, scrollController) {
-                    return SingleChildScrollView(
-                      controller: scrollController,
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: themeColorGrey,
-                            borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20))),
-                        clipBehavior: Clip.hardEdge,
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Center(
-                                child: Container(
-                                  width: 60,
-                                  height: 4,
-                                  decoration: BoxDecoration(
-                                      color:
-                                          const Color.fromARGB(255, 66, 66, 66),
-                                      borderRadius: BorderRadius.circular(30)),
-                                ),
-                              ),
-                              hSizedBox10,
-                              Text(
-                                "${widget.brand} ${widget.model}",
-                                style: const TextStyle(
-                                    color: Colors.white, fontSize: 30),
-                              ),
-                              hSizedBox10,
-                              Text(
-                                "₹${widget.price}/Day",
-                                style: const TextStyle(
-                                    color: Colors.white, fontSize: 30),
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      hSizedBox10,
-                                      Text(
-                                        widget.location,
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                      ),
-                                      hSizedBox10,
-                                      Text(
-                                        widget.isAvailable
-                                            ? "Available"
-                                            : "Unavailable",
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                      ),
-                                    ],
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Seat Capacity : ${widget.seatCapacity}",
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                      ),
-                                      hSizedBox10,
-                                      Text(
-                                        "Fuel Type : ${widget.fuelType}",
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                      ),
-                                      hSizedBox10,
-                                      Text(
-                                        "Model Year : ${widget.modelYear}",
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                              hSizedBox20,
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    "Owner Info",
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 22),
-                                  ),
-                                  hSizedBox10,
-                                  Container(
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Container buildOwnerData(BuildContext context) {
+    return Container(
                                     height: 100,
                                     decoration: BoxDecoration(
-                                        border:
-                                            Border.all(color: themeColorGreen),
+                                        border: Border.all(
+                                            color: themeColorGreen),
                                         borderRadius:
                                             BorderRadius.circular(20)),
                                     child: Padding(
@@ -339,8 +422,8 @@ class _CarDetailsState extends State<CarDetails> {
                                                         userName:
                                                             userData!.name,
                                                         userId: userData!.id,
-                                                        fcmToken:
-                                                            userData!.fcmToken,
+                                                        fcmToken: userData!
+                                                            .fcmToken,
                                                       ),
                                                     ),
                                                   );
@@ -358,89 +441,7 @@ class _CarDetailsState extends State<CarDetails> {
                                         ],
                                       ),
                                     ),
-                                  ),
-                                  hSizedBox20,
-                                  GestureDetector(
-                                    onTap: () async {
-                                      _mapLauncher(LatLng(
-                                          widget.latitude, widget.longitude));
-                                    },
-                                    child: Container(
-                                      height: 300,
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                          border: Border.all(
-                                              color: themeColorGreen),
-                                          borderRadius:
-                                              BorderRadius.circular(20)),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(20),
-                                        child: GoogleMap(
-                                            markers: {
-                                              Marker(
-                                                markerId: const MarkerId(
-                                                    'carLocation'),
-                                                position: LatLng(
-                                                    widget.latitude,
-                                                    widget.longitude),
-                                              ),
-                                            },
-                                            initialCameraPosition:
-                                                CameraPosition(
-                                                    target: LatLng(
-                                                        widget.latitude,
-                                                        widget.longitude),
-                                                    zoom: 8)),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              hSizedBox10,
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: () async {
-                                    widget.isAvailable
-                                        ? bookingDialogueBox(context)
-                                        : null;
-                                  },
-                                  style: ButtonStyle(
-                                    shape: MaterialStateProperty.all<
-                                        RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                    ),
-                                    backgroundColor: widget.isAvailable
-                                        ? MaterialStateProperty.all(
-                                            const Color(0xFF198396))
-                                        : MaterialStateProperty.all(
-                                            const Color.fromARGB(
-                                                255, 110, 128, 131)),
-                                  ),
-                                  child: Text(
-                                    "Book Now",
-                                    style: TextStyle(
-                                        color: widget.isAvailable
-                                            ? Colors.white
-                                            : Colors.grey),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                )
-              ],
-            ),
-          ),
-        );
-      },
-    );
+                                  );
   }
 
 //
@@ -457,9 +458,6 @@ class _CarDetailsState extends State<CarDetails> {
       builder: (context1) {
         return Consumer<BookingDateRangeProvider>(
           builder: (context, dateRangeProvider, _) {
-            // dateRangeProvider.startDate = null;
-            // dateRangeProvider.endDate = null;
-
             return AlertDialog(
               titleTextStyle: const TextStyle(
                 color: Colors.white,

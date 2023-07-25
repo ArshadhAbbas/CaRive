@@ -1,16 +1,17 @@
-import 'package:carive/providers/search_screen_provider.dart';
-import 'package:carive/shared/cars_list.dart';
-import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
+import 'package:provider/provider.dart';
 
 import 'package:carive/models/car_model.dart';
+import 'package:carive/providers/search_screen_provider.dart';
 import 'package:carive/screens/home/transluscent_card/transluscent_card.dart';
 import 'package:carive/services/auth.dart';
 import 'package:carive/services/car_database_service.dart';
+import 'package:carive/shared/cars_list.dart';
 import 'package:carive/shared/constants.dart';
+import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:carive/shared/custom_scaffold.dart';
-import 'package:provider/provider.dart';
 
 import '../../../shared/circular_progress_indicator.dart';
 
@@ -76,39 +77,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: TextFormField(
-                          controller: searchController,
-                          onChanged: (value) {
-                            context
-                                .read<SearchScreenState>()
-                                .updateSearchQuery(value);
-                          },
-                          style: const TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            suffixIcon: IconButton(
-                              onPressed: () {
-                                context
-                                    .read<SearchScreenState>()
-                                    .updateSearchQuery('');
-                                searchController.clear();
-                              },
-                              icon: Icon(
-                                Icons.clear,
-                                color: themeColorGreen,
-                              ),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(color: themeColorGreen),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(color: themeColorGreen),
-                            ),
-                            hintText: "Search for Brand, Model",
-                            hintStyle: TextStyle(color: themeColorblueGrey),
-                          ),
-                        ),
+                        child: buildSearchField(context),
                       ),
                       IconButton(
                         icon: Icon(
@@ -126,6 +95,38 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  TextFormField buildSearchField(BuildContext context) {
+    return TextFormField(
+      controller: searchController,
+      onChanged: (value) {
+        context.read<SearchScreenState>().updateSearchQuery(value);
+      },
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        suffixIcon: IconButton(
+          onPressed: () {
+            context.read<SearchScreenState>().updateSearchQuery('');
+            searchController.clear();
+          },
+          icon: Icon(
+            Icons.clear,
+            color: themeColorGreen,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide(color: themeColorGreen),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide(color: themeColorGreen),
+        ),
+        hintText: "Search for Brand, Model",
+        hintStyle: TextStyle(color: themeColorblueGrey),
       ),
     );
   }
@@ -170,10 +171,17 @@ class _SearchScreenState extends State<SearchScreen> {
         }).toList();
 
         if (filteredCars.isEmpty) {
-          return const Center(
-            child: Text(
-              'No Results Found',
-              style: TextStyle(color: Colors.white),
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Lottie.asset('assets/animation_lkgtssru.json',
+                    height: MediaQuery.of(context).size.height / 4),
+                const Text(
+                  'No Search Result.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
             ),
           );
         }
@@ -218,9 +226,23 @@ class _SearchScreenState extends State<SearchScreen> {
         final searchScreenState = Provider.of<SearchScreenState>(context);
         return AlertDialog(
           backgroundColor: themeColorGrey,
-          title: const Text(
-            "Filter Cars",
-            style: TextStyle(color: Colors.white),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Filter Cars",
+                style: TextStyle(color: Colors.white),
+              ),
+              IconButton(
+                icon: const Icon(
+                  Icons.close,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
           ),
           content: SingleChildScrollView(
             child: Column(
@@ -318,9 +340,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
                 hSizedBox10,
                 RangeSlider(
-                  divisions: 18,
+                  divisions: 180,
                   activeColor: themeColorGreen,
-                  min: 1000,
+                  min: 100,
                   max: 10000,
                   values: searchScreenState.priceRange,
                   labels: searchScreenState.priceRangeLabels,
@@ -332,7 +354,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "₹1000",
+                      "₹100",
                       style: TextStyle(color: Colors.white),
                     ),
                     Text(
@@ -349,7 +371,7 @@ class _SearchScreenState extends State<SearchScreen> {
               onPressed: () {
                 searchScreenState.updateSelectedFuel(null);
                 searchScreenState.updateSelectedSeatCapacity(null);
-                searchScreenState.updatePriceRange(RangeValues(1000, 10000));
+                searchScreenState.updatePriceRange(const RangeValues(1000, 10000));
                 Navigator.pop(context);
               },
               text: "Clear filters",

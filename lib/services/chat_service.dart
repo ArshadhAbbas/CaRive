@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:carive/models/chat_model.dart';
 import 'package:carive/services/firebase__notification_api.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

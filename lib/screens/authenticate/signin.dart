@@ -1,5 +1,8 @@
-import 'package:carive/screens/authenticate/forgot_password.dart';
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
+
+import 'package:carive/screens/authenticate/forgot_password.dart';
 import 'package:carive/screens/authenticate/register.dart';
 import 'package:carive/services/auth.dart';
 import 'package:carive/shared/constants.dart';
@@ -104,7 +107,7 @@ class _SignInState extends State<SignIn> {
                               isScrollControlled: true,
                               context: context,
                               builder: (context) {
-                                return Wrap(
+                                return const Wrap(
                                   children: [
                                     Register(),
                                   ],
@@ -190,7 +193,7 @@ class _SignInState extends State<SignIn> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => Center(
+        builder: (context) => const Center(
           child: CustomProgressIndicator(),
         ),
       );
@@ -199,8 +202,6 @@ class _SignInState extends State<SignIn> {
         emailController.text.trim(),
         passwordController.text.trim(),
       );
-
-      // Check if the widget is still mounted before continuing
       if (mounted) {
         Navigator.of(context).pop();
 
@@ -209,8 +210,6 @@ class _SignInState extends State<SignIn> {
               "Sign In Failed!", "Incorrect username or password.");
         } else if (result == 'user-not-found') {
           _showErrorDialog("Sign In Failed", "User not found.");
-        } else {
-          // If the result is successful, you can proceed with any necessary actions here
         }
       }
     }

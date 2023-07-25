@@ -53,6 +53,12 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
     context.read<LocationSelectionProvider>().setCurrentLocationFalse();
     context.read<LocationSelectionProvider>().addMarkers(latLng);
   }
+  getAddress(LatLng latLong) async {
+    List<Placemark> placemark =
+        await placemarkFromCoordinates(latLong.latitude, latLong.longitude);
+    context.read<LocationSelectionProvider>().setAddress(
+        "${placemark[0].subLocality!} ${placemark[0].locality!} ${placemark[0].country!}");
+  }
 
   Future<LatLng> getCurrentLocation() async {
     final Position position = await Geolocator.getCurrentPosition(
@@ -82,35 +88,26 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
       context.read<LocationSelectionProvider>().addMarkers(currentLocation);
       context.read<LocationSelectionProvider>().setCurrentLocationTrue();
 
-      // Animate the camera to the current location
       googleMapController.animateCamera(
         CameraUpdate.newLatLngZoom(
-            currentLocation, 15), // Adjust the zoom level as needed
+            currentLocation, 15), 
       );
     } else if (permissionStatus.isDenied ||
         permissionStatus.isPermanentlyDenied) {
-      // Handle permission denied or permanently denied
       showPermissionAlertDialog('Permission Denied',
           'Location permission has been denied by the user.');
     } else if (permissionStatus.isRestricted) {
-      // Handle permission restricted
       showPermissionAlertDialog(
           'Permission Restricted', 'Location permission is restricted.');
     }
   }
 
-  getAddress(LatLng latLong) async {
-    List<Placemark> placemark =
-        await placemarkFromCoordinates(latLong.latitude, latLong.longitude);
-    context.read<LocationSelectionProvider>().setAddress(
-        "${placemark[0].subLocality!} ${placemark[0].locality!} ${placemark[0].country!}");
-  }
+  
 
   void onCheckIconPressed() {
     if (context.read<LocationSelectionProvider>().selectedLatLng != null) {
       LatLng selectedLocation =
           context.read<LocationSelectionProvider>().selectedLatLng!;
-      // Call the onLocationSelected callback with the selected location
       widget.onLocationSelected?.call(selectedLocation);
     }
   }

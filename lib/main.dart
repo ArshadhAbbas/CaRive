@@ -1,18 +1,21 @@
+// ignore_for_file: use_key_in_widget_constructors
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:carive/models/custom_user.dart';
 import 'package:carive/providers/bottom_navbar_provider.dart';
 import 'package:carive/providers/location_selection_provider.dart';
 import 'package:carive/providers/register_screen_provider.dart';
 import 'package:carive/providers/search_screen_provider.dart';
-import 'package:carive/screens/host/host_notifications.dart';
+import 'package:carive/screens/host/host_notifications/host_notifications.dart';
 import 'package:carive/screens/splash/splash_screen.dart';
 import 'package:carive/services/auth.dart';
 import 'package:carive/services/firebase__notification_api.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'providers/add_car_provider.dart';
-import 'providers/booking_dateRange_provider.dart';
+import 'providers/booking_date_range_provider.dart';
 import 'providers/cusom_textfromfield_provider.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -34,7 +37,6 @@ class MyApp extends StatelessWidget {
           value: AuthService().user,
           initialData: null,
           catchError: (context, error) {
-            print("StreamProvider Error: $error");
             return null;
           },
         ),
@@ -66,11 +68,11 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           scaffoldBackgroundColor: Colors.transparent,
           bottomSheetTheme:
-              BottomSheetThemeData(backgroundColor: Colors.transparent),
+              const BottomSheetThemeData(backgroundColor: Colors.transparent),
         ),
-        home: SpalshScreen(),
+        home: const SpalshScreen(),
         routes: {
-          HostNotifications.route: (context) => HostNotifications(),
+          HostNotifications.route: (context) => const HostNotifications(),
           // Add other routes here if needed.
         },
       ),

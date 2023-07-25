@@ -3,7 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class LocationSelectionProvider extends ChangeNotifier {
   String? address;
-  Set<Marker>? markers; // Set to hold the selected marker
+  Set<Marker>? markers; 
   LatLng? selectedLatLng;
   bool? isCurrentLocationSelected;
 

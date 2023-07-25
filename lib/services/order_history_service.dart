@@ -11,7 +11,6 @@ class OrdersHistoryService {
     String startDate,
     String endDate,
   ) async {
-    try {
       final myOrdersCollectionReference =
           userCollectionReference.doc(uid).collection("myOrders").doc();
 
@@ -27,9 +26,6 @@ class OrdersHistoryService {
         'endDate': endDate,
         'orderDate':DateTime.now().toIso8601String()
       });
-    } catch (e) {
-      print("An error occurred while adding the car to orderHistory: $e");
-      throw e;
-    }
+   
   }
 }

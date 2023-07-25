@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:carive/screens/home/car_details/car_details.dart';
 import 'package:carive/services/wishlist_service.dart';
 import 'package:carive/shared/circular_progress_indicator.dart';
@@ -6,11 +8,12 @@ import 'package:carive/shared/custom_scaffold.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
-enum menuItem { open, remove }
+enum MenuItem { open, remove }
 
 class WishListScreen extends StatefulWidget {
-  WishListScreen({Key? key}) : super(key: key);
+  const WishListScreen({Key? key}) : super(key: key);
 
   @override
   State<WishListScreen> createState() => _WishListScreenState();
@@ -60,10 +63,17 @@ class _WishListScreenState extends State<WishListScreen> {
                   title: const Text("WishList"),
                   centerTitle: false,
                 ),
-                body: const Center(
-                  child: Text(
-                    'No cars in the wishlist.',
-                    style: TextStyle(color: Colors.white),
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Lottie.asset('assets/animation_lkgtfp7w.json',
+                          height: MediaQuery.of(context).size.height / 3),
+                      const Text(
+                        'No Cars in the wish list.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -99,9 +109,16 @@ class _WishListScreenState extends State<WishListScreen> {
                         centerTitle: false,
                       ),
                       body: Center(
-                        child: Text(
-                          'Your wishList is Empty',
-                          style: TextStyle(color: Colors.white),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Lottie.asset('assets/animation_lkgtfp7w.json',),
+                                // height: MediaQuery.of(context).size.height / 1),
+                            const Text(
+                              'No Cars in the wish list.',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -154,16 +171,16 @@ class _WishListScreenState extends State<WishListScreen> {
                                 ),
                                 title: Text(
                                   "$carMake $carName",
-                                  style: TextStyle(color: Colors.white),
+                                  style: const TextStyle(color: Colors.white),
                                 ),
                                 subtitle: Text(
                                   "$carLocation",
                                   style: TextStyle(color: themeColorblueGrey),
                                 ),
-                                trailing: PopupMenuButton<menuItem>(
+                                trailing: PopupMenuButton<MenuItem>(
                                   color: Colors.white,
                                   onSelected: (value) async {
-                                    if (value == menuItem.open) {
+                                    if (value == MenuItem.open) {
                                       Navigator.of(context)
                                           .push(MaterialPageRoute(
                                         builder: (context) => CarDetails(
@@ -182,7 +199,7 @@ class _WishListScreenState extends State<WishListScreen> {
                                             isAvailable: isAvailable,
                                             ownerFcmToken: ownerFcmToken),
                                       ));
-                                    } else if (value == menuItem.remove) {
+                                    } else if (value == MenuItem.remove) {
                                       await wishListService.removeFromWishList(
                                           _auth.currentUser!.uid, carId);
                                       ScaffoldMessenger.of(context)
@@ -196,19 +213,19 @@ class _WishListScreenState extends State<WishListScreen> {
                                     }
                                   },
                                   itemBuilder: (BuildContext context) => [
-                                    const PopupMenuItem<menuItem>(
-                                      value: menuItem.open,
+                                    const PopupMenuItem<MenuItem>(
+                                      value: MenuItem.open,
                                       child: Text('Open'),
                                     ),
-                                    const PopupMenuItem<menuItem>(
-                                      value: menuItem.remove,
+                                    const PopupMenuItem<MenuItem>(
+                                      value: MenuItem.remove,
                                       child: Text('Remove from wishlist'),
                                     ),
                                   ],
                                 ),
                               );
                             },
-                            separatorBuilder: (context, index) => Divider(),
+                            separatorBuilder: (context, index) => const Divider(),
                             itemCount: cars.length)),
                   ),
                 );

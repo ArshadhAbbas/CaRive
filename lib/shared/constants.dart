@@ -33,7 +33,7 @@ void dismissKeyboard(BuildContext context) {
           ),
           content: Text(
             message,
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
           ),
           actions: [
             CustomElevatedButton(

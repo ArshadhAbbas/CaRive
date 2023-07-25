@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+// ignore: library_prefixes
 import 'package:path/path.dart' as Path;
 
 class UserDatabaseService {
@@ -28,7 +29,6 @@ class UserDatabaseService {
     String mailId,
     String fcmToken,
   ) async {
-    try {
       String url = await uploadImage(selectedImage!);
       await userCollectionReference.doc(uid).set({
         "id": uid,
@@ -39,10 +39,7 @@ class UserDatabaseService {
         "address": address,
         'fcmToken': fcmToken
       });
-    } catch (e) {
-      print("An error occurred while adding the user: $e");
-      rethrow;
-    }
+    
   }
 
   // Edit user profile
@@ -69,28 +66,20 @@ class UserDatabaseService {
   }
 
   Future<String> getCurrentUserName(String uid) async {
-    try {
       final userSnapshot = await userCollectionReference.doc(uid).get();
       final userData = userSnapshot.data() as Map<String, dynamic>?;
       if (userData != null) {
         return userData['name'] ?? '';
       }
-    } catch (e) {
-      print('An error occurred while getting the user name: $e');
-    }
     return '';
   }
 
   Future<String> getCurrentUserImage(String uid) async {
-    try {
       final userSnapshot = await userCollectionReference.doc(uid).get();
       final userData = userSnapshot.data() as Map<String, dynamic>?;
       if (userData != null) {
         return userData['image'] ?? '';
       }
-    } catch (e) {
-      print('An error occurred while getting the user name: $e');
-    }
     return '';
   }
 
@@ -122,17 +111,10 @@ class UserDatabaseService {
   }
 
   Future<void> deleteUser(String deleteUid, User? user) async {
-     try {
         if (user != null) {
           // Delete the user account
           await user.delete();
-          print('User account deleted successfully.');
-        } else {
-          print('No user is currently logged in.');
         }
-      } catch (e) {
-        print(e.toString());
-      }
     // Delete user's profile image if available
     final userDocSnapshot = await userCollectionReference.doc(deleteUid).get();
     final userData = userDocSnapshot.data() as Map<String, dynamic>?;
@@ -226,36 +208,22 @@ class UserDatabaseService {
   }
 
   Future<void> addFcmToken(String uid, String? fcmToken) async {
-    try {
       await userCollectionReference.doc(uid).update({
         "fcmToken": FieldValue.arrayUnion([fcmToken]),
       });
-    } catch (e) {
-      print("An error occurred while adding the fcm Token: $e");
-      throw e;
-    }
   }
 
   Future<void> addPost(String uid, String postId) async {
-    try {
       await userCollectionReference.doc(uid).update({
         "posts": FieldValue.arrayUnion([postId]),
       });
-    } catch (e) {
-      print("An error occurred while adding the post: $e");
-      throw e;
-    }
   }
 
   Future<void> removePost(String uid, String postId) async {
-    try {
       await userCollectionReference.doc(uid).update({
         "posts": FieldValue.arrayRemove([postId]),
       });
-    } catch (e) {
-      print("An error occurred while removing the post: $e");
-      throw e;
-    }
+   
   }
 
   Future<DocumentSnapshot> getUserData(String uid) async {

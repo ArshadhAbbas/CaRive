@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 
 import 'package:carive/models/user_model.dart';
 import 'package:carive/screens/chat/chat_room_screen.dart';
@@ -52,10 +53,17 @@ class _ChatScreenState extends State<ChatScreen> {
             }
             List<DocumentSnapshot> chatDocuments = snapshot.data!.docs;
             if (chatDocuments.isEmpty) {
-              return const Center(
-                child: Text(
-                  'No chats found.',
-                  style: TextStyle(color: Colors.white),
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Lottie.asset('assets/animation Empty chats.json',
+                        height: MediaQuery.of(context).size.height / 3),
+                    const Text(
+                      'No chats found.',
+                      style: TextStyle(color: Colors.white,fontSize: 20),
+                    ),
+                  ],
                 ),
               );
             }
@@ -105,10 +113,8 @@ class _ChatScreenState extends State<ChatScreen> {
                       if (dateTime.year == currentDate.year &&
                           dateTime.month == currentDate.month &&
                           dateTime.day == currentDate.day) {
-                        // If the chat occurred today, show only the time
                         timeSentText = formattedTime;
                       } else {
-                        // If the chat occurred on any other date, show the full date
                         timeSentText = formattedDate;
                       }
                     }
@@ -128,6 +134,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       subtitle: Text(
                         lastMessage,
                         style: TextStyle(color: themeColorblueGrey),
+                        overflow: TextOverflow.ellipsis,
                       ),
                       trailing: Text(
                         timeSentText,

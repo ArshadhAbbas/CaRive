@@ -5,6 +5,7 @@ import 'package:carive/shared/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../services/auth.dart';
 
@@ -34,33 +35,25 @@ class _HostNotificationsState extends State<HostNotifications> {
     String startDate,
     String endDate,
   ) async {
-    try {
-      final notificationService = NotificationService();
-      final customerFcmToken = await getCustomerFCMToken(customerId);
-      await notificationService.sendApprovalNotificationToCustomer(
-          customerFcmToken,
-          customerId,
-          userId,
-          carModel,
-          amount,
-          carId,
-          startDate,
-          endDate);
-    } catch (e) {
-      print('Error sending approval notification: $e');
-    }
+    final notificationService = NotificationService();
+    final customerFcmToken = await getCustomerFCMToken(customerId);
+    await notificationService.sendApprovalNotificationToCustomer(
+        customerFcmToken,
+        customerId,
+        userId,
+        carModel,
+        amount,
+        carId,
+        startDate,
+        endDate);
   }
 
   Future<void> sendRejectionNotification(
       String customerId, String carModel) async {
-    try {
-      final notificationService = NotificationService();
-      final customerFcmToken = await getCustomerFCMToken(customerId);
-      await notificationService.sendRejectionNotificationToCustomer(
-          customerFcmToken, customerId, userId, carModel);
-    } catch (e) {
-      print('Error sending approval notification: $e');
-    }
+    final notificationService = NotificationService();
+    final customerFcmToken = await getCustomerFCMToken(customerId);
+    await notificationService.sendRejectionNotificationToCustomer(
+        customerFcmToken, customerId, userId, carModel);
   }
 
   @override
@@ -79,10 +72,17 @@ class _HostNotificationsState extends State<HostNotifications> {
             if (snapshot.hasData) {
               final notifications = snapshot.data!.docs;
               if (notifications.isEmpty) {
-                return const Center(
-                  child: Text(
-                    'No notifications available.',
-                    style: TextStyle(color: Colors.white),
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Lottie.asset('assets/animation_lkgq12zp.json',
+                          height: MediaQuery.of(context).size.height / 4),
+                      const Text(
+                        'No notifications available.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
                   ),
                 );
               }
@@ -117,7 +117,7 @@ class _HostNotificationsState extends State<HostNotifications> {
                           backgroundColor: Colors.transparent,
                           backgroundImage: customerImage != null
                               ? NetworkImage(customerImage)
-                              : AssetImage('assets/dp.png')
+                              : const AssetImage('assets/dp.png')
                                   as ImageProvider<Object>,
                         ),
                         title: Text(
@@ -151,13 +151,9 @@ class _HostNotificationsState extends State<HostNotifications> {
                                       .doc(userId)
                                       .collection('ownerNotifications')
                                       .doc(notificationId);
-                                  try {
-                                    await ownerNotificationRef
-                                        .update({'didReply': true});
-                                  } catch (e) {
-                                    print(
-                                        'Error updating "didReply" field in Firestore: $e');
-                                  }
+
+                                  await ownerNotificationRef
+                                      .update({'didReply': true});
                                 },
                               ),
                               IconButton(
@@ -182,13 +178,8 @@ class _HostNotificationsState extends State<HostNotifications> {
                                       .doc(userId)
                                       .collection('ownerNotifications')
                                       .doc(notificationId);
-                                  try {
-                                    await ownerNotificationRef
-                                        .update({'didReply': true});
-                                  } catch (e) {
-                                    print(
-                                        'Error updating "didReply" field in Firestore: $e');
-                                  }
+                                  await ownerNotificationRef
+                                      .update({'didReply': true});
                                 },
                               ),
                             ],

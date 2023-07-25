@@ -1,16 +1,16 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:convert';
 
-import 'package:carive/keys/keys.dart';
-import 'package:carive/main.dart';
-import 'package:carive/screens/host/host_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:carive/keys/keys.dart';
+import 'package:carive/main.dart';
+import 'package:carive/screens/host/host_notifications/host_notifications.dart';
+
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
-  print("Title:${message.notification!.title}");
-  print("Body:${message.notification!.body}");
-  print("PayLoad:${message.data}");
 }
 
 class FirebaseApi {

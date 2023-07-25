@@ -3,7 +3,6 @@
 import 'package:carive/providers/cusom_textfromfield_provider.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class CustomTextFormField extends StatefulWidget {
@@ -89,9 +88,9 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: Colors.red),
+            borderSide: const BorderSide(color: Colors.red),
           ),
-          contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 10),
+          contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
         ),
       );
     });

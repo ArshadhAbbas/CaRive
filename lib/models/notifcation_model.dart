@@ -7,8 +7,8 @@ class OwnerNotificationsModel {
   final String message;
   final String notificationId;
   final String timestamp;
-  final String? startDate; // Nullable startDate
-  final String? endDate;   // Nullable endDate
+  final String? startDate; 
+  final String? endDate;   
 
   OwnerNotificationsModel({
     required this.amount,

@@ -1,16 +1,19 @@
+// ignore_for_file: use_build_context_synchronously, use_key_in_widget_constructors
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
 import 'package:carive/models/chat_model.dart';
 import 'package:carive/services/auth.dart';
 import 'package:carive/services/chat_service.dart';
 import 'package:carive/services/user_database_service.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_scaffold.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class ChatRoomScreen extends StatefulWidget {
-  ChatRoomScreen({
+  const ChatRoomScreen({
     Key? key,
     required this.userImage,
     required this.userName,
@@ -21,6 +24,7 @@ class ChatRoomScreen extends StatefulWidget {
   final String userImage;
   final String userName;
   final String userId;
+  // ignore: prefer_typing_uninitialized_variables
   final fcmToken;
 
   @override
@@ -52,7 +56,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         chatReference.update({'lastMessageRead': true});
       }
     }).catchError((error) {
-      print('Error updating last message as read: $error');
     });
   }
 
@@ -71,7 +74,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  icon: Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_back),
                 ),
                 CircleAvatar(
                   backgroundImage: NetworkImage(widget.userImage),
@@ -98,7 +101,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 }
 
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
+                  return const CircularProgressIndicator();
                 }
 
                 final messages = snapshot.data!.docs
@@ -132,7 +135,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
                             date,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                               // color: Colors.white
@@ -169,7 +172,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 Flexible(
                   child: TextFormField(
                     controller: messageController,
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: themeColorGrey,
@@ -205,7 +208,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       }
                       messageController.clear();
                     },
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.send,
                       color: Colors.white,
                     ),

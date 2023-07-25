@@ -1,12 +1,16 @@
+// ignore_for_file: use_key_in_widget_constructors, use_build_context_synchronously
+
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:carive/shared/circular_progress_indicator.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:carive/shared/custom_text_form_field.dart';
 import 'package:carive/shared/logo.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../services/auth.dart';
+
 import '../../providers/register_screen_provider.dart'; // Import the RegisterScreenProvider
+import '../../services/auth.dart';
 
 class Register extends StatefulWidget {
   const Register({Key? key});
@@ -115,7 +119,7 @@ class _RegisterState extends State<Register> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => Center(
+        builder: (context) => const Center(
           child: CustomProgressIndicator(),
         ),
       );

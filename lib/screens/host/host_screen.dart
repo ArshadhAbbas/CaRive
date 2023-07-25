@@ -1,9 +1,10 @@
-import 'package:carive/screens/host/host_notifications.dart';
-import 'package:carive/screens/host/host_your_cars.dart';
-import 'package:carive/screens/host/new_or_edit_cars.dart';
+import 'package:flutter/material.dart';
+
+import 'package:carive/screens/host/host_notifications/host_notifications.dart';
+import 'package:carive/screens/host/host_your_cars_screen/host_your_cars.dart';
+import 'package:carive/screens/host/new_or_edit_cars_screen/new_or_edit_cars.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_scaffold.dart';
-import 'package:flutter/material.dart';
 
 class HostScreen extends StatelessWidget {
   const HostScreen({Key? key}) : super(key: key);
@@ -42,7 +43,7 @@ class HostScreen extends StatelessWidget {
               const SizedBox(
                 height: 10,
               ),
-              Expanded(
+              const Expanded(
                 child: TabBarView(
                   children: <Widget>[
                     HostYourCars(),
@@ -68,8 +69,8 @@ class HostScreen extends StatelessWidget {
                       )),
             );
           },
-          label: Row(
-            children: const [
+          label: const Row(
+            children: [
               Icon(Icons.add_circle_rounded),
               Text("Post New"),
             ],

@@ -1,6 +1,7 @@
-import 'package:carive/models/custom_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
+import 'package:carive/models/custom_user.dart';
 
 class AuthService {
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -29,7 +30,6 @@ class AuthService {
           return 'email-already-in-use';
         }
       }
-      print(e.toString());
       return null;
     }
   }
@@ -39,7 +39,6 @@ class AuthService {
     try {
       return await auth.signOut();
     } catch (e) {
-      print(e.toString());
       return null;
     }
   }
@@ -57,7 +56,6 @@ class AuthService {
           return 'user-not-found';
         }
       }
-      print(e.toString());
       return null;
     }
   }

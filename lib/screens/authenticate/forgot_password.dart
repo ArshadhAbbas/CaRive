@@ -1,7 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:flutter/material.dart';
+
 import 'package:carive/shared/constants.dart';
 import 'package:carive/shared/custom_elevated_button.dart';
 import 'package:carive/shared/custom_scaffold.dart';
-import 'package:flutter/material.dart';
 
 import '../../services/auth.dart';
 import '../../shared/custom_text_form_field.dart';
@@ -72,7 +75,6 @@ class ForgotPassword extends StatelessWidget {
             duration: Duration(seconds: 3),
           ),
         );
-        print(e.toString());
       }
     }
   }

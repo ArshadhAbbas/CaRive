@@ -35,7 +35,7 @@ class SettingsScreen extends StatelessWidget {
                     text: "My wishlist",
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => WishListScreen(),
+                        builder: (context) => const WishListScreen(),
                       ));
                     },
                     paddingHorizontal: 10,
@@ -62,53 +62,7 @@ class SettingsScreen extends StatelessWidget {
                   child: CustomElevatedButton(
                     text: "Delete my profile",
                     onPressed: () async {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            titleTextStyle: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            contentTextStyle:
-                                const TextStyle(color: Colors.white),
-                            backgroundColor: const Color(0xFF1E1E1E),
-                            title: const Text('Delete !?'),
-                            content: const Text(
-                                'All your posts will be deleted.This action cannot be undone'),
-                            actions: [
-                              TextButton(
-                                child: const Text(
-                                  'Cancel',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              CustomElevatedButton(
-                                text: "Ok",
-                                onPressed: () async {
-                                  showDialog(
-                                    context: context,
-                                    barrierDismissible: false,
-                                    builder: (context) => const Center(
-                                      child: CustomProgressIndicator(),
-                                    ),
-                                  );
-                                  await userDatabaseService
-                                      .deleteUser(_auth.currentUser!.uid,_auth.currentUser);
-                                  Navigator.pop(context);
-                                  Navigator.pop(context);
-                                },
-                                paddingHorizontal: 8,
-                                paddingVertical: 8,
-                              ),
-                            ],
-                          );
-                        },
-                      );
+                      bulidDeleteAccountDialogue(context);
                     },
                     paddingHorizontal: 10,
                     paddingVertical: 15,
@@ -120,44 +74,7 @@ class SettingsScreen extends StatelessWidget {
                   child: CustomElevatedButton(
                     text: "Sign Out",
                     onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            titleTextStyle: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            contentTextStyle:
-                                const TextStyle(color: Colors.white),
-                            backgroundColor: const Color(0xFF1E1E1E),
-                            title: const Text('Sign Out ?'),
-                            content: const Text(
-                                'Are you sure you want to sign out?'),
-                            actions: [
-                              TextButton(
-                                child: const Text(
-                                  'Cancel',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              CustomElevatedButton(
-                                text: "Ok",
-                                onPressed: () async {
-                                  await auth.signout();
-                                  Navigator.of(context).pop();
-                                },
-                                paddingHorizontal: 8,
-                                paddingVertical: 8,
-                              ),
-                            ],
-                          );
-                        },
-                      );
+                      buildSignOutDialogue(context);
                     },
                     paddingHorizontal: 10,
                     paddingVertical: 15,
@@ -168,6 +85,94 @@ class SettingsScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Future<dynamic> buildSignOutDialogue(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          titleTextStyle: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+          contentTextStyle: const TextStyle(color: Colors.white),
+          backgroundColor: const Color(0xFF1E1E1E),
+          title: const Text('Sign Out ?'),
+          content: const Text('Are you sure you want to sign out?'),
+          actions: [
+            TextButton(
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            CustomElevatedButton(
+              text: "Ok",
+              onPressed: () async {
+                await auth.signout();
+                Navigator.of(context).pop();
+              },
+              paddingHorizontal: 8,
+              paddingVertical: 8,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<dynamic> bulidDeleteAccountDialogue(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          titleTextStyle: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+          contentTextStyle: const TextStyle(color: Colors.white),
+          backgroundColor: const Color(0xFF1E1E1E),
+          title: const Text('Delete !?'),
+          content: const Text(
+              'All your posts will be deleted.This action cannot be undone'),
+          actions: [
+            TextButton(
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            CustomElevatedButton(
+              text: "Ok",
+              onPressed: () async {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => const Center(
+                    child: CustomProgressIndicator(),
+                  ),
+                );
+                await userDatabaseService.deleteUser(
+                    _auth.currentUser!.uid, _auth.currentUser);
+                Navigator.pop(context);
+                Navigator.pop(context);
+              },
+              paddingHorizontal: 8,
+              paddingVertical: 8,
+            ),
+          ],
+        );
+      },
     );
   }
 }

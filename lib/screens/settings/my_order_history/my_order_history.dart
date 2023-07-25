@@ -87,7 +87,7 @@ class _MyOrdersHistoryState extends State<MyOrdersHistory> {
                         final formattedEndDate =
                             DateFormat('dd/MM/yyyy').format(endDate);
 
-                            final orderDateString = order['orderDate'] as String;
+                        final orderDateString = order['orderDate'] as String;
                         final orderDate = DateTime.parse(orderDateString);
                         final formattedOrderDateDate =
                             DateFormat('dd/MM/yyyy').format(orderDate);
@@ -105,29 +105,32 @@ class _MyOrdersHistoryState extends State<MyOrdersHistory> {
                                     children: [
                                       Text(
                                         "Order Id: ${order['OrderId']}",
-                                        style: TextStyle(color: Colors.white),
+                                        style: const TextStyle(
+                                            color: Colors.white),
                                       ),
                                       hSizedBox10,
                                       Text(
                                         "Amount paid: ${order['amount']}",
-                                        style: TextStyle(color: Colors.white),
+                                        style: const TextStyle(
+                                            color: Colors.white),
                                       ),
                                       hSizedBox10,
                                       Text(
                                         "Start Date: $formattedStartDate",
-                                        style: TextStyle(color: Colors.white),
+                                        style: const TextStyle(
+                                            color: Colors.white),
                                       ),
                                       hSizedBox10,
                                       Text(
                                         "End Date: $formattedEndDate",
-                                        style: TextStyle(color: Colors.white),
+                                        style: const TextStyle(
+                                            color: Colors.white),
                                       ),
                                     ],
                                   ),
                                 ),
                               ),
                               backgroundColor: themeColorGrey,
-                              onPop: () => print('Popover was popped!'),
                               direction: PopoverDirection.top,
                               width: double.infinity,
                               arrowHeight: 15,
@@ -137,12 +140,12 @@ class _MyOrdersHistoryState extends State<MyOrdersHistory> {
                           child: ListTile(
                             leading: CircleAvatar(
                               radius: 30,
-                              backgroundColor: Color(0xFF3E515F),
+                              backgroundColor: const Color(0xFF3E515F),
                               backgroundImage: NetworkImage(carImage),
                             ),
                             title: Text(
                               "${carData['make']} ${carData['carModel']}",
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                             ),
                             subtitle: Text(
                               "ordered On $formattedOrderDateDate ",
@@ -151,12 +154,12 @@ class _MyOrdersHistoryState extends State<MyOrdersHistory> {
                           ),
                         );
                       } else {
-                        return CustomProgressIndicator();
+                        return const CustomProgressIndicator();
                       }
                     },
                   );
                 },
-                separatorBuilder: (context, index) => Divider(),
+                separatorBuilder: (context, index) => const Divider(),
                 itemCount: orders.length,
               );
             } else if (snapshot.hasError) {
