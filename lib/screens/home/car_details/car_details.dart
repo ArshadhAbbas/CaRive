@@ -179,7 +179,7 @@ class _CarDetailsState extends State<CarDetails> {
                   ),
                   DraggableScrollableSheet(
                     initialChildSize: 0.6,
-                    maxChildSize: 0.8,
+                    maxChildSize: 0.81,
                     minChildSize: 0.6,
                     builder: (context, scrollController) {
                       return SingleChildScrollView(
@@ -317,6 +317,32 @@ class _CarDetailsState extends State<CarDetails> {
                                         ),
                                       ),
                                     ),
+                                    SizedBox(
+                                      // height: 60,
+                                      width: double.infinity,
+                                      child: ElevatedButton(
+                                        onPressed: () async {
+                                          widget.isAvailable
+                                              ? bookingDialogueBox(context)
+                                              : null;
+                                        },
+                                        style: ButtonStyle(
+                                          backgroundColor: widget.isAvailable
+                                              ? MaterialStateProperty.all(
+                                                  const Color(0xFF198396))
+                                              : MaterialStateProperty.all(
+                                                  const Color.fromARGB(
+                                                      255, 110, 128, 131)),
+                                        ),
+                                        child: Text(
+                                          "Book Now",
+                                          style: TextStyle(
+                                              color: widget.isAvailable
+                                                  ? Colors.white
+                                                  : Colors.grey),
+                                        ),
+                                      ),
+                                    )
                                   ],
                                 ),
                               ],
@@ -329,29 +355,7 @@ class _CarDetailsState extends State<CarDetails> {
                 ],
               ),
             ),
-            bottomSheet: Padding(
-              padding: const EdgeInsets.only(top: 60),
-              child: SizedBox(
-                height: 60,
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    widget.isAvailable ? bookingDialogueBox(context) : null;
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: widget.isAvailable
-                        ? MaterialStateProperty.all(const Color(0xFF198396))
-                        : MaterialStateProperty.all(
-                            const Color.fromARGB(255, 110, 128, 131)),
-                  ),
-                  child: Text(
-                    "Book Now",
-                    style: TextStyle(
-                        color: widget.isAvailable ? Colors.white : Colors.grey),
-                  ),
-                ),
-              ),
-            ),
+            // bottomSheet: ,
           ),
         );
       },
@@ -360,88 +364,74 @@ class _CarDetailsState extends State<CarDetails> {
 
   Container buildOwnerData(BuildContext context) {
     return Container(
-                                    height: 100,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: themeColorGreen),
-                                        borderRadius:
-                                            BorderRadius.circular(20)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          SizedBox(
-                                            width: 80,
-                                            height: 80,
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              child: Image.network(
-                                                userData!.image,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          ),
-                                          wSizedBox10,
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                userData!.name,
-                                                style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 22),
-                                              ),
-                                              const Spacer(),
-                                              Text(
-                                                userData!.address,
-                                                style: const TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                              const Spacer(),
-                                              Text(
-                                                userData!.phoneNumber,
-                                                style: const TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                            ],
-                                          ),
-                                          const Spacer(),
-                                          IconButton(
-                                              onPressed: () async {
-                                                if (await isProfileCreated()) {
-                                                  Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ChatRoomScreen(
-                                                        userImage:
-                                                            userData!.image,
-                                                        userName:
-                                                            userData!.name,
-                                                        userId: userData!.id,
-                                                        fcmToken: userData!
-                                                            .fcmToken,
-                                                      ),
-                                                    ),
-                                                  );
-                                                } else {
-                                                  showCreateProfileDialogue(
-                                                      context,
-                                                      'Please create a profile to chat with the owner.');
-                                                }
-                                              },
-                                              icon: const Icon(
-                                                Icons.message,
-                                                color: Colors.white,
-                                                size: 30,
-                                              ))
-                                        ],
-                                      ),
-                                    ),
-                                  );
+      height: 100,
+      decoration: BoxDecoration(
+          border: Border.all(color: themeColorGreen),
+          borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 80,
+              height: 80,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network(
+                  userData!.image,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            wSizedBox10,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  userData!.name,
+                  style: const TextStyle(color: Colors.white, fontSize: 22),
+                ),
+                const Spacer(),
+                Text(
+                  userData!.address,
+                  style: const TextStyle(color: Colors.white),
+                ),
+                const Spacer(),
+                Text(
+                  userData!.phoneNumber,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+            const Spacer(),
+            IconButton(
+                onPressed: () async {
+                  if (await isProfileCreated()) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => ChatRoomScreen(
+                          userImage: userData!.image,
+                          userName: userData!.name,
+                          userId: userData!.id,
+                          fcmToken: userData!.fcmToken,
+                        ),
+                      ),
+                    );
+                  } else {
+                    showErrorDialogue(context, 'Create Profile',
+                        "Please create a profile to chat with the owner.");
+                  }
+                },
+                icon: const Icon(
+                  Icons.message,
+                  color: Colors.white,
+                  size: 30,
+                ))
+          ],
+        ),
+      ),
+    );
   }
 
 //
@@ -483,7 +473,7 @@ class _CarDetailsState extends State<CarDetails> {
                     child: dateRangeProvider.startDate == null
                         ? const Text("Select Date Range")
                         : Text(
-                            '${dateRangeProvider.startDate != null ? DateFormat("dd/MMM/yyyy").format(dateRangeProvider.startDate!) : '-'} - ${dateRangeProvider.endDate != null ? DateFormat("dd/MMM/yyyy").format(dateRangeProvider.endDate!) : '-'}',
+                            '${dateRangeProvider.startDate != null ? DateFormat("dd/MMM").format(dateRangeProvider.startDate!) : '-'} - ${dateRangeProvider.endDate != null ? DateFormat("dd/MMM").format(dateRangeProvider.endDate!) : '-'}',
                           ),
                   ),
                 ),
@@ -530,8 +520,8 @@ class _CarDetailsState extends State<CarDetails> {
                               showSnackbar(
                                   "Booking request has been sent to the owner. Please wait for the response");
                             } else {
-                              showCreateProfileDialogue(context,
-                                  'Please create a profile to create a booking.');
+                              showErrorDialogue(context, 'Create Profile',
+                                  'Please create a profile to create a booking. ');
                             }
                           } catch (e) {
                             showSnackbar(

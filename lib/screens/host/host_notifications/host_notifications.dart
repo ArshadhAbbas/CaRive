@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 
-import '../../services/auth.dart';
+import '../../../services/auth.dart';
 
 class HostNotifications extends StatefulWidget {
   const HostNotifications({Key? key}) : super(key: key);

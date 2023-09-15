@@ -6,7 +6,7 @@
     <uses-feature android:name="android.hardware.location.gps" />
 
    <application
-        android:label="carive"
+        android:label="caRive"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

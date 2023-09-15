@@ -55,8 +55,13 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       if (chatSnapshot.exists) {
         chatReference.update({'lastMessageRead': true});
       }
-    }).catchError((error) {
-    });
+    }).catchError((error) {});
+  }
+
+  @override
+  void dispose() {
+    messageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -196,15 +201,20 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                   child: IconButton(
                     onPressed: () async {
                       if (await isProfileCreated()) {
-                        chatService.sendTextMessage(
-                          auth.auth.currentUser!.uid,
-                          widget.userId,
-                          messageController.text.trim(),
-                          widget.fcmToken,
-                        );
+                        if (messageController.text != '') {
+                          chatService.sendTextMessage(
+                            auth.auth.currentUser!.uid,
+                            widget.userId,
+                            messageController.text.trim(),
+                            widget.fcmToken,
+                          );
+                        } else {
+                          showErrorDialogue(context, "Please type something",
+                              "Cannot be empty");
+                        }
                       } else {
-                        showCreateProfileDialogue(
-                            context, "Create profie to chat");
+                        showErrorDialogue(
+                            context, "Create profie to chat", "CreateProfile");
                       }
                       messageController.clear();
                     },

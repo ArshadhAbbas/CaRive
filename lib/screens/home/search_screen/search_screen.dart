@@ -101,6 +101,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   TextFormField buildSearchField(BuildContext context) {
     return TextFormField(
+      autofocus: true,
       controller: searchController,
       onChanged: (value) {
         context.read<SearchScreenState>().updateSearchQuery(value);
@@ -371,7 +372,8 @@ class _SearchScreenState extends State<SearchScreen> {
               onPressed: () {
                 searchScreenState.updateSelectedFuel(null);
                 searchScreenState.updateSelectedSeatCapacity(null);
-                searchScreenState.updatePriceRange(const RangeValues(1000, 10000));
+                searchScreenState
+                    .updatePriceRange(const RangeValues(1000, 10000));
                 Navigator.pop(context);
               },
               text: "Clear filters",

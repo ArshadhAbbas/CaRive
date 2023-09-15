@@ -149,7 +149,9 @@ class CarService {
   }
 
   Stream<QuerySnapshot> get car {
-    return carCollectionReference.snapshots();
+    return carCollectionReference
+        .orderBy('postDate', descending: true)
+        .snapshots();
   }
 
   void dispose() {

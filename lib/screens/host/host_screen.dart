@@ -25,6 +25,7 @@ class HostScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: TabBar(
+                    labelColor: Colors.white,
                     indicator: BoxDecoration(
                       color: themeColorGreen,
                       borderRadius: BorderRadius.circular(20),

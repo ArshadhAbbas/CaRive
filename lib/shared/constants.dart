@@ -21,14 +21,14 @@ void dismissKeyboard(BuildContext context) {
 }
 
 
- void showCreateProfileDialogue(BuildContext context ,String message) {
+ void showErrorDialogue(BuildContext context ,String message,String title) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: themeColorGrey,
-          title: const Text(
-            'Create Profile',
+          title:  Text(
+            title,
             style: TextStyle(color: Colors.white),
           ),
           content: Text(

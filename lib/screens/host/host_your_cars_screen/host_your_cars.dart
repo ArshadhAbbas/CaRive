@@ -47,7 +47,7 @@ class _HostYourCarsState extends State<HostYourCars> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Lottie.asset('assets/animation_lkgtfp7w.json',
-                        height: MediaQuery.of(context).size.height / 3),
+                        height: MediaQuery.of(context).size.height / 2),
                     const Text(
                       'No Cars Available.',
                       style: TextStyle(color: Colors.white),

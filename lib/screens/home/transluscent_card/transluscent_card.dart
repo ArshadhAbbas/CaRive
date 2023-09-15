@@ -61,8 +61,6 @@ class TransluscentCard extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(
-                  height: 130,
-                  width: 170,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: Image.network(
@@ -141,37 +139,40 @@ class TransluscentCard extends StatelessWidget {
                         ],
                       ),
                       !isCurrentUserOwner
-                          ? ElevatedButton(
-                              style: ButtonStyle(
-                                shape: MaterialStateProperty.all<
-                                    RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
+                          ? Expanded(
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                  shape: MaterialStateProperty.all<
+                                      RoundedRectangleBorder>(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
                                   ),
+                                  backgroundColor: MaterialStateProperty.all(
+                                      const Color(0xFF198396)),
                                 ),
-                                backgroundColor: MaterialStateProperty.all(
-                                    const Color(0xFF198396)),
+                                child: const Text("Explore",
+                                    overflow: TextOverflow.clip, maxLines: 1),
+                                onPressed: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => CarDetails(
+                                        latitude: latitude,
+                                        longitude: longitude,
+                                        carId: carId,
+                                        brand: brand,
+                                        image: image,
+                                        location: location,
+                                        model: model,
+                                        price: price,
+                                        modelYear: modelYear,
+                                        seatCapacity: seatCapacity,
+                                        fuelType: fuelType,
+                                        ownerId: ownerId,
+                                        isAvailable: isAvailable,
+                                        ownerFcmToken: ownerFcmToken),
+                                  ));
+                                },
                               ),
-                              child: const Text("Explore"),
-                              onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => CarDetails(
-                                      latitude: latitude,
-                                      longitude: longitude,
-                                      carId: carId,
-                                      brand: brand,
-                                      image: image,
-                                      location: location,
-                                      model: model,
-                                      price: price,
-                                      modelYear: modelYear,
-                                      seatCapacity: seatCapacity,
-                                      fuelType: fuelType,
-                                      ownerId: ownerId,
-                                      isAvailable: isAvailable,
-                                      ownerFcmToken: ownerFcmToken),
-                                ));
-                              },
                             )
                           : ElevatedButton(
                               style: ButtonStyle(
