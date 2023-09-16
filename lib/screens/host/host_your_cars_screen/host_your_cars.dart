@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:carive/services/auth.dart';
 import 'package:carive/shared/constants.dart';
 import 'package:lottie/lottie.dart';
-
 import '../../../models/car_model.dart';
 import '../../../shared/circular_progress_indicator.dart';
 
@@ -131,8 +130,8 @@ class _HostYourCarsState extends State<HostYourCars> {
                                   child: Column(
                                     children: [
                                       SizedBox(
-                                        height: 130,
-                                        width: 170,
+                                        // height: 130,
+                                        // width: 170,
                                         child: ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(20),
@@ -146,13 +145,15 @@ class _HostYourCarsState extends State<HostYourCars> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            car.carModel,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold),
+                                          Expanded(
+                                            child: Text(
+                                              car.carModel,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
                                           ),
                                           Row(
                                             children: [

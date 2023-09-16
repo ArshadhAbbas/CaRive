@@ -219,6 +219,7 @@ class _NewOrEditCarScreenState extends State<NewOrEditCarScreen> {
         ),
         const Text(
           "Available",
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(color: Colors.white),
         ),
         SizedBox(
@@ -232,7 +233,9 @@ class _NewOrEditCarScreenState extends State<NewOrEditCarScreen> {
             context.read<AddCarProvider>().setIsAvailable(value);
           },
         ),
-        const Text("Unavailable", style: TextStyle(color: Colors.white)),
+        const Text("Unavailable",
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: Colors.white)),
       ],
     );
   }
@@ -537,11 +540,13 @@ class _NewOrEditCarScreenState extends State<NewOrEditCarScreen> {
             onPressed: () async {
               showDialog(
                 context: context,
-                builder: (BuildContext context) {
+                builder: (BuildContext context1) {
                   return AlertDialog(
                     backgroundColor: themeColorGrey,
-                    contentTextStyle: const TextStyle(color: Colors.white,),
-                   title: const Text(
+                    contentTextStyle: const TextStyle(
+                      color: Colors.white,
+                    ),
+                    title: const Text(
                       'Confirm Delete',
                       style: TextStyle(color: Colors.white),
                     ),
