@@ -72,13 +72,15 @@ class TransluscentCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      model,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
+                    Expanded(
+                      child: Text(
+                        model,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),
+                      ),
                     ),
                     Row(
                       children: [
@@ -94,7 +96,9 @@ class TransluscentCard extends StatelessWidget {
                         Text(
                           isAvailable ? "Available" : "Unavailable",
                           style: const TextStyle(
-                              fontSize: 12, color: Colors.white),
+                            fontSize: 12,
+                            color: Colors.white,
+                          ),
                         ),
                       ],
                     )
