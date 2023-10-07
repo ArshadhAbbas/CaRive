@@ -1,4 +1,4 @@
-package com.example.carive
+package com.example.cariveapp
 
 import io.flutter.embedding.android.FlutterActivity
 

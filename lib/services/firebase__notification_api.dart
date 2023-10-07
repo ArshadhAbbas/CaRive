@@ -17,7 +17,7 @@ class FirebaseApi {
   final _firebaseMessaging = FirebaseMessaging.instance;
 
   final _androidChannel = const AndroidNotificationChannel(
-      'com.example.carive', 'carive',
+      'com.example.cariveapp', 'carive',
       description: 'Important Notification',
       importance: Importance.defaultImportance);
   final _localNotifications = FlutterLocalNotificationsPlugin();
